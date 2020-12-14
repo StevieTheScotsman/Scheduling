@@ -1,0 +1,386 @@
+﻿@model List<Scheduling.Models.ProjectDisplay>
+
+
+@{
+    ViewBag.Title = "Generate Reports ";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int NewsstandID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue"));
+
+}
+<!--Used to invoke pdf controller with pdf reporting attribute..click event in reporting.js-->
+@{
+
+    if (Model.Count > 0)
+    {
+        Session["ProjectDisplayResultSet"] = Model;
+
+        Html.BeginForm("ExcelStyleReportsPDFNewsStandReportForCirc", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToPDF" });
+        Html.EndForm();
+
+        Html.BeginForm("ExcelStyleReportsPDFReplicateView", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToPDFReplicateView" });
+        Html.EndForm();
+
+        Html.BeginForm("ExcelStyleReportsViewFormatRevised", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToPDFRevisedView" });
+        Html.EndForm();
+
+    }
+
+
+
+
+}
+<h5>
+    <img src="@Url.Content("~/images/export-to-pdf.jpg")" alt='export-to-pdf' style='width:25px;padding-left:10px' class='export-to-pdf' />
+    <span>On Sale Dates</span>
+</h5>
+
+<h5>
+    <img src="@Url.Content("~/images/export-to-pdf.jpg")" alt='export-to-pdf' style='width:25px;padding-left:10px' class='export-to-pdf-revised-view' /><span>
+        Project Production Schedules
+    </span>
+</h5>
+<div class="container excel-style-results-selector">
+    <!--Filter By Pubcode And Year-->
+    @{ Html.BeginForm("GenerateReportsFiltered", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExcelStyleReportsForm" }); }
+    <div class="sixteen columns">
+        <!--Filter by pubcode-->
+        <div class='four columns'>
+            <span class='pubcode-year-filter'>Filter By PubCode and Year</span>
+        </div>
+        <div class='three columns'>
+            <select name='pubcode' class='list-project-select-filter'>
+                <option value=''>--Choose Pubcode --</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPublicationDropdown(ViewBag.CurrentPubCode))
+            </select>
+        </div>
+        <div class='three columns'>
+            <select name='year' class='list-project-select-filter'>
+                <option value=''>-- Choose Year --</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedYearDropdownForReporting(ViewBag.CurrentYearCode))
+            </select>
+        </div>
+        <div class='three columns'>
+            <input type='submit' class='excel-style-submit-form' />
+        </div>
+        @{ Html.EndForm(); }
+    </div>
+   
+    <!--Filter By Pubcode/Timeline Range/Year-->
+    @{ Html.BeginForm("GenerateReportsFiltered", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExcelStyleReportsFormFilterByTimelineRange" }); }
+    <div class="sixteen columns">
+        <!--Filter by pubcode-->
+        <div class='four columns'>
+            <span class='pubcode-year-filter'>Filter By PubCode/Timeline Range</span>
+        </div>
+        <div class='three columns'>
+            <input type='text' class='monthPicker timelineRangeStart' name='timelineRangeStart' value='@ViewBag.PersistedStart' />
+        </div>
+        <div class='three columns'>
+            <input type='text' class='monthPicker timelineRangeEnd' name='timelineRangeEnd' value='@ViewBag.PersistedStop' />
+        </div>
+        <div class='three columns'>
+            <select name='pubcode-timeline' class='list-project-select-filter-timeline-range' multiple="multiple">
+                <option value=''>All Pubcodes</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedMultiplePublicationDropdown(ViewBag.CurrentPubCodeList))
+            </select>
+        </div>
+        <div class='two columns'>
+            <input type='submit' class='excel-style-submit-form-timeline-range' />
+        </div>
+        @{ Html.EndForm(); }
+    </div>
+    <div class='sixteen columns'>
+        <div class='error-message'>
+        </div>
+    </div>
+</div>
+<div class='excel-style-results'>
+    @{
+          
+        
+             Scheduling.Database.Utility.CreateApplicationLoggingEntry("Entering Model Count Section at " + DateTime.Now);
+       
+
+
+             if (Model.Count > 0)
+             {
+
+                 List<Scheduling.Models.ProjectDisplay> CurrentList = Model as List<Scheduling.Models.ProjectDisplay>;
+                 List<int?> UniquePubCodes = CurrentList.Select(x => x.PubCodeFK).Distinct().ToList();
+
+            <!--Generate header to assist user-->
+            string PubHeader = "Pub Code Report Includes";
+            foreach (int? i in UniquePubCodes)
+            {
+                if (i.HasValue)
+                {
+                    PubHeader += string.Format("...{0}", Scheduling.Database.Utility.GetPubCodeShortDescFromID(i.Value));
+
+                }
+            }
+
+            <h5 style="font-style: italic; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; color: #808080">@PubHeader</h5>
+
+
+
+            foreach (Scheduling.Models.ProjectDisplay pd in CurrentList)
+            {
+                int CurrentCount = Model.IndexOf(pd) + 1;
+                int PubCodeCount = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == pd.PubCodeFK).Count();
+
+
+
+                <div class='project-container'>
+                    <div style='overflow: hidden'>
+                        <div style='float:left'>
+                            <h5 class='main-header'>@Scheduling.Html.ReportingUtilities.GenerateMonthYearHeaderForSingleProject(pd)</h5>
+                        </div>
+                        @{ if (CurrentCount == 1)
+                         {
+                            <div style='float:left;margin-left:60%;'>
+
+                                <h5 class='main-header'>Revised @DateTime.Now.ToShortDateString()</h5>
+                            </div>
+
+                         }
+
+                        }
+
+                        <!--PubCode-->
+                        @{ if (PubCodeCount == 1)
+                         {
+                            <div style='float:right;margin-right:5%;'>
+
+                                <h5 class='main-header'>@Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == pd.PubCodeFK).First().ShortDesc</h5>
+                            </div>
+
+                         }
+                        }
+
+                        <!--stop-->
+                    </div>
+                    @{
+                         int MajorMilestoneCount = Scheduling.Html.ReportingUtilities.GetNumberOfMajorMilestonesForProject(pd.ID);
+
+                         if (MajorMilestoneCount > 0)
+                         {
+
+                             List<string> DescList = Scheduling.Html.ReportingUtilities.GetDistinctSubItemDescriptions(pd.ID);
+
+                             string SortSubItems = System.Configuration.ConfigurationManager.AppSettings["SortSubItemsForReporting"];
+
+                             //start sub item logic
+                             if (SortSubItems.ToUpper() == "TRUE")
+                             {
+                                                                
+                                 DescList = Scheduling.Sorting.DisplaySorting.GetSortedDisplaySequenceFromDbBasedOnPubCodeAndTimeline(pd);
+
+                             }
+
+
+                             List<Scheduling.Models.MilestoneValue> MilestoneValueWithoutParents = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(pd.ID).Where(p => p.ParentID == null).OrderByDescending(x => x.DisplaySortOrder).ToList();
+                             List<Scheduling.Models.ProjectNote> CurrentNotes = Scheduling.Database.Utility.GetProjectNotesFromProjectID(pd.ID);
+                <!--notes start-->
+                             if (@CurrentNotes.Count() > 0)
+                             {
+                                <table>
+                                    <tr>
+                                        <td style='border: none'></td>
+                                        <!--Kpc Job No start-->
+                                        @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.KPCJobNumber).Count() > 0)
+                                        {
+
+                                            string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.KPCJobNumber).First().NoteValue;
+                                            if (!string.IsNullOrWhiteSpace(CurrentVal))
+                                            {
+                                                string DisplayStr = string.Format("KPC Project Number : {0}", CurrentVal);
+                                                <td colspan='4' style='border: none; font-weight: bold'>
+                                                    @DisplayStr
+                                                </td>}
+                                        }
+                                        <!--stop-->
+                                        <!--Quad Job No start-->
+                                        @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.QuadJobNumber).Count() > 0)
+                                        {
+                                            string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.QuadJobNumber).First().NoteValue;
+                                            string DisplayStr = string.Format("Quad Job # : {0}", CurrentVal);
+                                            <td colspan='4' style='border: none; font-weight: bold'>
+                                                @DisplayStr
+                                            </td>
+                                        }
+
+                                        <!--Cross Promo Ads start-->
+                                        @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.NextIssueAndCrossPromo).Count() > 0)
+                                        {
+                                            string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.NextIssueAndCrossPromo).First().NoteValue;
+                                            string DisplayStr = string.Format("Next Issue And Cross Promo Ads : {0}", CurrentVal);
+                                            <td style='border: blue; font-weight: bold; width: 50%'>
+                                                @DisplayStr
+                                            </td>
+                                        }
+                                    </tr>
+                                </table>
+                             }
+                <!--stop-->
+
+                            <table class='top-item-container'>
+                                <tr>
+                                    <td class='empty'></td>
+                                    @{foreach (Scheduling.Models.MilestoneValue TopItem in MilestoneValueWithoutParents)
+                                    {
+                                        string TopValue = Scheduling.Database.Utility.GetAllMilestoneFields().Find(x => x.ID == TopItem.MilestoneFieldFK).Description;
+                                        if (TopItem.MilestoneFieldFK == NewsstandID)
+                                        {
+                                            TopValue = Scheduling.Database.Utility.GetAliasByPubCodeAndMilestoneField(pd.PubCodeFK, TopItem.MilestoneFieldFK, TopValue);
+                                        }
+                                        string cn = string.Format("top-item top-item{0}", TopItem.MilestoneFieldFK);
+                                        <td class='@cn'>
+                                            @TopValue
+                                        </td>
+                                    }
+
+                                    }
+                                </tr>
+                                <!--start parent duedate For n/s date show year as well-->
+                                <tr class='parent-due-date'>
+                                    <td class='empty'></td>
+                                    @{
+                             foreach (Scheduling.Models.MilestoneValue TopItem in MilestoneValueWithoutParents)
+                             {
+                                <td class='parent-due-date'>
+                                    @{
+                                 if (!string.IsNullOrWhiteSpace(TopItem.DueDate))
+                                 {
+
+                                     string[] sa = TopItem.DueDate.Split('/');
+                                     if (TopItem.MilestoneFieldFK == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+                                     {
+                                        <text>@string.Format("{0}/{1}/{2}", sa[0], sa[1], sa[2])</text>
+
+                                     }
+
+                                     else
+                                     {
+                                        <text>@string.Format("{0}/{1}", sa[0], sa[1])</text>
+
+                                     }
+                                 }
+                                    }
+                                </td>
+
+                             }
+
+                                    }
+                                </tr>
+                                <!--stop-->
+                            </table>
+                            <table class='calculation'>
+                                @if (DescList.Count > 0)
+                                {
+
+                                    foreach (string DescItem in DescList)
+                                    {
+                                        <tr>
+                                            <td style='width: 100px'>
+                                                @DescItem
+                                            </td>
+                                            @{ foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueWithoutParents)
+                                             {
+                                                 string insert = Scheduling.Html.ReportingUtilities.GetDateBasedOnSubItemDescAndParentIDForSpecificProject(DescItem, pd.ID, mv.MilestoneFieldFK);
+                                                <td class="calcValue">
+                                                    @insert
+                                                </td>
+
+                                             }
+
+
+                                            }
+                                        </tr>
+                                    }
+
+                                }
+                            </table>
+                         }
+
+                         else
+                         {
+
+                            <p>
+                                There are no Major Milestones For This Project
+                            </p>
+
+                         }
+
+                    }
+                </div>
+                                                    }
+
+
+                                                    
+
+                                                }
+
+             else
+                        {
+                            if (ViewBag.InitialLoad == "N")
+                            {
+                                <p style='font-weight: bold'>
+                                    No matching results
+                                </p>
+
+                                                    }
+
+
+                                                }
+
+                                                Scheduling.Database.Utility.CreateApplicationLoggingEntry("Leaving model count section at " + DateTime.Now);
+
+    }
+</div>
+<script src=@Url.Content("~/Scripts/Bundled/DatepickerMonthOnly.js") type="text/javascript"></script>
+<script src=@Url.Content("~/Scripts/Bundled/lodash.js") type="text/javascript"></script>
+
+<!--test mode defined in globalvars-->
+<script type='text/javascript'>
+
+    $(document).ready(function () {
+
+        $('table.calculation tbody tr:nth-child(odd)').css('background-color', '#ccc');
+
+        //client side val on pubcode/year submit
+
+        $('#ExcelStyleReportsForm').submit(function () {
+            
+            $('.error-message').html('');
+
+            var pubcodeSel = $('#ExcelStyleReportsForm select.list-project-select-filter').eq(0);
+            
+            var yearSel = $('#ExcelStyleReportsForm select.list-project-select-filter').eq(1);
+
+            var pubcodeSelVal=$(pubcodeSel).val();
+            var yearSelVal=$(yearSel).val();
+ 
+            //use lodash library for ease of detection (better than isNan(parseInt) !
+
+            if (_.size(pubcodeSelVal) > 0 && _.size(yearSelVal) > 0)
+            {
+                
+                return true;
+            }
+            
+            else
+            {
+                $('.error-message').html('Please Choose A Pubcode And Year');
+                return false;
+            }
+            
+
+
+            
+            
+        });
+
+    });
+
+</script>
+

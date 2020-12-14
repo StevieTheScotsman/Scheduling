@@ -1,0 +1,7 @@
+﻿<table border='1'>
+ <caption style='background-color: #ddd'>#ProjectName#</caption>
+  <thead> <tr> <th> From </th> <th> To </th> </tr> </thead>
+   <tbody>  <tr> <td>#OldLockStatus# </td> <td>#NewLockStatus# </td> </tr>  </tbody> 
+   </table>
+
+   <p>Uses basic table html that can be changed in a text file</p>

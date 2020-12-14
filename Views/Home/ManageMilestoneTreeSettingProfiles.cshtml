@@ -1,0 +1,363 @@
+﻿@model List<Scheduling.Models.MilestoneTreeSettingsProfileDisplay>
+    @{
+    ViewBag.Title = "Manage Milestone Tree Setting Profiles";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    }
+    <div class='container'>
+
+        <div class="sixteen columns">
+            <p class='italic'>Once Baselines Are Assigned To Projects They Cannot Be Edited</p>
+            <p class="italic">Selecting Unassigned will ensure that we are dealing with baselines that are NOT assigned to projects.</p>
+
+            @{ Html.BeginForm("ManageMilestoneTreeSettingProfiles", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "BaselineType", id = "BaselineType" }); }
+
+
+
+            <div class="four columns chooseUnassigned">
+                <select class="unassigned-selection" name="unassigned-selection">
+                    <option value="">--Choose Unassigned --</option>
+                    @Html.Raw(Scheduling.Html.ViewDropdown.BuildUnassignedBaselineDropdown(ViewBag.ChosenUnassigned))
+                </select>
+            </div>
+
+
+
+
+            <div class="four columns chooseAssigned">
+                <select class="assigned-selection" name="assigned-selection">
+                    <option value="">--Choose Assigned --</option>
+                    @Html.Raw(Scheduling.Html.ViewDropdown.BuildAssignedBaselineDropdown(ViewBag.ChosenAssigned))
+                </select>
+            </div>
+
+
+
+
+            <div class="four columns">
+                <select class="assigned-type-selection" name="assigned-type-selection" id="assigned-type-selection">
+                    <!---->
+                    @if(ViewBag.CurrentAssignedType =="U")
+
+                    {
+                    <option value="U" selected="selected">--UnAssigned--</option>
+                    <option value="A">--Assigned--</option>
+                    }
+
+                    else
+                    {
+                    <option value="U">--UnAssigned --</option>
+                    <option value="A" selected="selected">--Assigned --</option>
+                    }
+
+
+
+
+                </select>
+            </div>
+
+            <div class="one column" style="margin-top:-5px"><input type="submit" value="Filter" style="padding:2px" /></div>
+
+            <div class="one column">
+                <img style="display: none; width:35px;position:relative;top:-10px;" src="@Url.Content("~/images/check.png")" alt="check" class="img-ajax-success" />
+                
+            </div>
+
+            @{Html.EndForm();}
+        </div>
+
+        <div class='sixteen columns submitErrorMessage'>
+
+        </div>
+
+
+        <div class='sixteen columns'>
+
+
+            @{
+            if (Model.Count > 0)
+            {
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Baselines")
+            <table class='condensed zebra-striped'>
+                <thead>
+                    <tr>
+                        <th>
+                            Description
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.MilestoneTreeSettingsProfileDisplay mpd in Model)
+
+                    {
+
+                    int rp = Scheduling.Database.Utility.GetAllProjects().Where(x => x.MilestoneTreeSettingsProfileFK == mpd.ID).Count();
+
+                    <tr>
+                        <td>
+                            @mpd.Description
+                        </td>
+                        <td>
+                            @{ Html.BeginForm("LoadProjectsFromBaseline", "MassDelete", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            @{
+
+                            if (rp > 0)
+                            {
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Manage Deletable Projects' />
+
+                            }
+
+                            }
+                            @{ Html.EndForm(); }
+                        </td>
+                        <td>
+                            @{ Html.BeginForm("DeleteSingleMilestoneTreeProfile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            @{
+
+                            if (rp == 0)
+                            {
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Remove Baseline' />
+
+                            }
+
+                            }
+                            @{ Html.EndForm(); }
+                        </td>
+                        <td>
+                            @{ Html.BeginForm("EditSingleMilestoneTreeProfile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            @{
+                            int j = Scheduling.Database.Utility.GetAllProjects().Where(x => x.MilestoneTreeSettingsProfileFK == mpd.ID).Count();
+                            if (j == 0)
+                            {
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Edit Main Items' />
+
+                            }
+
+                            }
+                            @{ Html.EndForm(); }
+                        </td>
+                        <td>
+                            @{ Html.BeginForm("EditSingleMilestoneTreeProfileSubItems", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            @{
+                            int k = Scheduling.Database.Utility.GetAllProjects().Where(x => x.MilestoneTreeSettingsProfileFK == mpd.ID).Count();
+                            if (k == 0)
+                            {
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Edit Sub Items' />
+
+                            }
+
+                            }
+                            @{ Html.EndForm(); }
+                        </td>
+                        <td>
+                            @{ Html.BeginForm("CloneSingleMilestoneTreeProfile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            @{
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Clone Baseline' />
+
+
+
+                            }
+                            @{ Html.EndForm(); }
+                        </td>
+                        <!--Prepopulate Projects Ensure only assigned projects-->
+                        <td>
+
+                            @{
+
+                            if(ViewBag.CurrentAssignedType =="A")
+
+                            {
+
+                          
+                           
+                            <input value="Prepopulate Projects" type="button" class='prepopulate-projects' id="@mpd.ID"/>
+
+                           
+                            }
+
+                            }
+
+
+                        </td>
+
+                        <!--Baseline footer -->
+                        <td>
+                            @{ Html.BeginForm("EditSingleMilestoneReportFooter", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Edit Baseline Report Footer' />
+                            @{ Html.EndForm(); }
+                        </td>
+                        <td>
+                            @{
+
+                            if (Scheduling.Database.Utility.IsMagazineProfileTypeBasedOnSettingsProfile(mpd.ID))
+                            {
+                            Html.BeginForm("VerifySingleMilestoneTreeProfileForMagazineType", "Home", FormMethod.Post, new { enctype = "multipart/form-data" });
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Verify Baseline' />
+                            Html.EndForm();
+                            }
+
+                            else
+                            {
+
+                            Html.BeginForm("VerifySingleMilestoneTreeProfileForNonMagazineType", "Home", FormMethod.Post, new { enctype = "multipart/form-data" });
+                            <input type='hidden' value='@mpd.ID' name="id" />
+                            <input type="submit" value='Verify Baseline' />
+                            Html.EndForm();
+
+                            }
+
+
+
+                            }
+                        </td>
+                    </tr>
+
+
+                    }
+
+                    }
+                </tbody>
+            </table>
+
+
+
+            }
+
+
+
+
+            }
+        </div>
+
+       
+
+    </div>
+
+
+    <script type="text/javascript">
+
+        // mass update
+        $(document).ready(function () {
+
+            $('.prepopulate-projects').click(function (e)
+            
+            {
+                
+                var id = $(this).attr('id');
+                var url = baseUrl + '/Ajax/RevertAllProjectsBasedOnBaselineID/';
+                                
+                //
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ID: id
+
+                    },
+                    success: function (result) {
+
+                        
+                        if (result == "1")
+                        {
+                            $('.img-ajax-success').show().fadeOut(4000);
+                        }
+                        
+                        
+                    },
+                    error: function (e) {
+
+                        console.log(e);
+                    }
+
+
+                    });
+
+
+                //
+                
+                return false;
+
+            })
+            
+           
+
+        });
+        //
+
+
+        $(document).ready(function () {
+
+            $('#assigned-type-selection').change(function () {
+                setUpAssignedDesignation();
+            });
+
+
+
+            setUpAssignedDesignation();
+
+            verifySubmit();
+
+        });
+
+
+        function verifySubmit() {
+            $(".one.column input[type='submit']").click(function () {
+
+                var v = $('#assigned-type-selection').val().toUpperCase();
+
+                if (v == "A") {
+                    var assignedVal = $('.assigned-selection').val();
+                    if (!assignedVal) {
+                        $('.submitErrorMessage').html("<p style='color:#f00'>Choose An Assigned Baseline In The First Dropdown</p>");
+                        return false;
+
+                    }
+                }
+
+                if (v == "U") {
+                    var unAssignedVal = $('.unassigned-selection').val();
+                    if (!unAssignedVal) {
+                        $('.submitErrorMessage').html("<p style='color:#f00'>Choose An UnAssigned Baseline In The First Dropdown</p>");
+                        return false;
+                    }
+                }
+
+
+                return true;
+
+            });
+
+
+
+        }
+
+        function setUpAssignedDesignation() {
+
+            var v = $('#assigned-type-selection').val();
+            $('.submitErrorMessage').html("");
+
+            if (v == "A") {
+                $('.assigned-selection').show();
+                $('.unassigned-selection').hide();
+
+            }
+
+            if (v == "U") {
+                $('.assigned-selection').hide();
+                $('.unassigned-selection').show();
+
+            }
+
+        }
+    </script>

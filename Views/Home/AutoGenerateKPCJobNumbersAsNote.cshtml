@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Auto Generate KPC Job Numbers As A Note";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+
+
+<div class='container' style='border-bottom:3px double #ccc;margin-bottom:15px'>
+
+<h4>Auto Generate KPC JobNumbers As A Project Note</h4>
+   
+    <p style='font-style:italic'>This utility will automatically generate the Kpc Project Numbers For All Projects with a Profile Type of Magazine<br />
+    It uses the convention MAG-[PUBCODE]-[MONTH][TWODIGITYEAR] <br />
+    e.g A magazine with a pub code of BDS for November 2015 will be given the name  MAG-BDS-NOV15 <br />
+
+    Currently this utility works on <span style='font-weight:bold'>ALL projects</span>
+    </p>
+
+
+    <div class='sixteen columns'>
+        
+     @{ Html.BeginForm("ProcessAutoGenerateKpcJobNumbersAsNote", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "AutoGenerateKpcJobNumbers", id = "AutoGenerateKpcJobNumbers" }); }
+          
+     <input type="submit" value="Go" />
+
+
+      @{ Html.EndForm(); }
+    </div>
+    
+</div>
+

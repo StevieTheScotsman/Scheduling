@@ -1,0 +1,74 @@
+﻿@model List<Scheduling.Models.DupProjectEntry>
+    @{
+        ViewBag.Title = "Verify Data Integrity";
+        Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    }
+
+
+
+    @{
+
+        if (Model.Count > 0)
+        {
+            <div class="container">
+
+                <div class="sixteen columns">
+
+                    <p>There can only be one entry for a specific pubcode,timeline and year.Please correct the issue(s) below.</p>
+                    <table class='condensed zebra-striped' id='results'>
+                        <thead>
+                            <tr>
+                                <th>
+                                    Publication
+                                </th>
+                                <th>
+                                    Timeline
+                                </th>
+
+                                <th>Year</th>
+                                <th>Num Entries</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class='group-pagination'>
+                            @{  foreach (Scheduling.Models.DupProjectEntry de in Model)
+                              {
+
+                                <tr>
+                                    <td>
+                                        @Scheduling.Database.Utility.GetPubCodeShortDescFromID(de.PubCodeFK)
+                                    </td>
+
+                                    <td>
+                                        @Scheduling.Database.Utility.GetAllProjectRanges().Where(x => x.ID == de.ProjectRangeFK).First().ShortDesc
+                                    </td>
+
+                                    <td>
+                                        @Scheduling.Database.Utility.GetAllYears().Where(x => x.ID == de.YearFK).First().Value
+                                    </td>
+                                    <td>
+                                        @de.Count
+                                    </td>
+                                </tr>
+
+
+                              }
+
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        }
+
+        else
+        {
+            <p style="font-style:italic;font-size:1.2em;">There are no duplicate entries</p>
+
+        }
+
+    }
+
+

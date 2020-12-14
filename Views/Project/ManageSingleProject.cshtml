@@ -1,0 +1,137 @@
+﻿@using Scheduling.Models
+@model EditProjectWithMilestones
+
+@{
+    ViewBag.Title =string.Format("{0} {1}", Model.Name,Model.Year);
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int ProfileTypeID = Scheduling.Database.Utility.GetPrimaryProjectTypeProfileIDBasedOnPrimaryProjectID(Model.ID);
+    int MagazineProfileTypeID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType"));
+    bool CanShowRevertButton = MagazineProfileTypeID == ProfileTypeID;
+
+}
+
+<!--ICON SWITCHER-->
+<div id="switcher" style="overflow:hidden;border-bottom:1px solid #ddd;padding-bottom:15px;">
+
+    <img style="display:block;float:left;width:45px;margin-right:20px" src=@Url.Content("~/images/dates.jpg") class="icon-switcher" id="icon-values" alt="change dates" title="Change Dates" />
+    <img style="display:block;float:left;margin-right:20px" src=@Url.Content("~/images/large-note.png") class="icon-switcher" id="icon-notes" alt="change notes" title="Change Notes" />
+    <img style="display:block;float:left;width:45px" src=@Url.Content("~/images/windback.jpg") class="windback" id="icon-revert" alt="revert to baseline" title="Revert to Baseline" />
+    <img style="display:block;float:left;width:70px;position:relative;top:-10px" src=@Url.Content("~/images/name.jpg") class="icon-switcher" id="icon-rename" alt="Rename Project" title="Rename Project" />
+    <img style="display:block;float:left;width:100px;margin-right:10px" src=@Url.Content("~/images/addremove.jpg") class="icon-switcher" id="icon-addremovemilestones" alt="Add/Remove Milestones" title="Add / Remove Milestones" />
+    <img style="display:block;float:left;" src=@Url.Content("~/images/history.png") class="icon-switcher" id="icon-history" alt="View History" title="View History" />
+    <img style="display:block;float:left;width:100px;margin-left:20px;margin-top:5px;border-radius:5px" src=@Url.Content("~/images/closetab.png") class="closetab" id="closetab" alt="Close this Tab" title="Close This Tab" />
+
+</div>
+
+<!--EDIT PROJECT VALUES-->
+<div id="project-values" class="hasPartial">
+    @Html.Partial("_EditProjectValues", Model)
+</div>
+
+<!--EDIT PROJECT NOTES-->
+<div id="project-notes" class="hasPartial">
+    @Html.Partial("_EditProjectNotes", Model)
+</div>
+
+
+<!--WINDBACK TO PROFILE -->
+@if (CanShowRevertButton)
+{
+
+    <div id="project-revert" class="revert">
+
+        @{ Html.BeginForm("RevertToBaseline", "Project", FormMethod.Post, new { enctype = "multipart/form-data", name = "project-revert-form", id = "project-revert-form" }); }
+
+        <input type='hidden' value='@Model.ID' name='ProjectID' id="ProjectID" />
+
+        @{Html.EndForm();}
+
+    </div>
+
+}
+
+<!--EDIT PROJECT NAME-->
+
+<div id="project-rename" class="hasPartial">
+
+    @Html.Partial("_EditProjectName", Model)
+</div>
+
+<!--ADD REMOVE MILESTONES-->
+
+<div id="project-addremovemilestones" class="hasPartial">
+
+    @Html.Partial("_EditAddRemoveMilestones", Model)
+
+</div>
+
+<!--PROJECT HISTORY-->
+<div id="project-history" class="hasPartial">
+    @Html.Partial("_ViewProjectHistory", Model)
+</div>
+
+
+
+<!---CLIENT SIDE SCRIPTING -->
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('.closetab').click(function () { window.close();});
+
+        //init
+        $('.hasPartial').hide();
+        $('#project-values').show();
+
+
+        // date/note click switcher
+        $('.icon-switcher').click(function () {
+            var currentArr = $(this).attr('id').split('-');
+            var currentMode = currentArr[1];
+            var partialToShow = '#project-' + currentMode;
+
+            $('.hasPartial').hide();
+            $(partialToShow).show();
+
+        });
+
+        //rename 
+
+        $('.rename-project').click(function () {
+            $('#rename-project-form').submit();
+
+        });
+
+
+        //revert
+        $('#icon-revert').click(function () {
+
+            
+            $('<div></div>').appendTo('body')
+           .html('<div><h6>Are you sure you want to windback the calculations and start fresh ?</h6></div>')
+           .dialog({
+               modal: true, title: 'Confirm Windback to Profile Settings', zIndex: 10000, autoOpen: true,
+               width: 'auto', resizable: true,
+               buttons: {
+                   Yes: function () {
+                       $('#project-revert-form').submit();
+                       $(this).dialog("close");
+                   },
+                   No: function () {
+                       $(this).dialog("close");
+                   }
+
+
+               },
+
+               close: function (event, ui) {
+
+               }
+           });
+
+
+        });
+
+
+    });
+</script>

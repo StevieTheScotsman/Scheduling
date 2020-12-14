@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "Manage Holidays";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    List<DateTime> AllHolidays = (List<DateTime>)ViewBag.AllHolidays;
+}
+<div class='container scroll-to-on-load' style='border-bottom:3px double #ccc;margin-bottom:15px'>
+   
+    <div class='sixteen columns '>
+
+    @Html.ValidationSummary()
+     @{ Html.BeginForm("ProcessAddHoliday", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageHolidays", id = "ManageHolidays" }); }
+
+     <input type='text' class='datepicker' name="holiday"/>
+     <input type="submit" value="Add Holiday" />
+
+
+      @{ Html.EndForm(); }
+    </div>
+</div>
+
+
+
+@foreach (int i in ViewBag.DistinctYears)
+{
+
+    string CurrentYear = Scheduling.Database.Utility.GetAllYears().Where(x => x.ID == i).First().Value.ToString();
+
+    List<DateTime> CurrentList = AllHolidays.Where(x => x.Year.ToString() == CurrentYear).ToList();
+
+    if (CurrentList.Count > 0)
+    {
+    <div class='container' style='margin-bottom:10px'>
+        <div class='sixteen columns'>
+            <table class='condensed zebra-striped'>
+                <caption style='background-color: #ddd'>@CurrentYear</caption>
+                <thead>
+                </thead>
+                <tbody>
+                    @foreach (DateTime dt in CurrentList)
+                    {
+                        <tr>
+                            <td>@dt.ToLongDateString()
+                            </td>
+                        </tr>
+               
+               
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+
+
+
+}

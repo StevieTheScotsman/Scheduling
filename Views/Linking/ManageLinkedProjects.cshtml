@@ -1,0 +1,108 @@
+﻿@model List<Scheduling.Models.ProjectLinkDisplay>
+@{
+    ViewBag.Title = "Manage Linked Projects";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+
+}
+@{
+    if (Model.Count == 0)
+    {
+    <p class='italic'>
+        There Are No Linked Project Entries</p>
+                
+                
+    }
+            
+            
+}
+<div class='container'>
+
+   
+    <div class='sixteen columns'>
+        @{
+            
+        
+            
+            if (Model.Count > 0)
+            {
+            
+                
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Linked Projects")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                            Primary Project
+                        </th>
+                        <th>
+                            Primary Profile Type
+                        </th>
+                        <th>
+                            Secondary Project
+                        </th>
+                        <th>
+                            Secondary Profile Type
+                        </th>
+                        <th>Remove Link Only</th>
+                        <th>Remove Link/Reset Secondary Values</th>
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.ProjectLinkDisplay d in Model)
+                        { 
+           
+                        <tr>
+                            <td>@d.PrimaryProject
+                            </td>
+                            <td>@d.PrimaryProjectProfileType
+                            </td>
+                            <td>@d.SecondaryProject
+                            </td>
+                            <td>@d.SecondaryProjectProfileType
+                            </td>
+                            <td>
+                                
+                                @{ Html.BeginForm("DeleteSingleProjectLinkEntry", "Linking", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteSingleProjectLinkEntry" }); }
+                                <img src="@Url.Content("~/images/remove-project.png")" alt='remove-project-link' style='width:30px;display:block;margin:0 auto'
+                                    class='remove-project-link' title='remove link and keep date values'/>
+                                <input type='hidden' value='@d.ID' name='id'/>
+                                <input type='hidden' value='@d.PrimaryProjectID' name='PrimaryProjectID' />
+                                <input type='hidden' value='@d.SecondaryProjectID' name='SecondaryProjectID' />
+                                @{ Html.EndForm(); }
+                            </td>
+                             <td>
+                                @{ Html.BeginForm("DeleteSingleProjectLinkEntryAndRemoveSecondaryValues", "Linking", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteSingleProjectLinkEntry" }); }
+                                <img src="@Url.Content("~/images/remove-project.png")" alt='remove-project-link' style='width:30px;display:block;margin:0 auto'
+                                    class='remove-project-link remove-project-link-reset-values' title='remove link and whack values !!!!!'/>
+                                <input type='hidden' value='@d.ID' name='id'/>
+                                <input type='hidden' value='@d.PrimaryProjectID' name='PrimaryProjectID' />
+                                <input type='hidden' value='@d.SecondaryProjectID' name='SecondaryProjectID' />
+                                @{ Html.EndForm(); }
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+    <div id="pageNavPosition">
+    </div>
+    <script type="text/javascript"><!--
+        var pager = new Pager('results', 10);
+        pager.init();
+        pager.showPageNav('pager', 'pageNavPosition');
+        pager.showPage(1);
+    </script>
+</div>

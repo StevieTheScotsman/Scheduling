@@ -1,0 +1,16 @@
+﻿@{
+    Scheduling.Models.ReadOnlyProjectWithMilestones rop = (Scheduling.Models.ReadOnlyProjectWithMilestones)ViewData["rop"];
+
+    Scheduling.Models.ProjectDisplay pd = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == rop.ID).First();
+
+    string CurrentProjectName = pd.Name;
+  
+   int CurrentProjectStatus = pd.CurrentProjectStatus;
+    string CurrentProjectStatusName = Scheduling.Database.Utility.GetAllProjectStatuses().Where(x => x.ID == CurrentProjectStatus).First().Description;
+
+}
+<div style='padding-top: 10px; border-bottom: 3px double #ccc'>
+    <p style='text-align: left; text-decoration: underline;color:#0f566f;font-size:1.2em'>@string.Format("Project {0} of {1} ({2}-{4}) {3}", ViewBag.Counter, ViewBag.ProjectCount, CurrentProjectName, rop.Year, CurrentProjectStatusName)
+    </p>
+   
+</div>

@@ -1,0 +1,107 @@
+﻿
+
+<div class='sixteen columns' style='padding: 15px 0px; border-bottom: 3px double #ccc'>
+
+ 
+    @{ 
+        //Passed in Values
+        List<Scheduling.Models.MilestoneValue> CurrentList =(List<Scheduling.Models.MilestoneValue>)ViewData["CurrentMilestoneSubItems"];
+        //Get Parent Ref
+        int? CurrentParent = CurrentList.First().ParentID;
+
+        //Get Parent Description
+        Scheduling.Models.MilestoneField CurrentParentMilestone = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == CurrentParent).First();
+        string CurrentParentDesc =string.Format("Parent {0} Sub Items", CurrentParentMilestone.Description);
+
+        //Get List of Children
+        IEnumerable<Scheduling.Models.MilestoneValue> CurrentSubItemValueList = CurrentList.AsEnumerable();
+    
+        <div>
+            <table class='condensed zebra-striped'>
+                <caption style='background-color:#ddd'>
+                    @CurrentParentDesc</caption>
+                <thead>
+                    <tr>
+                        <th >
+                            Sub Item
+                        </th>
+                        <th >
+                            Depends On 
+                        </th>
+                        <th >
+                            Calculation
+                        </th>
+
+                        <th >
+                            CalcFiringOrder
+                        </th>
+
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ foreach (Scheduling.Models.MilestoneValue mst in CurrentSubItemValueList)
+                       {
+                           string CurrentDesc = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mst.MilestoneFieldFK).First().Description;
+
+                           string DepDesc = "N/A";
+                           int DepCount = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mst.DependantUpon).Count();
+                           if (DepCount > 0)
+                           {
+
+                               DepDesc = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mst.DependantUpon).First().Description;
+
+                           }
+
+                           string CalcDesc = "N/A";
+                           int CalcCount = Scheduling.Database.Utility.GetAllCalculationFields().Where(x => x.ID == mst.CalculationFK).Count();
+                           if (CalcCount > 0)
+                           {
+                               CalcDesc = Scheduling.Database.Utility.GetAllCalculationFields().Where(x => x.ID == mst.CalculationFK).First().ShortDesc;
+
+                           }
+
+                           string CalcFiringOrder = "N/A";
+                           
+                           if(mst.CalcFiringOrder.HasValue)
+                           {
+
+                               CalcFiringOrder = mst.CalcFiringOrder.ToString();
+                               
+                           }
+
+                           string DueDate = "N/A";
+                           if(!string.IsNullOrWhiteSpace(mst.DueDate))
+                           {
+                               DueDate=Convert.ToDateTime(mst.DueDate).ToShortDateString();
+                               
+                               
+                           }
+                           
+                        <tr>
+                            <td >
+                                @CurrentDesc
+                            </td>
+                            <td >
+                                @DepDesc
+                            </td>
+
+                             <td >
+                                @CalcDesc
+                            </td>
+
+                             <td >
+                                @CalcFiringOrder
+                            </td>
+
+                            <td>@DueDate</td>
+                                                        
+                        </tr>
+                       }
+                    }
+                </tbody>
+            </table>
+        </div>
+    
+    }
+</div>

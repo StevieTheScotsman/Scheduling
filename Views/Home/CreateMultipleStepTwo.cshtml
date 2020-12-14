@@ -1,0 +1,111 @@
+﻿@model Scheduling.Models.MultipleProjectStepTwo
+@{
+    ViewBag.Title = "Create Multiple Projects From Baseline StepTwo";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+    string CurrentYear = Scheduling.Database.Utility.GetYearByID(Convert.ToInt32(Model.Year)).ToString();
+    string CurrentPubCode = Scheduling.Database.Utility.GetPubCodeShortDescFromID(Convert.ToInt32(Model.Pubcode));
+    string CurrentProfile = Scheduling.Database.Utility.GetAllMilestoneTreeSettingsProfiles().Where(x => x.ID == Convert.ToInt32(Model.Profile)).First().Description;
+    bool IsMagProfileType = Scheduling.Database.Utility.IsMagazineProfileTypeBasedOnSettingsProfile(Convert.ToInt32(Model.Profile));
+
+    string ProductStr = string.Empty;
+
+    if (!string.IsNullOrWhiteSpace(Model.Product))
+    {
+
+        ProductStr = string.Format(" / Product is {0}", Model.Product);
+    }
+}
+<h4>
+    Create Multiple Projects From Baseline Step Two
+</h4>
+<p style='font-style: italic'>
+    (Year is @CurrentYear / PubCode is @CurrentPubCode / Profile is @CurrentProfile
+    @ProductStr )</p>
+
+
+@{
+    
+    if (IsMagProfileType)
+    {
+        
+        <div style='overflow: hidden'>
+
+
+            @{ Html.BeginForm("ProcessMultipleProjectsStepTwo", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateMultipleProjectFormStepTwo" }); }
+
+        @{
+               int counter = 0;
+               foreach (string s in ViewBag.StrList)
+               {
+                   counter++;
+                   string TimelineStr = Scheduling.Database.Utility.GetTimelineFromID(Convert.ToInt32(s));
+              <div style='float: left;padding:10px'>
+                <p>@TimelineStr</p>
+                <input type='hidden' id='timeline-@counter' name='timeline-@counter' value='@s' />
+                <input type='text' class='datepicker' id='duedate-@counter' name='duedate-@counter'/>
+            </div>
+               }
+       
+       
+        }
+
+        <div style='clear:both'/>
+        <input type='hidden' name='profile' value='@Model.Profile' />
+        <input type='hidden' name='pubcode' value='@Model.Pubcode' />
+        <input type='hidden' name='product' value='@Model.Product' />
+        <input type='hidden' name='year'  value='@Model.Year' />
+        <input type='hidden' name='counter' value='@counter' />
+        <input type='submit' value='Create @counter Project(s)' />
+
+          @{ Html.EndForm(); }
+
+
+
+
+        </div>
+        
+        
+        
+        
+    }
+
+    else
+    {
+              <p style='font-style:italic'>This is not a Magazine Type so we do not have the option to populate the N/S Dates.</p>
+        
+        //start we will keep empty text boxes so we can keep the underlying logic 
+
+        Html.BeginForm("ProcessMultipleProjectsStepTwo", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateMultipleProjectFormStepTwo" });
+
+        int counter = 0;
+        foreach (string s in ViewBag.StrList)
+        {
+            counter++;
+            string TimelineStr = Scheduling.Database.Utility.GetTimelineFromID(Convert.ToInt32(s));
+              <div style='float: left;padding:10px;display:none'>
+                <p>@TimelineStr</p>
+                <input type='hidden' id='timeline-@counter' name='timeline-@counter' value='@s' />
+                <input type='text' class='datepicker' id='duedate-@counter' name='duedate-@counter'/>
+            </div>
+        }
+
+        
+        <div style='clear:both'/>
+        <input type='hidden' name='profile' value='@Model.Profile' />
+        <input type='hidden' name='pubcode' value='@Model.Pubcode' />
+        <input type='hidden' name='product' value='@Model.Product' />
+        <input type='hidden' name='year'  value='@Model.Year' />
+        <input type='hidden' name='counter' value='@counter' />
+        <input type='submit' value='Create @counter Project(s)' />
+
+        Html.EndForm();
+
+
+        //stop
+
+
+
+
+    }
+}

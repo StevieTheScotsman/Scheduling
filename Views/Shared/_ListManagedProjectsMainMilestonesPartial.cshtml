@@ -1,0 +1,46 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+    List<Scheduling.Models.MilestoneValue> MilestoneValueWithoutParents = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject).Where(p => p.ParentID == null).OrderBy(x=>x.DisplaySortOrder).ToList();
+    List<Scheduling.Models.MilestoneField> MilestoneFieldList = Scheduling.Database.Utility.GetAllMilestoneFields();
+}
+<table class='condensed zebra-striped manage-project-partial '>
+
+    <thead>
+    <tr> <th>
+    <div style='position:relative;left:-6px'><img src="@Url.Content("~/images/toggle.gif")" style='width:30px' alt='toggle' class='img-manage-project-partial'/><span style='font-weight:bold;font-size:14px'> Major Milestones</span></div></th></tr>
+      
+       
+    </thead>
+    <tbody>
+    </tbody>
+    <tr>
+        <td>
+            <div style='overflow: hidden'>
+            
+                @{
+                      <p style='font-style:italic;font-size:0.8em'>Shows top level milestones (Top Level Milestones have no designated parent)</p>    
+                    foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueWithoutParents)
+                    {
+                              
+                    <div style='float: right; padding: 10px; border: 1px solid #ccc; margin: 2px'>
+                        @{
+                        string s = MilestoneFieldList.Where(x => x.ID == mv.MilestoneFieldFK).First().Description;
+                        string dd = "___";
+                        if (!string.IsNullOrWhiteSpace(mv.DueDate))
+                        { dd = mv.DueDate; }   
+                        }
+
+                        <p style='text-decoration: underline'>@s</p>
+                        <p style='color:#05556f;font-weight:bold'>@dd
+                        </p>
+                    </div>
+                              
+                              
+                    }
+                          
+                          
+                }
+            </div>
+        </td>
+    </tr>
+</table>

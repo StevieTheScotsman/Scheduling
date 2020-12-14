@@ -1,0 +1,88 @@
+﻿@model List<Scheduling.Models.ChangeRequest>
+@{
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    ViewBag.Title = "Manage Change Requests";
+    List<int> ids = Model.Select(x => x.ProjectFK).Distinct().ToList();
+    List<Scheduling.Models.ProjectDisplay> PdList = Scheduling.Database.Utility.GetAllProjects().Where(y => ids.Contains(y.ID)).ToList();
+    
+}
+
+    @{
+           
+        if (Model.Count == 0)
+        {
+               
+        <p>
+            There are no results</p>
+               
+        }
+
+        else
+        {
+
+
+            foreach (Scheduling.Models.ProjectDisplay pd in PdList)
+            {
+        <div style='padding: 15px'>
+            <table class='condensed zebra-striped'>
+                <caption style='background-color: #ddd'>
+                    @pd.Name</caption>
+                <thead>
+                    <tr>
+                        <th>
+                            Comment
+                        </th>
+                        <th>
+                            Requestor
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                
+                List<Scheduling.Models.ChangeRequest> CurrentChangReqList = Model.Where(x => x.ProjectFK == pd.ID).ToList();
+                List<Scheduling.Models.ChangeRequestStatus> StatusList = Scheduling.Database.Utility.GetAllChangeRequestStatuses().ToList();
+
+                foreach (Scheduling.Models.ChangeRequest CrItem in CurrentChangReqList)
+                {
+                    
+                        <tr>
+                            <td>@CrItem.RequestorComment
+                            </td>
+                            <td>@CrItem.CreatedBy
+                            </td>
+                            @{
+                    Scheduling.Models.ChangeRequestStatus crs = StatusList.Where(x => x.ID == CrItem.RequestStatus).First();
+                    string CurrentStatus = crs.Description;
+                        
+                                
+                                <td>
+                                    @{ Html.BeginForm("ProcessRemoveChangeRequestsSingleItem", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "DeleteSingleUser" }); }
+                                    <input type='hidden' value='@CrItem.ID' name='id' />
+                                    <input type='hidden' value='@CrItem.ProjectFK' name='ProjectID' />
+                                    <input type="submit" value='Remove Change Request' />
+                                    @{ Html.EndForm(); }
+                                </td>
+                         
+                            }
+                        </tr>
+                }
+                
+                
+                    }
+                </tbody>
+            </table>
+        </div>
+                   
+            }
+
+
+
+        }
+           
+           
+           
+    }
+

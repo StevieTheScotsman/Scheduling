@@ -1,0 +1,46 @@
+﻿
+
+@{
+    
+    Scheduling.Models.ProjectDisplay CurrentItem = Model;
+    }
+
+
+
+<table width='100%' class='top-header-table'>
+<tr>
+<td class='top-header-class'>
+<div style='overflow:hidden;font-weight:bold;font-size:0.7em;padding-top:10px;margin-top:-20px'>
+
+ @{
+     
+     string ReportDesc = string.Format("{0} {1} Production Schedule", Scheduling.Database.Utility.GetPubCodeReportDescFromID(CurrentItem.PubCodeFK.Value),ViewBag.ReportingYearVal);
+     <div style='float:left'><p style='font-size:1.5em;font-weight:bold'>@ReportDesc</p></div>
+     
+ }
+ <div style='clear:both' />
+ <div style='float:left'>@string.Format("Pub Code :{0}", Scheduling.Database.Utility.GetPubCodeShortDescFromID(CurrentItem.PubCodeFK.Value))</div>
+
+ @{int? ProfitCenter=Scheduling.Database.Utility.GetAllPublicationCodes().Where(x=>x.ID==CurrentItem.PubCodeFK.Value).First().ProfitCenter;
+    
+ 
+ if(ProfitCenter.HasValue)
+ {
+     <div style='float:left;margin-left:25%'>@string.Format("Profit Center :{0}",ProfitCenter.Value)</div>
+           
+     
+    
+    }
+    
+    }
+
+    <div style='float:right;margin-right:2%'>@string.Format("{0}", Scheduling.Database.Utility.GetPubCodeShortDescFromID(CurrentItem.PubCodeFK.Value))</div>
+    <div style='float:right;margin-right:10%'>Revised @DateTime.Now.ToShortDateString()</div>   
+</div>
+
+</td>
+</tr>
+</table>
+
+
+

@@ -1,0 +1,205 @@
+﻿@{
+    ViewBag.Title = "AddReportingPresentation";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int MaxSortOrder = 10;
+}
+
+<h2>Add Reporting Presentation</h2>
+
+<p class="italic" style="margin-top:-30px;font-size:1.1em;font-weight:bold;">Since there is no edit facility the logic will overwrite an existing presentation if it exits.</p>
+
+<p>Click the add button to add a sort item after choosing a publication and a timeline (optional)</p>
+<div class="container">
+    @{ Html.BeginForm("ProcessAddPresentationSubitems", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessAddPresentationSubitems" }); }
+
+    <div class="row">
+        <div class="eight columns">
+
+            <!--Pubcode-->
+            <p style="font-weight:bold">
+                Publication
+            </p>
+            <select name='pubcode' id="pubcode">
+                @Html.Raw(ViewBag.PubCodeDropdownOptions)
+            </select>
+        </div>
+
+        <div class="eight columns">
+        
+            <!--timeline  -->
+            <p style="font-weight:bold">
+                Choose Timeline(Optional)
+            </p>
+            <select name='project-range' id='project-range' class='project-range-presentation'>
+                <option value=''>Choose Timeline (optional)</option>
+                @Html.Raw(ViewBag.ProjectRangeOptions)
+            </select>
+           
+        </div>
+    </div>
+
+    <div class="sixteen columns">
+
+        <img style="display:block;width:50px;margin-bottom:10px" class="add-sort-item" src="@Url.Content("~/images/add-item.png")"> 
+    
+    </div>
+
+    <div class="row submission clone-me">
+        <div class="sixteen columns">
+            <div class="four columns">
+                <select name="sub-item-select" class="sub-item-select">
+                    <option value="">--Choose Subitem--</option>
+                    @Html.Raw(ViewBag.ReportingSubItemOptins)
+                </select>
+            </div>
+
+            <div class="four columns ">
+                <select name="sub-sort-select" class="sub-sort-select">
+                    <option value="">--Choose Sort Order--</option>
+                    @{
+
+                        for (int i = 1; i <= 10; i++)
+                        {
+                            <option value="@i">@i</option>
+
+                        }
+
+
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+        <!--inject rows here-->
+        <div class="inject-me">
+
+        </div>
+   
+
+  
+
+    <input type="submit" value="Create Report Setup" class="report-button"/>
+    <input type="hidden" value="" class="hf-report-setup" name="hf-report-setup"/>
+    
+
+    @{ Html.EndForm(); }
+
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+        //globals 
+        var numRows = 1;
+
+
+        //form submit
+
+        $("form").submit(function (event) {
+
+
+            var numValidRows = GetNumberOfValidRows();
+
+
+
+            if (numValidRows < 2)
+            {
+                alert('Requires at least 2 valid rows');
+                return false;
+                
+            }
+
+           
+                GenerateHiddenFieldForSubmission()
+            
+        });
+
+
+        
+      
+
+        function GenerateHiddenFieldForSubmission()
+        {
+            var totalStr = '';
+
+            $('.sub-item-select').each(function () {
+
+                var siv = $(this).val();                
+                var ov = $(this).parents('.sixteen').find('.sub-sort-select').val();
+             
+                
+                if(siv.length > 0 && ov.length > 0)
+                {
+                    
+                    var currentStr = siv + '|' + ov + '||';
+                    totalStr = totalStr + currentStr;
+                }
+
+            })
+            
+            $('.hf-report-setup').val(totalStr);
+            
+
+        }
+
+        function GetNumberOfValidRows()
+        {
+            var validRows = 0;
+            $('.sub-item-select').each(function () {
+
+                var siv = $(this).val();                
+                var ov = $(this).parents('.sixteen').find('.sub-sort-select').val();
+                
+                if(siv.length > 0 && ov.length > 0)
+                {
+                    validRows++;
+
+                }
+
+            }
+
+            );
+
+            return validRows;
+
+        }
+
+
+
+        function GenerateSubItemMarkup()
+        {
+            var injectedHtml = '';
+            for (var i = 1; i <= numRows; i++) {
+
+                injectedHtml = injectedHtml + $('.row.clone-me').html();
+
+            }
+                        
+
+            $('.inject-me').html(injectedHtml);
+
+        }
+
+
+
+        $('.add-sort-item').click(function () {
+
+            var pubVal = $('#pubcode').val();
+            if (pubVal.length == 0)
+            {
+                alert('Please Select Publication Code');
+                return;
+            }
+
+            numRows++;
+
+            GenerateSubItemMarkup();
+
+        }
+        
+        )
+    });
+
+</script>

@@ -1,0 +1,33 @@
+﻿@model List<Scheduling.Models.UserDisplay>
+
+@{
+    ViewBag.Title = "List Users";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+ @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Users")
+
+
+    <table id="user-table">
+    <tr>
+	<th id="th-username">User Name</th>
+    <th id="th-role">Role</th>
+	<th id="th-email">Email</th>
+    <th id="th-group">Group(s)</th>
+	
+</tr>
+    
+    @{
+        foreach(Scheduling.Models.UserDisplay ud in Model)
+        {
+            <tr>
+            <td>@ud.UserName</td>
+             <td>@ud.RoleDesc</td>
+             <td>@ud.Email</td>
+             <td>@ud.GroupDesc</td>
+            </tr>
+        }
+        
+    }
+    
+    </table>

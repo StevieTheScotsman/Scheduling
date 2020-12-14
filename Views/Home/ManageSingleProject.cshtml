@@ -1,0 +1,327 @@
+﻿@model List<Scheduling.Models.EditProjectWithMilestones>
+@{
+    ViewBag.Title = "Project Listing ";
+    Layout = "~/Views/Shared/_EditProjectLayout.cshtml";
+    int ProfileTypeID = Scheduling.Database.Utility.GetPrimaryProjectTypeProfileIDBasedOnPrimaryProjectID(Model.First().ID);
+    //for now only show revert/calc image if of magazine profile type
+    int MagazineProfileTypeID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType"));
+    bool CanShowRevertButton = MagazineProfileTypeID == ProfileTypeID;
+    string ProfileNameStr = Scheduling.Database.Utility.GetProfileTypeNameFromProjectID(Model.First().ID);
+
+    List<int> NoteKeyValues = Scheduling.Database.Utility.GetProjectNoteKeyValues(Model.First().ID);
+
+    int CurrentProject = Model.First().ID;
+
+    int? PrevProjectID = Scheduling.Database.Utility.GetPreviousProjectIDForManageProjectNav(CurrentProject);
+    int? NextProjectID = Scheduling.Database.Utility.GetNextProjectIDForManageProjectNav(CurrentProject);
+}
+@{
+    string HdrStr = string.Format("Manage {0} Project", Model.First().Name);
+    <h2>
+        @HdrStr
+    </h2>
+    
+}
+<div class='manage-project-navigation' style='overflow: hidden; border-bottom: 1.5px solid #ddd'>
+    @if (PrevProjectID.HasValue)
+    {
+        <div class='prev-project-nav' style='float: left; margin-right: 10px;'>
+            @{ Html.BeginForm("ManageSingleProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditPrevProject" }); }
+            <input type='hidden'  value='@PrevProjectID' name='id'/>
+            <img src="@Url.Content("~/images/prev-project.jpg")" width="25" alt='prev project' title='edit prev project'
+                class='edit-prev-project' />
+            @{ Html.EndForm(); }
+        </div>
+        
+    }
+    @if (NextProjectID.HasValue)
+    {
+        <div class='next-project-nav' style='float: left;'>
+            @{ Html.BeginForm("ManageSingleProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditNextProject" }); }
+            <input type='hidden'  value='@NextProjectID' name='id'/>
+            <img src="@Url.Content("~/images/next-project.jpg")" width="25" alt='next project' title='edit next project' class='edit-next-project'/>
+            @{ Html.EndForm(); }
+        </div>
+            
+    }
+</div>
+<div class='manage-single-project-help'>
+    <img src="@Url.Content("~/images/help_75.png")" style='width: 25px' alt='help' class='image-help' title='Show Help Display'/>
+    <div class='manage-single-project-help-inner'>
+        <div>
+            <img src="@Url.Content("~/images/history.png")" style='width: 25px' alt='help' title='Show Project History'/>Show
+            Project History</div>
+        <div>
+            <img src="@Url.Content("~/images/calendar_blank.png")" style='width: 25px' alt='help' title='Show Milestone Due Dates Alteration Panel (Not Desktop Mode)'/>
+            Show Milestone Due Dates Alteration Panel (Not Desktop Mode)
+        </div>
+       
+        <div>
+            <img src="@Url.Content("~/images/edit.png")" style='width: 25px' alt='edit' />Edit
+            Header/Project Status/Lock Status (Make changes on textboxes above this icon)</div>
+        <div>
+            <img src="@Url.Content("~/images/large-note.png")" style='width: 25px' alt='help' />Show Project Notes
+            </div>
+        <div>
+            <img src="@Url.Content("~/images/plus-minus.png")" style='width: 25px' alt='help' />Show Add/Remove Milestone Panel
+           </div>
+
+        <div>
+            <img src="@Url.Content("~/images/windback.jpg")" style='width: 25px' alt='help' />Windback Calculations Based on Profile Setting
+        </div>
+    </div>
+</div>
+<div class='edit-projects-container'>
+    @foreach (Scheduling.Models.EditProjectWithMilestones epm in Model)
+    {
+
+        List<Scheduling.Models.ProjectNote> NoteList = Scheduling.Database.Utility.GetProjectNotesFromProjectID(epm.ID);
+            
+
+        <div class='image-note-container'>
+            <img src="@Url.Content("~/images/large-note.png")" style='width: 25px' alt='note' class='image-note' title='Toggle Project Note Display'/>
+        </div>
+        
+        <!--link section-->
+        if (Scheduling.Database.Utility.IsProjectLinkAvailableForDeletion(epm.ID))
+        {
+            Scheduling.Models.ProjectLink ProjLink = Scheduling.Database.Utility.GetAllProjectLinks().Where(x => x.SecondaryProjectID == epm.ID).First();
+            string PrimProjName = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == ProjLink.PrimaryProjectID).First().Name;
+            int PrimProfileID = Scheduling.Database.Utility.GetPrimaryProjectTypeProfileIDBasedOnPrimaryProjectID(ProjLink.PrimaryProjectID);
+            string PrimProfileStr = Scheduling.Database.Utility.GetAllProjectProfileTypes().Where(x => x.ID == PrimProfileID).First().Description;
+        <div class='manage-single-project-link'>
+            <img src="@Url.Content("~/images/link.png")" style='width: 25px' alt='link' class='image-link' title='Toggle Project Link Display'/>
+            <div class='manage-single-project-link-inner'>
+                Currently linked to Primary Project @PrimProjName with profile type of @PrimProfileStr.ToUpper()
+                    @{ Html.BeginForm("DeleteSingleProjectLinkFromManagedKeepingValues", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteSingleProjectLink" }); }
+                   <img src="@Url.Content("~/images/remove-item.png")" style='width: 25px' alt='link' class='delete-project-link' title='Delete the link to @PrimProjName (Due Dates Are Preserved)'/>
+                   
+                   <input type='hidden' name='projectid' id='projectid' value='@epm.ID' />
+                @{Html.EndForm();}
+            </div>
+        </div>
+        }
+        
+        <div class='manage-single-project-note'>
+            @foreach (int i in NoteKeyValues)
+            {
+                string CurrentNoteValue = string.Empty;
+
+                int NoteCountForCurrentEntry = NoteList.Where(x => x.NoteLabelID == i).Count();
+                if (NoteCountForCurrentEntry == 1)
+                {
+                    CurrentNoteValue = NoteList.Where(x => x.NoteLabelID == i).First().NoteValue;
+
+                }
+            
+                <div style='overflow: hidden; padding: 10px 0px' class='note-container'>
+                    <input type='hidden' name='note-identifier' value='@i' class='note-identifier'/>
+                    <input type='hidden' name='project-identifier' value='@CurrentProject' class='project-identifier' />
+                    <div style='float: left; font-weight: bold;'>@Scheduling.Database.Utility.GetProjectNoteLabelBasedOnID(i)</div>
+                    <div style='float: left; margin-left: 20px;'>
+                        <input type='text' class='note-field-value' value='@CurrentNoteValue'/></div>
+                    <img style='display: block; margin-left: 10px; margin-right: 5px; float: left; margin-top: 2px;width:23px'
+                        alt='Save Note' src="@Url.Content("~/images/save.png")"class='save-note' />
+                    <img style='display: none; width: 30px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success' />
+                </div>
+
+            }
+        </div>
+       
+                
+        <div class='edit-projects-show-history-container'>
+            <img src="@Url.Content("~/images/history.png")"alt='show-history' title='Toggle Project History Display'/>
+            <div class='edit-project-show-history'>
+                @{
+            List<Scheduling.Models.ProjectHistory> HisList = Scheduling.Database.Utility.GetProjectHistoryFromProjectID(epm.ID);
+
+            int HisCounter = 0;
+
+            foreach (Scheduling.Models.ProjectHistory ph in HisList)
+            {
+                HisCounter = HisCounter + 1;
+                    <div class='edit-history-item-container'>
+                        <div class='edit-history-item'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    Date</p>
+                            }
+                            <p>@ph.EntryDate</p>
+                        </div>
+                        <div class='edit-history-item is-comment'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    Comments</p>
+                            }
+                            <p>@ph.Comments</p>
+                        </div>
+                        <div class='edit-history-item'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    UserName</p>
+                            }
+                            <p>@ph.Username</p>
+                        </div>
+                    </div>
+            }
+                }
+            </div>
+        </div>
+        <div class='edit-projects-inner-container'>
+            @{ Html.BeginForm("ProcessEditSingleProjectFromManageSingleProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditSingleProject" }); }
+            <div class='column-container'>
+                <p>
+                    Year</p>
+                @epm.Year
+            </div>
+            <div class='column-container'>
+                <p>
+                    Creation Date</p>
+                @epm.DateCreated
+            </div>
+            <div class='column-container'>
+                <p>
+                    Profile Type</p>
+                <b>@ProfileNameStr.ToUpper()</b>
+            </div>
+            <div class='column-container'>
+                <p>
+                    Name</p>@Html.TextBox("Name", epm.Name)</div>
+            <div class='column-container'>
+                <p>
+                    Project Status</p>
+                <select name='ProjectStatus'>
+                    @foreach (Scheduling.Models.ProjectStatus ps in ViewBag.StatusList)
+                    {
+                        if (ps.ID == epm.CurrentProjectStatus)
+                        {
+                        <option selected="selected" value='@ps.ID'>@ps.Description</option>
+
+                        }
+
+                        else
+                        {
+                        <option value='@ps.ID'>@ps.Description</option>  
+                        }
+
+
+                    }
+                </select></div>
+            <div class='column-container'>
+                <p>
+                    Lock Status</p>
+                <select name='lock'>
+                    <option value='0' @{if (epm.IsLocked == 0)
+                                        {<text>selected="selected"</text>}}>Unlocked</option>
+                    <option value='1'  @{if (epm.IsLocked == 1)
+                                         {<text>selected="selected"</text>}}>Locked</option>
+                </select>
+            </div>
+            <input type='hidden' value='@epm.ID' name='ID'/>
+            <input type='hidden' value='@epm.CurrentProjectStatus' name='OriginalProjectStatus' />
+            <input type='hidden' value ='@epm.IsLocked' name='OriginalLockStatus' />
+            @{ Html.EndForm(); }
+        </div>
+        <!--end single project main properties container-->
+        
+     
+        <div style='clear: both' />
+               //form submit triggered by image click in editprojects.js
+        <div class='edit-projects-milestone-container'>
+            <div class='edit-projects-expand-logo-container'>
+                <img alt='toggle' src="@Url.Content("~/images/calendar_blank.png")" class='milestone-toggle' style='width:30px' title='Toggle Milestone Due Date Display'/>
+                <img alt='toggle' src="@Url.Content("~/images/plus-minus.png")" class='milestone-plus-minus-toggle'  style='margin-left:5px;width:30px' title='Toggle Add/Remove milestone Display'/>
+                @{ Html.BeginForm("EditProjectsCalculateRevertToBaselineVersion342", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditProjectsCalculateRevertToBaselineVersion342" }); }
+                @{
+                    
+                   if (CanShowRevertButton)
+                   {
+                    <img alt='toggle' src="@Url.Content("~/images/windback.jpg")" class='milestone-calc' style='margin-left:5px;width:30px;position:relative;' title='Wind Dates Back Using Profile Calculation'/>
+                   }
+                    
+                }
+                @{ 
+                    
+                   //for magazine types pass the newstand date into the form for calculations
+                   int? ProjectMilestoneProfile = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == epm.ID).First().MilestoneTreeSettingsProfileFK;
+                   int ProjectTypeProfile = Scheduling.Database.Utility.GetAllMilestoneTreeSettingsProfiles().Where(x => x.ID == ProjectMilestoneProfile).First().ProjectType;
+
+                   int MagProjProfileTypeSetting = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType"));
+                   int NsID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue"));
+
+                   if (ProjectTypeProfile == MagProjProfileTypeSetting)
+                   {
+                       string NsDate = epm.MileValueList.Where(x => x.MilestoneFieldFK == NsID).First().DueDate;
+                    <input type='hidden' value='@NsDate' name='hfDueDate' class='hfDueDate' />
+                    <input type='hidden' value='@ProjectTypeProfile' name='ProjectTypeProfile' />
+                      
+                        
+                   }
+                    
+
+                }
+                <input type='hidden' value='@epm.ID' name='id' id="ProjectID"/>
+                @{Html.EndForm();}
+                <img src="@Url.Content("~/images/edit.png")" class='edit-project-update' alt='update' style='position:relative;width:30px;margin-left:5px' title='Alter Project Name/Status/Lock Status'/>
+            </div>
+            <div>
+                <p style='font-weight: bold'>
+                    This section allows the manipulation of the due dates and dependancies</p>
+            </div>
+            @{
+               
+                
+                
+            }
+            @foreach (Scheduling.Models.MilestoneValue mv in epm.MileValueList)
+            {
+
+                Scheduling.Models.MilestoneField mf = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mv.MilestoneFieldFK).First();
+
+                string CurrentDesc = mf.Description;
+                CurrentDesc = Scheduling.Database.Utility.GetProjectSpecificDescWithParent(epm.ID, mf.ID);
+
+                if (mf.ID == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+                {
+                    Scheduling.Models.ProjectDisplay pd = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == epm.ID).First();
+
+                    //MOD has shipping completed instead of n/s date.
+                    CurrentDesc = Scheduling.Database.Utility.GetAliasByPubCodeAndMilestoneField(pd.PubCodeFK, mf.ID, CurrentDesc);
+                <div class='milestone-item'>
+                    <img style='display: none; width: 30px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success' />
+                    <p>@CurrentDesc</p>
+                    <input type='hidden' value='@mv.MilestoneFieldFK' class='milestone-field-hidden' />
+                    <input type='text' class='datepicker is-newsstand-item' value='@mv.DueDate' />
+                    <input type='hidden' value='@mv.DueDate' class='original-due-date-hidden' />
+                    <img src="@Url.Content("~/images/change.png")" alt='request' style='position: relative;
+                        top: 5px;width:30px' class='single-milestone-edit' title='Alter Due Date'/>
+                </div>
+                }
+
+                else
+                {
+                <div class='milestone-item'>
+                    <img style='display: none; width: 30px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success' />
+                    <p>@CurrentDesc</p>
+                    <input type='hidden' value='@mv.MilestoneFieldFK' class='milestone-field-hidden' />
+                    <input type='text' class='datepicker ' value='@mv.DueDate' />
+                    <input type='hidden' value='@mv.DueDate' class='original-due-date-hidden' />
+                    <img src="@Url.Content("~/images/change.png")" alt='request' style='position: relative;
+                        top: 5px;width:30px' class='single-milestone-edit' title='Alter Due Date'/>
+                </div>
+                    
+                }
+
+
+
+
+            }
+        </div>
+            
+        <div class='manage-single-project-add milestones'>@Html.Partial("_ListManagedProjectsAddRemoveMilestones", ViewData["ProjectID"] = epm.ID)</div>
+           
+    }
+</div>

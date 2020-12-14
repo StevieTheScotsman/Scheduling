@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Manage Holiday Live Change";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<h4>This procedure will recalculate the values for all projects which is necessary after a holiday change that has not been anticipated</h4>
+
+@{ Html.BeginForm("ProcessManageHolidayLiveChange", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessManageHolidayLiveChange" }); }
+
+
+
+
+@{
+    
+    if(!string.IsNullOrEmpty(ViewBag.Result))
+    {
+        <p>Completed</p>
+        
+    }
+    
+    else
+    {
+        
+        <input type='submit' value='Recalculate' />
+        
+    }
+    
+}
+
+
+@{ Html.EndForm(); }

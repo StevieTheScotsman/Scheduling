@@ -1,0 +1,167 @@
+﻿@{
+    Scheduling.Models.ProjectDisplay pd = Model;
+}
+@{
+    List<Scheduling.Models.ProjectNote> CurrentNotes = Scheduling.Database.Utility.GetProjectNotesFromProjectID(pd.ID);
+    int MajorMilestoneCount = Scheduling.Html.ReportingUtilities.GetNumberOfMajorMilestonesForProject(pd.ID);
+
+    int recordCellCount = 0;
+    switch (MajorMilestoneCount)
+    {
+        case 10:
+            recordCellCount = 134;
+            break;
+        case 11:
+            recordCellCount = 128;
+            break;     
+        case 12:
+            recordCellCount = 122;
+            break;
+        case 13:
+            recordCellCount = 116;
+            break;
+        case 14:
+            recordCellCount = 110;
+            break;
+        case 15:
+            recordCellCount = 104;
+            break;
+        case 16:
+            recordCellCount = 98;
+            break;
+        case 17:
+            recordCellCount = 92;
+            break;
+        case 18:
+            recordCellCount = 86;
+            break;
+        case 19:
+            recordCellCount = 80;
+            break;
+        case 20:
+            recordCellCount = 74;
+            break;
+        case 21:
+            recordCellCount = 68;
+            break;
+        case 22:
+            recordCellCount = 62;
+            break;
+        case 23:
+            recordCellCount = 56;
+            break;
+        case 24:
+            recordCellCount = 50;
+            break;
+        case 25:
+            recordCellCount = 44;
+            break;
+    }
+    
+    <table class="replicate-view-table">
+        @{
+
+            if (MajorMilestoneCount > 0)
+            {
+                List<Scheduling.Models.MilestoneValue> MilestoneValueWithoutParents = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(pd.ID).Where(p => p.ParentID == null).OrderByDescending(x => x.DisplaySortOrder).ToList();
+                int NewColspanVal = MajorMilestoneCount + 1;
+                int AlteredColSpanVal = NewColspanVal - 1;
+                <tr>
+                    <td><div class="viewTableLeft">@Scheduling.Html.ReportingUtilities.GenerateMonthYearHeaderForSingleProject(pd)</div></td>
+                    <td class="viewTableRight" colspan="@AlteredColSpanVal">
+                        @{
+                if (CurrentNotes.Count() > 0)
+                {
+                    <table class="kpcQuadPromo">
+                        <tr>
+                            <!--Kpc Job No start-->
+                            @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.KPCJobNumber).Count() > 0)
+                            {
+                                string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.KPCJobNumber).First().NoteValue;
+                                string DisplayStr = string.Format("KPC Project Number : {0}", CurrentVal);
+                                <td>@DisplayStr</td>
+                            }
+                            <!--Quad Job No start-->
+                            @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.QuadJobNumber).Count() > 0)
+                            {
+                                string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.QuadJobNumber).First().NoteValue;
+                                string DisplayStr = string.Format("Quad Job # : {0}", CurrentVal);
+                                <td>@DisplayStr</td>
+                            }
+                            <!--Cross Promo Ads start-->
+                            @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.NextIssueAndCrossPromo).Count() > 0)
+                            {
+                                string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.NextIssueAndCrossPromo).First().NoteValue;
+                                string DisplayStr = string.Format("Next Issue And Cross Promo Ads : {0}", CurrentVal);
+                                <td>@DisplayStr</td>
+                            }
+                            <td class="stayRight">@Scheduling.Html.ReportingUtilities.GenerateMonthYearHeaderForSingleProject(pd)</td>
+                        </tr>
+                    </table>
+                }
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    @{
+                        <td></td>
+                foreach (Scheduling.Models.MilestoneValue TopItem in MilestoneValueWithoutParents)
+                {
+                    <td class="dueDate">
+
+                        <div style="width:@recordCellCount;">
+                            @if (!string.IsNullOrWhiteSpace(TopItem.DueDate))
+                            {
+                                string[] sa = TopItem.DueDate.Split('/');
+                                if (TopItem.MilestoneFieldFK == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+                                {
+                                    <span>@string.Format("{0}/{1}/{2}", sa[0], sa[1], sa[2])</span>
+                                }
+
+                                else
+                                {
+                                    <span>@string.Format("{0}/{1}", sa[0], sa[1])</span>
+                                }
+
+                            }
+                        </div>
+
+                      </td>
+
+                }
+
+                }
+</tr>
+
+                List<string> DescList = Scheduling.Html.ReportingUtilities.GetDistinctSubItemDescriptions(pd.ID);
+
+                //Get Sorted List
+
+                string SortSubItems = System.Configuration.ConfigurationManager.AppSettings["SortSubItemsForReporting"];
+
+                if (SortSubItems.ToUpper() == "TRUE")
+                {
+                    DescList = Scheduling.Sorting.DisplaySorting.GetSortedDisplaySequenceFromDbBasedOnPubCodeAndTimeline(pd);
+                }
+
+                //stop
+                int i = 0;
+                foreach (string s in DescList)
+                {
+                    <tr class="@if (i % 2 == 0) {<text>rowColorGray</text>} @if (i % 2 != 0) {<text>rowColorWhite</text>}">
+                        <td class="descList">@s</td>
+                        @{foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueWithoutParents)
+                        {
+                            string insert = Scheduling.Html.ReportingUtilities.GetDateBasedOnSubItemDescAndParentIDForSpecificProject(s, pd.ID, mv.MilestoneFieldFK);
+                            <td class="subitemdates dataResults">@insert</td>
+                        }
+                        }
+                    </tr>
+                        i++;
+                }
+            }
+        }
+    </table>
+
+}
+

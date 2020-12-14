@@ -1,0 +1,66 @@
+﻿
+
+@{
+    
+    Scheduling.Models.ProjectDisplay CurrentItem = Model;
+  }
+
+
+
+@{
+    int? PrinterVal=null;
+    
+    Scheduling.Models.ProjectDisplay FooterItem = Model;
+    int? FooterPubID = FooterItem.PubCodeFK;
+    if(FooterPubID.HasValue)
+    {
+        PrinterVal=Scheduling.Database.Utility.GetAllPublicationCodes().Where(x=>x.ID==FooterPubID.Value).First().PrinterFK;
+    }
+ }
+
+<table width='100%' class='bottom-footer-table'>
+<tr>
+<td class='bottom-footer-class'>
+<div style='overflow:hidden;font-weight:bold;font-size:0.6em;padding:5px;width:100%;margin-top:-15px;' class='printer-div-outer'>
+@if (PrinterVal !=null)
+{
+    Scheduling.Models.Printer FooterPrinter=Scheduling.Database.Utility.GetAllPrinters().Where(x => x.ID == PrinterVal).First();
+   <div style='float:right;padding:10px' class='printer-div-inner'>
+   @string.Format("Printer: {0} , {1}",FooterPrinter.Company,FooterPrinter.Address)
+   </div>
+      <div style='clear:both;border-bottom:1px solid #ddd' />
+    
+   
+}
+ 
+</div>
+
+<div style='clear:both'/>
+
+<div style='overflow:hidden;font-weight:normal' class="footer-note-container">
+  <!--if there is a note show it-->
+     @{
+        string FooterReportNote = Scheduling.Database.Utility.GetReportFooterNoteByProjectID(FooterItem.ID);
+        
+        if(!string.IsNullOrWhiteSpace(FooterReportNote))
+        {
+            
+            <div style='float:left;'>@Html.Raw(FooterReportNote)</div>
+        }
+        
+         }
+
+</div>
+
+</td>
+</tr>
+</table>
+
+<!--Use Js To Get Page Layout 
+    Working-->
+<script type="text/javascript">
+
+    $('.footer-note-container p').css('margin', '0').css('padding', '0');
+    $('.footer-note-container').each(function () { $(this).find('p').first().css('padding-top', '5px'); });
+        
+</script>

@@ -1,0 +1,176 @@
+﻿@model List<Scheduling.Models.ChangeRequest>
+@{
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    ViewBag.Title = "Manage Change Requests";
+    List<int> ids = Model.Select(x => x.ProjectFK).Distinct().ToList();
+    List<Scheduling.Models.ProjectDisplay> PdList = Scheduling.Database.Utility.GetAllProjects().Where(y => ids.Contains(y.ID)).ToList();
+    bool FilterByStatus =Convert.ToBoolean(ViewBag.FilterByStatus);
+    
+    
+}
+@{
+           
+    if (Model.Count == 0)
+    {
+               
+    <p>
+        There are no results</p>
+               
+    }
+
+    else
+    {
+
+          
+    <div class='container'>
+        <div class='sixteen columns'>
+            <div class='six columns'>
+                @{   
+        if (ViewBag.CurrentProject == null)
+        {
+            ViewBag.CurrentProject = string.Empty;
+        }
+
+        Html.BeginForm("ProcessManageChangeRequests", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ProcessManageChangeRequests", id = "ProcessManageChangeRequests" });
+            
+            
+                }
+                <p>
+                    Projects With Change Requests</p>
+                <select name='project' class='select-change-request-project'>
+                    <option value=''>-All-</option>
+                    @Html.Raw(Scheduling.Html.ViewDropdown.BuildProjectsWithChangeRequestsDropdown(ViewBag.CurrentProject.ToString()))
+                </select>
+            </div>
+            <div class='six columns'>
+                <div style='margin-top: 40px'>
+
+                     @if (FilterByStatus)
+                     {
+                         
+                         <input type='checkbox' checked='checked' name='FilterByPendingChangeRequests' id='FilterByPendingChangeRequests' value='FilterOnPendingOnly' /><span style='margin-left: 10px; font-weight: bold'>Filter Pending Projects</span>
+                         
+                     }
+
+
+                     else
+                     {
+                              <input type='checkbox' name='FilterByPendingChangeRequests' id='FilterByPendingChangeRequests' value='FilterOnPendingOnly' /><span style='margin-left: 10px; font-weight: bold'>Filter Pending Projects</span>
+                         
+                     }                                         
+                       
+                    
+                </div>
+            </div>
+            @{
+                
+                     Html.EndForm();
+                
+            }
+        </div>
+    </div>    
+          
+
+                     foreach (Scheduling.Models.ProjectDisplay pd in PdList)
+                     {
+    <div style='padding: 15px'>
+        <table class='condensed zebra-striped'>
+            <caption style='background-color: #ddd'>
+                @pd.Name</caption>
+            <thead>
+                <tr>
+                    <th>
+                        Comment
+                    </th>
+                    <th>
+                        Requestor
+                    </th>
+                    <th>
+                        Decision
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                
+                         List<Scheduling.Models.ChangeRequest> CurrentChangReqList = Model.Where(x => x.ProjectFK == pd.ID).ToList();
+                         List<Scheduling.Models.ChangeRequestStatus> StatusList = Scheduling.Database.Utility.GetAllChangeRequestStatuses().ToList();
+
+                         foreach (Scheduling.Models.ChangeRequest CrItem in CurrentChangReqList)
+                         {
+                    
+                    <tr>
+                        <td>@CrItem.RequestorComment
+                        </td>
+                        <td>@CrItem.CreatedBy
+                        </td>
+                        @{
+                             Scheduling.Models.ChangeRequestStatus crs = StatusList.Where(x => x.ID == CrItem.RequestStatus).First();
+                             string CurrentStatus = crs.Description;
+                        
+                               
+                         
+                            <td>
+                                @{ if (CrItem.RequestStatus == (int)Scheduling.Enums.ChangeRequestStatus.Created)
+                                   {
+
+                                       Html.BeginForm("ProcessManageChangeRequestSingleItem", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageChangeRequestsSingleItem", @class = "ManageChangeRequestsSingleItemForm" });
+                                       foreach (Scheduling.Models.ChangeRequestStatus s in ViewBag.RequestStatusList)
+                                       {
+
+                                           if (CrItem.RequestStatus == s.ID)
+                                           {
+                                    <div class='change-request-container'>
+                                        <span class='change-request-radio-span'>@s.Description</span><input type="radio" name="RequestStatus-@CrItem.ID" value="@s.ID" checked="checked" /></div> 
+                                                   
+                                           }
+
+
+                                           else
+                                           {
+                                    <div class='change-request-container'>
+                                        <span class='change-request-radio-span'>@s.Description</span>
+                                        <input type="radio" name="RequestStatus-@CrItem.ID" value="@s.ID" /></div>
+
+                                           }
+
+
+                                       }
+                                           
+                                    <input type='hidden' name='ProjectFK' value='@CrItem.ProjectFK' />
+                                    <input type='hidden' name='id' value='@CrItem.ID' />
+                                    <img src="@Url.Content("~/images/save.png")" style='width:20px;position:relative;left:5px;top:0px' alt='manage change request' class='manage-change-request-save' />
+                                       Html.EndForm();
+                                   }
+
+                                   else
+                                   {
+                                       string CurrentDecisionStatus = Scheduling.Database.Utility.GetAllChangeRequestStatuses().Where(x => x.ID == CrItem.RequestStatus).First().Description;
+                                    <p>@CurrentDecisionStatus
+                                    </p>
+                                           
+                                           
+                                   }
+                                    
+                                }
+                            </td>
+                         
+                        }
+                    </tr>
+                         }
+                
+                
+                }
+            </tbody>
+        </table>
+    </div>
+                   
+        }
+
+
+
+    }
+           
+           
+           
+}

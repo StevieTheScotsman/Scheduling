@@ -1,0 +1,56 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+
+    List<Scheduling.Models.ProjectNote> ProjNotes = Scheduling.Database.Utility.GetProjectNotesFromProjectID(CurrentProject);
+    List<Scheduling.Models.ProjectNoteLabel> ProjLabelList = Scheduling.Database.Utility.GetAllProjectNoteLabels();
+}
+@{
+    
+    
+    if (ProjNotes.Count > 0)
+    {
+    <div class='list-project-notes-container'>
+        <img src="@Url.Content("~/images/toggle.gif")"style='width: 30px' alt='toggle' class='list-project-notes' />
+        <span class='bold'>Project Notes</span>
+        <div class='list-project-notes-information'>
+            <table class="condensed zebra-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            Label
+                        </th>
+                        <th>
+                            Value
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+        foreach (Scheduling.Models.ProjectNote pn in ProjNotes)
+        {
+
+            string CurrentLabel = ProjLabelList.Where(x => x.ID == pn.NoteLabelID).First().ShortDesc;
+
+            string CurrentValue = "---";
+            if(!string.IsNullOrWhiteSpace(pn.NoteValue)) {
+                CurrentValue = pn.NoteValue;
+            };
+                        <tr>
+                            <td>
+                               @CurrentLabel
+                            </td>
+                            <td>
+                                @CurrentValue
+                            </td>
+                        </tr>
+
+        }
+                    
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+    
+}

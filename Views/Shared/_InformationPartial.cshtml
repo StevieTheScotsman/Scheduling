@@ -1,0 +1,11 @@
+﻿<div style='position: fixed; top: 15px; right: 15px; color: #0f556f;padding-bottom:10px;padding-left:10px;' class='information-container'>
+    <span> @User.Identity.Name
+        @{
+            int i = Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID();
+            if (i > 0)
+            {
+            <text>|</text> @Scheduling.Database.Utility.GetAllRoles().Where(x => x.ID == Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID()).First().ShortDesc 
+            }
+        }
+    </span><span class="vault-info">| @Scheduling.StringFunctions.Utility.GetAppSettingValue("VaultInstance") </span><span class='db-info' >| @Scheduling.Security.Utility.GetDatabaseConnection() </span><span class="versionInfo">| v @Scheduling.Database.Utility.GetAppVersionNumber()</span>
+</div>

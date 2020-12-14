@@ -1,0 +1,75 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+    List<Scheduling.Models.MilestoneValue> MilestoneValueList = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject).Where(x => x.CalcFiringOrder != null && x.DependantUpon !=null).OrderBy(x => x.CalcFiringOrder).ToList();
+    List<Scheduling.Models.MilestoneField> MilestoneFieldList = Scheduling.Database.Utility.GetAllMilestoneFields();
+    List<int?> DistinctDependancyList = MilestoneValueList.Select(x => x.DependantUpon).Distinct().ToList();
+}
+ 
+<table class='condensed  manage-project-dependancy-partial '>
+
+    <thead>
+    <tr> <th><div style='position:relative;left:-7px'><img src="@Url.Content("~/images/toggle.gif")" style='width:30px' alt='toggle' class='img-manage-project-dependancy-partial'/><span style='font-size:14px;font-weight:bold'> Dependancies</span></div></th></tr>
+      
+       
+    </thead>
+    <tbody>
+             
+             <tr><td><p style='font-style:italic;font-size:0.8em'>Parenthesis show assigned parent item</p></td></tr>
+    
+       
+            @{
+                foreach (int? du in DistinctDependancyList)
+                {
+                    string FieldName = Scheduling.Database.Utility.GetMilestoneDescFromID((int)du);
+
+                    List<Scheduling.Models.MilestoneValue> DepList = MilestoneValueList.Where(x => x.DependantUpon == (int)du).ToList();
+                        
+                  <tr> <td>
+                               
+                  
+                                <table >
+                                <thead>
+                                <tr style='background-color:#f5f5f5;'> <th style='width:50%'>@FieldName</th><th style='font-size:0.9em;font-weight:normal;font-style:italic'>Calculation</th></tr>
+      
+                                          
+                                </thead>
+                                 <tbody>
+
+
+                                 @{
+                    foreach (Scheduling.Models.MilestoneValue mv in DepList)
+                    {
+                        //Get Calculation                 
+                                          
+                                         // string RowFieldName = Scheduling.Database.Utility.GetMilestoneDescFromID(mv.MilestoneFieldFK);
+                        string RowFieldName = Scheduling.Database.Utility.GetProjectSpecificDescWithParent(CurrentProject, mv.MilestoneFieldFK);
+                        string RowCalcName =string.Format("  {0} ", Scheduling.Database.Utility.GetAllCalculationFields().Where(x => x.ID == mv.CalculationFK).First().ShortDesc);
+                                         
+                                         <tr ><td style='width:50%'>
+                                                 @RowFieldName
+                                         </td>
+                                         <td >
+                                                 @RowCalcName
+                                         </td>
+                                         </tr>
+                                     
+                    }
+                                     
+                                   }
+  <tr></tr>
+                                 </tbody>
+                  
+                             
+                               </table>
+                  
+                  
+                  
+                  </td>
+                     </tr>
+                }
+            }
+
+
+         </tbody>
+   
+</table>

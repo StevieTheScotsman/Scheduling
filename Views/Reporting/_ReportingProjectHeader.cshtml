@@ -1,0 +1,26 @@
+﻿@{
+    Scheduling.Models.ProjectDisplay CurrentItem = Model;
+}
+
+<div class="header">
+    @{
+        string ReportDesc = string.Format("{0} {1} - Production Schedule", Scheduling.Database.Utility.GetPubCodeReportDescFromID(CurrentItem.PubCodeFK.Value), ViewBag.ReportingYearVal);
+        <h2>@ReportDesc</h2>
+    }
+    <div class="pubcodeTop">@string.Format("Pub Code: {0}", Scheduling.Database.Utility.GetPubCodeShortDescFromID(CurrentItem.PubCodeFK.Value))</div>
+
+    @{int? ProfitCenter = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == CurrentItem.PubCodeFK.Value).First().ProfitCenter;
+
+    if (ProfitCenter.HasValue)
+    {
+        <div class="profitCenterTop">@string.Format("Profit Center: {0}", ProfitCenter.Value)</div>
+    }
+    }
+    <div class="pubcodeTopRight">@string.Format("{0}", Scheduling.Database.Utility.GetPubCodeShortDescFromID(CurrentItem.PubCodeFK.Value))</div>
+    <div class="revisedDateTop">Revised @DateTime.Now.ToShortDateString()</div>
+</div>
+
+
+
+
+

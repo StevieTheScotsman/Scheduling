@@ -1,0 +1,81 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+    List<Scheduling.Models.MilestoneValue> CurrentList = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject);
+
+    List<Scheduling.Models.MilestoneValue> ParentList = CurrentList.Where(x => x.ParentID == null).OrderByDescending(x => x.DisplaySortOrder).ToList();
+    string ProfileTypeDesc = Scheduling.Database.Utility.GetProfileTypeNameFromProjectID(CurrentProject);
+    
+    //start Get Project Baseline Description
+    int? MilestoneProfileFK = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == CurrentProject).First().MilestoneTreeSettingsProfileFK;
+    string CurrentBaselineStr = string.Empty;
+    if(MilestoneProfileFK.HasValue)
+    {
+
+        CurrentBaselineStr = Scheduling.Database.Utility.GetAllMilestoneTreeSettingsProfiles().Where(x => x.ID == MilestoneProfileFK.Value).First().Description;
+        
+    }
+    
+    int NewsstandDateID=Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")); 
+    
+    Scheduling.Models.ProjectDisplay ProjectInstance = Scheduling.Database.Utility.GetAllProjects().Where(x=>x.ID==CurrentProject).First();
+    
+    //stop
+}
+<div class='slider-container'>
+  
+    <div>
+        <img src="@Url.Content("~/images/toggle.gif")" style='width: 30px' alt='toggle' class='img-manage-project-partial-slider' /><span
+            class='bold'>@string.Format("Project Baseline is {0} based on  Profile Type of {1}",CurrentBaselineStr.ToUpper(),ProfileTypeDesc.ToUpper())</span></div>
+    <div class="scroll-pane ui-widget ui-widget-header ui-corner-all slider-content-container">
+        <div class="scroll-content">
+            @foreach (Scheduling.Models.MilestoneValue mv in ParentList)
+            { 
+                string FieldName = Scheduling.Database.Utility.GetMilestoneDescFromID(mv.MilestoneFieldFK);
+                if (mv.MilestoneFieldFK == NewsstandDateID)
+                {
+                    FieldName = Scheduling.Database.Utility.GetAliasByPubCodeAndMilestoneField(ProjectInstance.PubCodeFK, mv.MilestoneFieldFK, FieldName);
+                }
+               
+                <div class="scroll-content-item ui-widget-header">
+                    <p class='slider-p-header'>
+                        @FieldName</p>
+                    <p class='slider-p-duedate'>
+                        @mv.DueDate</p>
+                    @{
+                List<Scheduling.Models.MilestoneValue> SubItemList = CurrentList.Where(x => x.ParentID == mv.MilestoneFieldFK).ToList();
+                        <div class='slider-subitem-container'>
+                            @foreach (Scheduling.Models.MilestoneValue mvsi in SubItemList)
+                            {
+                                <p>@Scheduling.Database.Utility.GetMilestoneDescFromID(mvsi.MilestoneFieldFK)</p>
+                                <p style='border-bottom: 3px dashed white'>@mvsi.DueDate</p>
+                        
+                        
+                                //start Go Down one nested level
+                                int ChildrenOfSubItemsCount = CurrentList.Where(x => x.ParentID == mvsi.MilestoneFieldFK).Count();
+                                if (ChildrenOfSubItemsCount > 0)
+                                {
+                                    List<Scheduling.Models.MilestoneValue> NestedList = CurrentList.Where(x => x.ParentID == mvsi.MilestoneFieldFK).ToList();
+                                    foreach (Scheduling.Models.MilestoneValue mvni in NestedList)
+                                    {  <div style='border-bottom: 1px dashed blue'>
+                                        <p style='font-style: italic'>@Scheduling.Database.Utility.GetMilestoneDescFromID(mvni.MilestoneFieldFK)</p>
+                                        <p style='font-style: italic'>@mvni.DueDate</p>
+                                    </div>
+                                    }
+
+                                }
+
+
+                                //stop
+                            }
+                        </div>
+                    }
+                </div>
+     
+            }
+        </div>
+        <div class="scroll-bar-wrap ui-widget-content ui-corner-bottom">
+            <div class="scroll-bar">
+            </div>
+        </div>
+    </div>
+</div>

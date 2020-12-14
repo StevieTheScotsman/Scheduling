@@ -1,0 +1,101 @@
+﻿@model List<Scheduling.Models.ProjectDisplay> 
+@{
+    ViewBag.Title = "Edit Reviewable Projects";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int MilestoneFieldID = Convert.ToInt32(ViewBag.MilestoneFieldID);
+    int ProjectStatusRejectedOnSaleID = (int)Scheduling.Enums.ProjectStatus.OnSaleDateRejected;
+    int ProjectStatusApprovedOnSaleID = (int)Scheduling.Enums.ProjectStatus.OnSaleDateApproved;
+    List<int?> PubCodeList = Model.Select(x => x.PubCodeFK).Distinct().ToList();
+
+}
+@if (Model.Count == 0)
+{
+
+    <p style='font-style: italic'>
+        There Are No Currently Reviewable Projects.These are projects with a status of OnSaleDate In Review</p>
+}
+@if (Model.Count > 0)
+{
+    
+    
+    <div>
+        <input type='checkbox' value='Accept All' name='ReviewAcceptAllAndSubmit' id='ReviewAcceptAllAndSubmit' /><span
+            style='margin-left: 10px; font-weight: bold'>Accept All And Submit Changes</span>
+    </div> 
+
+    foreach (int? i in PubCodeList)
+    {
+
+
+        if (i.HasValue)
+        {
+            string PubCodeDesc = Scheduling.Database.Utility.GetPubCodeShortDescFromID(i.Value);
+            string Header = string.Format("{0} Reviewable Projects", PubCodeDesc);
+            List<Scheduling.Models.ProjectDisplay> CurrentPdList = Model.Where(x => x.PubCodeFK == i).ToList();
+
+    @Html.Partial("_TableHeaderPartial", ViewData["header"] = Header);
+
+                                                                     
+    <table id="review-table">
+        <tr>
+            <th id="th-name">
+                Project Name
+            </th>
+            <th id="th-duedate">
+                NewsStand Date
+            </th>
+            <th>
+                Decision
+            </th>
+            <th>
+                Optional Comment
+            </th>
+        </tr>
+        @{ foreach (Scheduling.Models.ProjectDisplay p in CurrentPdList)
+           {
+               string DueDate = "---";
+               DueDate = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(p.ID).Where(x => x.MilestoneFieldFK == MilestoneFieldID).First().DueDate;
+               if (!string.IsNullOrWhiteSpace(DueDate))
+               {
+
+                   DueDate = Convert.ToDateTime(DueDate).ToLongDateString();
+
+               }
+            <tr>
+                <td>@p.Name
+                </td>
+                <td>@DueDate
+                </td>
+                <td>
+                    @{ Html.BeginForm("ProcessSingleManageableReviewableProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", @class = "ProcessSingleManageableReviewableProject" }); }
+                    <div>
+                        <div style='display: inline; margin-right: 20px'>
+                            <span style='position: relative; top: -3px'>Accept</span><input type='radio' name='review-radio-group'
+                            value='@ProjectStatusApprovedOnSaleID' /></div>
+                        <div style='display: inline'>
+                            <span style='position: relative; top: -3px'>Reject</span><input type='radio' name='review-radio-group'
+                            value='@ProjectStatusRejectedOnSaleID' /></div>
+                    </div>
+                </td>
+                <td>
+                    <input type='text' name='comment' />
+                </td>
+                <td>
+                    <input type='submit' value='Update Status' />
+                    <input type='hidden' name='ProjectID' value='@p.ID' class='hf-project-id'/>
+                    @{ Html.EndForm(); }
+                </td>
+            </tr>
+       
+           }
+        }
+    </table>
+            
+
+        }
+
+    }
+
+
+}
+    

@@ -1,0 +1,101 @@
+﻿@model List<Scheduling.Models.ProjectNote>
+@{
+    ViewBag.Title = "ManageSingleProjectNotes";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+@Html.ValidationSummary()
+@{ Html.BeginForm("ProcessAddNoteToProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditSingleProject" }); }
+<div class='container'>
+    <h2>
+        Manage Project Notes for @ViewBag.ProjectDisplay.Name</h2>
+    <div class='row clearfix'>
+        <div style='padding-bottom: 10px'>
+            <input type='hidden' value='@ViewBag.ProjectDisplay.ID' name='ProjectFK'/>
+            <p style='font-weight: bold'>
+                Note Label</p>
+            <input type="text" name="NoteLabel" />
+            <p style='font-weight: bold'>
+                Note Value</p>
+            <textarea rows="4" cols="50" style='max-width:250px' name="NoteValue" id="NoteValue" >
+     
+</textarea>
+        </div>
+        <input type="submit" value="Add Project Note" />
+        @{ Html.EndForm(); }
+    </div>
+    <div class='sixteen columns' style='border-top: 1px solid #ccc; padding-top: 15px'>
+        @{
+            if (Model.Count == 0)
+            {
+            <p>
+                There are no notes for this project</p>
+                
+                
+            }
+
+            else
+            {
+            <table class='condensed zebra-striped'>
+                <thead>
+                    <tr>
+                        <th>
+                            Label
+                        </th>
+                        <th>
+                            Value
+                        </th>
+                        <th class='hideoncenterlimit'>
+                            Created By
+                        </th>
+                        <th class='hideoncenterlimit'>
+                            Date Created
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.ProjectNote pn in Model)
+                        { 
+           
+                        <tr class='list-projects-row'>
+                            <td>@pn.NoteLabel
+                            </td>
+                            <td>@pn.NoteValue
+                            </td>
+                            <td>@pn.Username
+                            </td>
+                            <td class='hideoncenterlimit'>
+                            
+                             @Convert.ToDateTime(pn.EntryDate).ToShortDateString() 
+                            </td>
+
+                             <td>
+                                 
+                                 @{
+                                
+
+                            Html.BeginForm("DeleteSingleProjectNote", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "AdvancedProjects",@class="AdvancedProjects" }); }
+                                <img src="@Url.Content("~/images/remove-note.png")" width='20px' alt='edit advanced project' class='remove-project-note'/>
+                                <input type='hidden' name='id' value='@pn.ID' />
+                                <input type='hidden' name='ProjectFk' value='@pn.ProjectFK' />
+                                 @{ Html.EndForm(); }
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+                
+                
+                
+            }
+            
+            
+            
+        }
+    </div>
+</div>
+   

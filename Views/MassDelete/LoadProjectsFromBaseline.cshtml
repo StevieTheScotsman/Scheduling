@@ -1,0 +1,157 @@
+﻿@model List<Scheduling.Models.ProjectDisplay>
+@using Scheduling.Models;
+
+@{
+    ViewBag.Title = "Delete Selected Projects";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int CurrentProfileID = Convert.ToInt32(ViewBag.ID);
+
+    string Desc = Scheduling.Database.Utility.GetAllMilestoneTreeSettingsProfiles().Where(x => x.ID == CurrentProfileID).First().Description;
+    string HeaderDesc = string.Format("Projects Based On {0}", Desc);
+}
+
+
+
+@Html.Partial("_TableHeaderPartial", ViewData["header"] = HeaderDesc)
+
+<table class='condensed zebra-striped' id='results'>
+    <thead>
+        <tr>
+            <th><input type="checkbox" name="selectAllProjects" value="all" class="ProjectAllCbx"> Select All </th>
+            <th>
+                Project Name
+            </th>
+
+        </tr>
+    </thead>
+    <tbody class='group-pagination'>
+
+
+
+        @{  foreach (Scheduling.Models.ProjectDisplay p in Model)
+          {
+
+            <tr>
+                <td><input type="checkbox" name="selectAllProjects" value="project_@p.ID" class="ProjectCbx">Delete</td>
+                <td>
+                    @p.Name
+                </td>
+
+            </tr>
+
+
+          }
+
+        }
+
+
+
+    </tbody>
+
+
+
+</table>
+
+<input type="button" value="Delete Projects" class="delete-projects" style="margin-top:20px"/> 
+
+@{ Html.BeginForm("DeleteProjects", "MassDelete", FormMethod.Post, new { enctype = "multipart/form-data", name = "MassDelete", id = "MassDelete" }); }
+<input type="hidden" class="hfProjectsToDelete" value="" name="ProjectsToDelete"/>
+
+
+@{Html.EndForm();}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+        //init 
+        function initCbxs()
+        {
+            $('.ProjectAllCbx,.ProjectCbx').prop('checked', false);
+
+        }
+
+        //submit event
+        $('.delete-projects').on("click" ,function () {
+
+            var numChecked = $('.ProjectCbx:checked').length;
+            if (numChecked == 0) { alert('select at least one project'); return false;}
+            
+            //ui
+            $('<div></div>').appendTo('body')
+            .html('<div><h6>Are you sure you want to delete all projects associated with this baseline?</h6></div>')
+            .dialog({
+                modal: true, title: 'Confirm Projects Deletion', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                buttons: {
+                    Yes: function () {
+                        
+                        $('#MassDelete').submit();
+                        $(this).dialog("close");
+
+                    },
+                    No: function () {
+                        $(this).dialog("close");
+                        
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                    
+                }
+            });
+            
+            
+            
+        });
+
+        //Just post the project ids to be deleted.
+        function PopulateProjectsHiddenField()
+        {
+            var idsToDelete = '';
+
+            $('.ProjectCbx:checked').each(function () {
+
+                var cvArray = $(this).val().split('_');
+                var cc = cvArray[1];
+                idsToDelete += cc + ',';
+            })
+
+            idsToDelete = idsToDelete.substring(0, idsToDelete.length - 1);
+            $('.hfProjectsToDelete').val(idsToDelete);
+
+        }
+
+        $('.ProjectCbx').click(function () {
+
+            PopulateProjectsHiddenField();
+
+        });
+
+
+        //select all event 
+        $('.ProjectAllCbx').click(function () {
+
+            
+            if ($(this).is(':checked')) {
+
+                $('.ProjectCbx').prop('checked', true);
+            }
+
+            else
+            {
+                $('.ProjectCbx').prop('checked', false);
+
+            }
+
+            PopulateProjectsHiddenField();
+
+        });
+        
+        initCbxs();
+
+    });
+
+</script>

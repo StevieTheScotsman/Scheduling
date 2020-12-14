@@ -1,0 +1,113 @@
+﻿@model Scheduling.Models.PublicationCode
+@{
+    ViewBag.Title = "Edit Publication";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+    //IsActive
+    bool IsActive = false;
+    if (Model.IsActive.HasValue) { if(Model.IsActive.Value == 1) { IsActive = true; }}
+      
+    
+    //IsAnnual
+    bool IsAnnual = false;
+    if (Model.IsAnnual==1) { IsAnnual = true; }
+
+    //Newsstand Report
+    bool ShowInNewsstandReport = false;
+    if (Model.ShowInNewsStandReport == 1) { ShowInNewsstandReport = true; }
+
+    bool HasCustomOffset = false;
+    if (Model.HasCustomOffset == 1) { HasCustomOffset = true; }
+}
+
+
+<div class="container">
+    <div class='row clearfix'>
+        <h2>
+           Edit @Model.ShortDesc
+        </h2>
+        
+    </div>
+    <div style="font-weight:bold">@Html.ValidationSummary()</div>
+    
+    <!--form start-->
+    @{ Html.BeginForm("ProcessEditPublication", "Publication", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessEditPublication" }); }
+    <div class='row'>
+        <input type="hidden" value="@Model.ID" name="id"/>
+        <!--steps one thro four-->
+        <div class='eight columns'>
+            <!--short desc-->
+            <p>
+                Short Description
+            </p>
+            @Html.TextBox("ShortDesc",Model.ShortDesc)
+            <!--long desc-->
+            <p>
+                Long Description
+            </p>
+            @Html.TextBox("LongDesc",Model.LongDesc)
+
+            <!--report desc-->
+            <p>
+                Report Description
+            </p>
+            @Html.TextBox("ReportDesc",Model.ReportDesc)
+            <p>
+
+                <!--Is Active -->
+                Is Active
+            </p>
+            
+
+            @Html.CheckBox("IsActive",IsActive)
+
+            <!--Custom Offset -->
+            <p style='padding-top:10px;'>
+                Has  Custom Offset
+            </p>
+            @Html.CheckBox("HasCustomOffset", HasCustomOffset)
+        </div>
+        <div class='eight columns'>
+            <!--right hand column -->
+            <!--printer-->
+            <p>
+                Printer (Optional)
+            </p>
+            <select name="Printer">
+                <option value=''>--Choose--</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPrinterDropdownForPublication(Model.PrinterFK))
+            </select>
+
+            <!--profit center -->
+            <p>
+                Profit Center
+            </p>
+            @Html.TextBox("ProfitCenter",Model.ProfitCenter)
+
+            <!--Parent Pub -->
+            <p>
+                Parent Pub
+            </p>
+            <select name="ParentPub">
+                <option value=''>--No Parent Pub--</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedParentPubForPublication(Model.ParentPub))
+            </select>
+
+            <!--Is Annual -->
+            <p>
+                Is Annual
+            </p>
+           @Html.CheckBox("IsAnnual",IsAnnual)
+
+            <!--Show In Newsstand -->
+            <p style='padding-top:10px;'>
+                Show In Newsstand
+            </p>
+           @Html.CheckBox("ShowInNewsStand",ShowInNewsstandReport)
+
+            <br />
+            <input type='submit' value='Edit Publication' style='margin-top:10px;' />
+        </div>
+    </div>
+    @{ Html.EndForm(); }
+</div>

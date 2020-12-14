@@ -1,0 +1,210 @@
+﻿@{
+    int CurrentRoleID = Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID();
+}
+
+<div class="gridRow header">
+
+    <div class="imageHolder">
+        <a class='no-underline go-to-root'>
+            <img src="~/images/updates/kLogoClear.png" title="Kalmbach Publishing - Production Schedule" alt="kalmbach publishing - production schedule" />
+        </a>
+    </div>
+
+    <div class="navHolder">
+        <a class="toggleMenu" id="toggleLink" name="toggleMenu"><img src="~/Images/updates/menuBlue.png" style="width:55%;" /></a>
+        <ul class="nav">
+            <li>
+                <a name="users">Users</a>
+                <ul>
+                    @{
+                        if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+                        {
+                            <li>@Html.ActionLink("Add User(s)", "AddSingleUser", "Home")</li>
+                            <li>@Html.ActionLink("Manage Users", "EditUsers", "Home")</li>
+                            <li>@Html.ActionLink("Manage Groups", "ManageGroups", "Home")</li>
+                            <li>@Html.ActionLink("Group Associations", "ManageGroupAssociations", "Home")</li>
+                        }
+                    }
+                    <li>@Html.ActionLink("View Users", "ListUsers", "Home")</li>
+                    <li class='default'>@Html.ActionLink("View Departments", "ListDepartments", "Home")</li>
+                    <li class='default'>@Html.ActionLink("View Groups", "ListGroups", "Home")</li>
+                    <li class='default'>@Html.ActionLink("View Roles", "ListRoles", "Home")</li>
+                    <li class='default'>@Html.ActionLink("Group Associations", "ListGroupAssociations", "Home")</li>
+                </ul>
+            </li>
+            <li class="bd"></li>
+            <li>
+                <a name="projects">Projects</a>
+                <ul>
+                    @{
+
+                        if (CurrentRoleID != (int)Scheduling.Enums.Role.Admin && CurrentRoleID != (int)Scheduling.Enums.Role.SuperAdmin)
+                        {
+                            <li>@Html.ActionLink("View Projects", "ListProjects", "Home")</li>
+                        }
+
+                        if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+                        {
+                            <li>@Html.ActionLink("Delete Proj. Entries", "ResetProjects", "Home")</li>
+                            <li>@Html.ActionLink("Manage Projects", "ListManagedProjects", "Home")</li>
+                            <li>@Html.ActionLink("Create Projects", "CreateMultipleStepOne", "Home")</li>
+                        }
+
+                    }
+                </ul>
+            </li>
+            <li class="bd"></li>
+            <li>
+                <a name="activity">Activity</a>
+                <ul>
+                    <li>@Html.ActionLink("View Activity Log", "ListActivities", "Home")</li>
+                    <li class='delete-activity'>@Html.ActionLink("Delete Activity Log", "DeleteAllActivity", "Home")</li>
+                </ul>
+            </li>
+            <li class="bd"></li>
+            <li>
+                <a name="baselines">Baselines</a>
+                <ul>
+                   <!--Remove listprofiletypes controller reference-->
+                    <li>@Html.ActionLink("Manage Baselines", "ManageMilestoneTreeSettingProfiles", "Home")</li>
+                    <li>@Html.ActionLink("Create Baseline", "AddSingleMilestoneTreeSettingProfile", "Home")</li>
+                </ul>
+            </li>
+            <li class="bd"></li>
+            <li>
+                <a href="#">Reporting</a>
+                <ul>
+                    <li class='default'>@Html.ActionLink("Generate Reports", "GenerateReportsFiltered", "Reporting")</li>
+                </ul>
+            </li>
+            <li class="bd"></li>
+            <li>
+                <a href="#">Administration</a>
+                <ul>
+                    <li>@Html.ActionLink("Baseline Types", "ListProfileTypes", "Home")</li>
+                    @{
+                        if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                        {
+                            <li class='default'>@Html.ActionLink("Major Milestones", "ManageMajorMilestones", "Home")</li>  }
+
+                    }
+                    <li>
+                        <a name="publications">Publications</a>
+                        <ul>
+                            <li class="default">@Html.ActionLink("Publication Info.", "ListPublicationCodes", "Home")</li>
+
+                            @{
+                                if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                                {
+                                    <li class="default">@Html.ActionLink("Add Publication", "AddPublication", "Publication") </li>
+                                    <li class='default'>@Html.ActionLink("Update Publication", "ManagePublicationCodes", "Publication")</li>  }
+
+                            }
+
+                        </ul>
+                    </li>
+                    <li>
+                        <a name="logging">Logging</a>
+                        <ul>
+                            <li class="default">@Html.ActionLink("View App Log", "ShowApplicationLog", "Logging")</li>
+                            <li class="default">@Html.ActionLink("View App Error Log", "ShowApplicationErrorLog", "Logging")</li>
+                            <li class="default">@Html.ActionLink("Reset App Log", "ResetApplicationLog", "Logging")</li>
+                            <li class="default">@Html.ActionLink("Reset Error Log", "ResetApplicationErrorLog", "Logging")</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a name="testing">Testing</a>
+                        <ul>
+                            <li class="default">@Html.ActionLink("Email Connection", "Email", "Test")</li>
+                            <li class="default">@Html.ActionLink("Exception Filter", "Exception", "Test")</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a name="holidays">Holidays</a>
+                        <ul>
+                            <li class='default'>@Html.ActionLink("Holidays", "ManageHolidays", "Home")</li>
+                            <li class='default'>@Html.ActionLink("Holiday Change", "ManageHolidayLiveChange", "Home")</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a name="linking">Linking</a>
+                        <ul>
+                            @{ if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                             {
+                                <li>@Html.ActionLink("Manage Settings", "ManageLinkSettings", "Linking")</li>
+                             }
+
+                             else
+                             {
+                                <li>@Html.ActionLink("View Settings", "ListLinkSettings", "Linking")</li>
+                             }
+                            }
+                        </ul>
+                    </li>
+                    <li>@Html.ActionLink("Field Aliases", "ListFieldAliases", "Home")</li>
+                    <li>@Html.ActionLink("Reports Presentation", "Presentation", "Reporting")</li>
+                    <li>@Html.ActionLink("Check for Duplicates", "DataIntegrity", "Reporting")</li>
+                </ul>
+            </li>
+            <li class="bd"></li>
+            <li>
+                <a name="documentation">Documentation</a>
+                <ul>
+                    @{
+                        if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                        {
+                            <li class='default'>@Html.ActionLink("Application Settings", "AppSettings", "Documentation")</li>
+                            <li class='default'>@Html.ActionLink("Developer Notes", "DeveloperNotes", "Documentation")</li>
+                            <li class='default'>@Html.ActionLink("User Information", "UserInformation", "Documentation")</li>
+                        }
+                    }
+                </ul>
+            </li>
+            <li style="display:none;" id="userInfoLi">
+                <div class='information-container noMarginLeft userInfo'>
+                    <span>
+                        <strong>Welcome back:</strong> </><span class="userName"> @User.Identity.Name </span>
+                        @{
+                            int j = Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID();
+                            if (j > 0)
+                            {
+                                <text><br /><strong>Role:</strong></text> @Scheduling.Database.Utility.GetAllRoles().Where(x => x.ID == Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID()).First().ShortDesc
+                            }
+                        }
+                    </span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div id="infoBlock" class='information-container userInfo'>
+        <span>
+                <strong>Welcome back:</strong> </><span class="userName"> @User.Identity.Name </span>
+            @{
+                int i = Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID();
+                if (i > 0)
+                {
+                    <text><br /><strong>Role:</strong></text> @Scheduling.Database.Utility.GetAllRoles().Where(x => x.ID == Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID()).First().ShortDesc
+                }
+            }
+        </span>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var str = $('.userName').html();
+        $('.userName').html(str.replace(/WAUKESHA\\/g, ''));
+
+        $('#toggleLink').click(function () {
+            if ($("#toggleLink").hasClass('active')) {
+                $('#userInfoLi').css('display', 'none');
+                $('#infoBlock').css('display', 'inline-block');
+            }
+            else {
+                $('#infoBlock').css('display', 'none');
+                $('#userInfoLi').css('display', 'inline-block');
+            }
+        });
+    });
+</script>

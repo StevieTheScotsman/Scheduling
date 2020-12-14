@@ -1,0 +1,69 @@
+﻿@model List<Scheduling.Models.Group>
+
+@{
+    ViewBag.Title = "List Groups";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+
+@{ if (Model.Count==0)
+   {
+       <p>There are no results</p>
+    }
+}
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Groups")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                           Group
+                        </th>
+                                               
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.Group g in Model)
+                        { 
+           
+                        <tr>
+                            <td>@g.Description
+                            </td>
+                            
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+       <div id="pageNavPosition"></div>
+  
+        <script type="text/javascript"><!--
+            var pager = new Pager('results', 5);
+            pager.init();
+            pager.showPageNav('pager', 'pageNavPosition');
+            pager.showPage(1);
+       </script>
+
+
+    
+</div>

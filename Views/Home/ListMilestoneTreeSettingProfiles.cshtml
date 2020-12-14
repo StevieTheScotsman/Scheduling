@@ -1,0 +1,61 @@
+﻿@model List<Scheduling.Models.MilestoneTreeSettingsProfileDisplay>
+@{
+    ViewBag.Title = "ListMilestoneTreeSettingProfiles";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                       @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Baselines")
+            <table class='condensed zebra-striped'>
+                <thead>
+                    <tr>
+                       <th>ID</th>
+                        <th>
+                            Description
+                        </th>
+                        <th>
+                            Baseline Type
+                        </th>
+                        <th>In Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.MilestoneTreeSettingsProfileDisplay mpd in Model)
+                        {
+
+                            int i = Scheduling.Database.Utility.GetAllProjects().Where(x => x.MilestoneTreeSettingsProfileFK ==mpd.ID).Count();
+
+                            string InUse = "NO";
+                            if (i > 0)
+                            {
+                                InUse = string.Format("Used in {0} Project(s)", i);
+
+                            }
+                            
+                        <tr>
+                            <td>@mpd.ID</td>
+                            <td>@mpd.Description
+                            </td>
+                            <td>@mpd.ProjectProfileTypeName
+                            </td>
+                            <td>@InUse</td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+</div>

@@ -1,0 +1,158 @@
+﻿@*  Prepopulate Primary Profile and field with magazine and n/s on sale date   *@
+
+@{
+    ViewBag.Title = "Add Link Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<div class="container linkaddition">
+    @Html.ValidationSummary()
+    @{ Html.BeginForm("ProcessAddLinkSetting", "Linking", FormMethod.Post, new { enctype = "multipart/form-data", id = "AddLinkSetting" }); }
+    <div class="sixteen columns scroll-to-on-load">
+        <h2>Add Link Setting</h2>
+        <h4>Step 1... Choose Source Profile Type and Milestone</h4>
+
+        <div class="seven columns alpha">
+
+            <p>Primary Project Profile</p>
+
+            <select name="PrimaryProfileTypeID">
+                @foreach (Scheduling.Models.ProjectProfileType ppt in ViewBag.ProjectProfileTypeList)
+                {
+
+                    if (ppt.ID == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType")))
+                    {
+                        <option selected="selected" value="@ppt.ID">@ppt.Description</option> }
+
+                    else
+                    {
+                        <option value="@ppt.ID">@ppt.Description</option>
+
+                    }
+
+                }
+
+            </select>
+        </div>
+
+        <div class="seven columns">
+
+
+            <p>Primary Milestone Field</p>
+
+            <select name="PrimaryMilestoneID">
+                @foreach (Scheduling.Models.MilestoneField mf in ViewBag.ParentMilestoneList)
+                {
+                    if (mf.ID == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+                    {
+                <option selected="selected" value="@mf.ID">@mf.Description</option> }
+
+                    else
+                    {
+                <option value="@mf.ID">@mf.Description</option>
+
+                    }
+
+                }
+
+            </select>
+        </div>
+
+
+    </div>
+    <div class="sixteen columns">
+
+        <h4>Step 2... Choose Target Profile Type and Milestone</h4>
+
+        <div class="seven columns alpha">
+
+            <p>Secondary Project Profile</p>
+
+            <select name="SecondaryProfileTypeID">
+                @foreach (Scheduling.Models.ProjectProfileType ppt in ViewBag.ProjectProfileTypeList)
+                {
+                    <option value="@ppt.ID">@ppt.Description</option>
+                }
+
+            </select>
+        </div>
+
+        <div class="seven columns">
+
+
+            <p>Primary Milestone Field</p>
+
+            <select name="SecondaryMilestoneID">
+                @foreach (Scheduling.Models.MilestoneField mf in ViewBag.ParentMilestoneList)
+                {
+                    <option value="@mf.ID">@mf.Description</option>
+
+                }
+
+            </select>
+        </div>
+
+
+    </div>
+    <div class="sixteen columns">
+        <h4>Step 3 </h4>
+        <div class="five columns alpha">
+            <p>Name of Setting</p>
+            <input name="Name" type="text" />
+
+        </div>
+
+    </div>
+
+    <div class="sixteen columns">
+        
+        <div class="seven columns alpha">
+        <h4>Step 4..(Optional PubCode)</h4>
+            <select name="PubCode">
+                @{
+                    <option value="">--N/A--</option>
+                    foreach (Scheduling.Models.PublicationCode pc in ViewBag.PubCodeList)
+                    {
+                <option value="@pc.ID">@pc.ShortDesc</option>
+
+                    }
+
+                }
+            </select>
+
+        </div>
+
+        <div class="seven columns">
+            <h4>(Optional Timeline)</h4>
+            <select name="Timeline">
+                @{
+                    <option value="">--N/A--</option>
+                    foreach (Scheduling.Models.Timeline t in ViewBag.Timelines)
+                    {
+                <option value="@t.ID">@t.ShortDesc</option>
+
+                    }
+
+                }
+            </select>
+
+        </div>
+
+    </div>
+    <div class="sixteen columns">
+        <h4>Step 5..Calculation</h4>
+        <select name="CalculationID">
+            <option value=''>--Choose Calculation</option>
+            @foreach (Scheduling.Models.Calculation c in ViewBag.Calculations)
+            {
+                <option value="@c.ID">@c.ShortDesc</option>
+            }
+        </select>
+    </div>
+
+    <div class='add-single-submit-container'>
+        <input type="submit" value='Add Link Setting' />
+    </div>
+    @{ Html.EndForm(); }
+</div>
+

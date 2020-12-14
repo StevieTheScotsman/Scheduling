@@ -1,0 +1,130 @@
+﻿@model List<Scheduling.Models.MilestoneField>
+@{
+    ViewBag.Title = "List Major Milestones";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    List<Scheduling.Models.MilestoneField> MainList = Model.Where(x => x.IsCreatedByUser != 1).ToList();
+    List<Scheduling.Models.MilestoneField> UserList = Model.Where(x => x.IsCreatedByUser == 1).ToList();
+}
+
+
+@{ if (Model.Count==0)
+   {
+       <p>There are no results</p>
+    }
+}
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (MainList.Count > 0)
+            {
+                  
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Major Milestones")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                           Major Milestone
+                        </th>
+                                               
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.MilestoneField f in MainList)
+                        { 
+           
+                        <tr>
+                            <td>@f.Description
+                            </td>
+                            
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+       <div id="pageNavPosition"></div>
+  
+        <script type="text/javascript"><!--
+            var pager = new Pager('results', 10);
+            pager.init();
+            pager.showPageNav('pager', 'pageNavPosition');
+            pager.showPage(1);
+       </script>
+
+
+    
+</div>
+
+
+<!--User Milestones-->
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (UserList.Count > 0)
+            {
+                  
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Minor Milestones")
+                
+            <table class='condensed zebra-striped' id='results2'>
+                <thead>
+                    <tr>
+                        <th>
+                           Minor Milestone
+                        </th>
+                                               
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.MilestoneField f in UserList)
+                        { 
+           
+                        <tr>
+                            <td>@f.Description
+                            </td>
+                            
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+       <div id="pageNav2Position"></div>
+  
+        <script type="text/javascript"><!--
+            var pager2 = new Pager('results2', 10);
+            pager2.init();
+            pager2.showPageNav('pager2', 'pageNav2Position');
+            pager2.showPage(1);
+       </script>
+
+
+    
+</div>
+

@@ -1,0 +1,463 @@
+﻿@if (Model.MileValueList.Count > 0)
+{
+    int CurrentProject = Model.ID;
+    
+    List<Scheduling.Models.MilestoneValue> CurrentList = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject);
+
+    List<Scheduling.Models.MilestoneValue> ParentList = CurrentList.Where(x => x.ParentID == null).OrderByDescending(x => x.DisplaySortOrder).ToList();
+    string ProfileTypeDesc = Scheduling.Database.Utility.GetProfileTypeNameFromProjectID(CurrentProject);
+
+    //start Get Project Baseline Description
+    int? MilestoneProfileFK = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == CurrentProject).First().MilestoneTreeSettingsProfileFK;
+    string CurrentBaselineStr = string.Empty;
+    if (MilestoneProfileFK.HasValue)
+    {
+
+        CurrentBaselineStr = Scheduling.Database.Utility.GetAllMilestoneTreeSettingsProfiles().Where(x => x.ID == MilestoneProfileFK.Value).First().Description;
+
+    }
+
+    int NewsstandDateID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue"));
+
+    Scheduling.Models.ProjectDisplay ProjectInstance = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == CurrentProject).First();
+
+    //stop
+
+        
+    <div id="successDialog"><img src=@Url.Content("~/images/check.png") style="display:block;width:50px;margin-left:100px" /><p style="padding:10px 10px 10px 0px;"></p></div>
+
+    <div class='slider-container'>
+        <input type="hidden" id="currentProjectReference" value="@Model.ID" />
+        <div>
+            <h4 class='bold'>@string.Format("Manage Dates for {0} {1}", Model.Name, Model.Year)</h4>
+        </div>
+        <div class="scroll-pane ui-widget ui-widget-header ui-corner-all slider-content-container">
+            <div class="scroll-content">
+                @foreach (Scheduling.Models.MilestoneValue mv in ParentList)
+                {
+                    string FieldName = Scheduling.Database.Utility.GetMilestoneDescFromID(mv.MilestoneFieldFK);
+                    if (mv.MilestoneFieldFK == NewsstandDateID)
+                    {
+                        FieldName = Scheduling.Database.Utility.GetAliasByPubCodeAndMilestoneField(ProjectInstance.PubCodeFK, mv.MilestoneFieldFK, FieldName);
+                    }
+
+                    <div class="scroll-content-item ui-widget-header" style="cursor:pointer;">
+                        <p class='slider-p-header editDateHeader' id="milestoneheader_@mv.ID">
+                            @FieldName
+                        </p>
+
+
+                        <p class='slider-p-duedate'>
+                            <input class="editDate datepicker" id="milestonevalue_@mv.ID" value="@mv.DueDate" style="width:95px" />
+                            <input type="hidden" value="@mv.DueDate" id="oldmilestonevalue_@mv.ID" />
+                            <input type="hidden" value="@mv.MilestoneFieldFK" class="hfMilestonevalueFieldRef_@mv.ID" />
+                        </p>
+
+
+                        @{
+                    List<Scheduling.Models.MilestoneValue> SubItemList = CurrentList.Where(x => x.ParentID == mv.MilestoneFieldFK).ToList();
+                    <div class='slider-subitem-container'>
+                        <!--Currrently we are only going down one level -->
+                        @foreach (Scheduling.Models.MilestoneValue mvsi in SubItemList)
+                        {
+                            <p class="editDateHeader childItem" id="milestoneheader_@mvsi.ID">@Scheduling.Database.Utility.GetMilestoneDescFromID(mvsi.MilestoneFieldFK)</p>
+                            <input type="text" class="datepicker editDate" value="@mvsi.DueDate" style="width:90px" id="milestonevalue_@mvsi.ID" />
+                            <input type="hidden" class="oldDate" value="@mvsi.DueDate" id="oldmilestonevalue_@mvsi.ID" />
+
+                            <!--The milestonefieldfk is distinct in the milestonevalue table at present so we don't need to pass the milestone value id the milestone field suffices. -->
+
+                            <input type="hidden" value="@mvsi.MilestoneFieldFK" class="hfMilestonevalueFieldRef_@mvsi.ID" />
+
+
+                        }
+                    </div>
+                        }
+                    </div>
+
+                }
+            </div>
+            <div class="scroll-bar-wrap ui-widget-content ui-corner-bottom">
+                <div class="scroll-bar">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--client  code start-->
+
+
+
+
+    <script type="text/javascript">
+
+        //js start
+
+        //needs initialised ..even thought it is reinitialised when it is invoked
+        $(function () {
+
+            $("#successDialog").dialog({
+                autoOpen: false,
+            });
+
+
+            //start invoke click event of header when datepicker selected  http://stackoverflow.com/questions/887696/jquery-datepicker-onselect-wont-work  turns out we need to invoke datepicker first.
+            $('.datepicker').datepicker();
+            $('.datepicker').datepicker("option", "onSelect", function () {
+                var valArray = $(this).attr('id').split('_');
+                var valSingle = valArray[1];
+                var elemToTrigger = '#milestoneheader_' + valSingle;
+                $(elemToTrigger).trigger('click');
+
+            });
+
+            //end
+
+            function reloadPage() {
+                setTimeout(function () { location.reload(true); }, 1500);
+            }
+
+
+
+            function invokeSuccessDialog(inputDate, inputTitle) {
+
+                // start..dialog needs to be initialised add class then hide bar.
+                var sd = $("#successDialog").dialog({
+                    autoOpen: false,
+                    dialogClass: 'no-close',
+                    title: inputTitle
+
+                });
+
+
+                sd.dialog("open").find('p').text('Updated to ' + inputDate + ' ..Reloading Page');
+
+                $('.no-close .ui-dialog-titlebar-close').hide();
+                //stop
+
+            }
+
+            function AjaxNoDependencySimpleUpdate(CurrentProject, CurrentMilestoneFieldVal, CurrentDueDate, CurMileName) {
+
+
+                var url = baseUrl + '/Ajax/AjaxNoDependencySimpleUpdate/';
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID: CurrentProject,
+                        MilestoneFieldFK: CurrentMilestoneFieldVal,
+                        DueDate: CurrentDueDate
+
+                    },
+                    success: function (data) {
+
+                        invokeSuccessDialog(CurrentDueDate, CurMileName);
+                        reloadPage();
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert('AjaxNoDependencySimpleUpdate...Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+
+            }
+
+
+            //use existing logic that takes milestone field fk
+            function AjaxSingleProjectUpdateKeepingDependants(CurrentProject, CurrentMilestoneFieldVal, CurDueDate, CurMileName) {
+                var url = baseUrl + '/Ajax/AjaxUpdateKeepingDependants/';
+                var CurrentMilestoneHfRef = ".hfMilestonevalueFieldRef_" + CurrentMilestoneFieldVal;
+                var CurrentMilestone = $(CurrentMilestoneHfRef).val();
+
+                //data represents the esm object
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID: CurrentProject,
+                        MilestoneFieldFK: CurrentMilestone,
+                        DueDate: CurDueDate
+
+                    },
+                    success: function (data) {
+
+                        invokeSuccessDialog(CurDueDate, CurMileName);
+                        reloadPage();
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert(xhr.status);
+                        alert('AjaxSingleProjectUpdateKeepingDependants...Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+            }
+
+            function AjaxSingleProjectUpdateBreakingDependants(CurrentProject, CurrentMilestoneFieldVal, CurDueDate, CurMileName) {
+
+
+                var url = baseUrl + '/Ajax/AjaxUpdateBreakingDependants/';
+                var CurrentMilestoneHfRef = ".hfMilestonevalueFieldRef_" + CurrentMilestoneFieldVal;
+                var CurrentMilestone = $(CurrentMilestoneHfRef).val();
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID: CurrentProject,
+                        MilestoneFieldFK: CurrentMilestone,
+                        DueDate: CurDueDate
+
+                    },
+                    success: function (data) {
+
+                        invokeSuccessDialog(CurDueDate, CurMileName);
+                        reloadPage();
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert(xhr.status);
+                        alert('AjaxSingleProjectUpdateBreakingDependants..Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+
+            }
+
+            //test ok
+
+            function AjaxProjectNoDependencySimpleUpdate(CurrentProject, CurrentMilestoneFieldVal, CurrentDueDate, CurMileName) {
+
+                var url = baseUrl + '/Ajax/AjaxSingleProjectNoDependencySimpleUpdate/';
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID: CurrentProject,
+                        MilestoneValueID: CurrentMilestoneFieldVal,
+                        DueDate: CurrentDueDate
+
+                    },
+                    success: function (data) {
+
+                        invokeSuccessDialog(CurrentDueDate, CurMileName);
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+
+            }
+
+            //test ok
+
+            function ResetMilestoneValue(ID, OldDate) {
+
+                var targetElem = "#milestonevalue_" + ID;
+                $(targetElem).val(OldDate);
+
+            }
+
+            //hover
+            var targetedElement = $(".editDate");
+
+            $(targetedElement).hover(
+             function () {
+                 $(this).css({ "cursor": "pointer" });
+                 $(this).css({ "font-size": "0.9em" })
+                 $(this).css({ "font-weight": "bold" })
+             },
+             function () {
+                 $(this).css({ "font-weight": "normal" })
+                 $(this).css({ "font-size": "1em" })
+             }
+         );
+
+            //click
+
+
+            $(".editDateHeader").on("click", function () {
+                var CurrentProjectID = $('#currentProjectReference').val();
+                var CurrentMvIDArray = $(this).attr('id').split('_');
+                var CurrentMilestoneValueID = CurrentMvIDArray[1];
+                var CurMileName = $(this).text();
+
+                var newDateElem = "#milestonevalue_" + CurrentMilestoneValueID;
+                var oldDateElem = "#oldmilestonevalue_" + CurrentMilestoneValueID;
+
+                var CurDueDate = $(newDateElem).val();
+                var CurOldDate = $(oldDateElem).val();
+
+                var CurrentMileFieldTargetElem = ".hfMilestonevalueFieldRef_" + CurrentMilestoneValueID;
+                var CurMilestoneFieldID = $(CurrentMileFieldTargetElem).val();
+
+                var ParentSize = $(this).parents('.slider-subitem-container').length;
+
+                var ParentName = '';
+
+                if (ParentSize == 1) {
+                    var closestContainer = $(this).parents('.slider-subitem-container').first();
+                    ParentName = $(closestContainer).parent().find('.editDateHeader').first().text();
+
+                }
+
+
+                if (CurDueDate != '') {
+
+                    //use existing edit project logic
+                    var url = baseUrl + '/Ajax/HasDependantFields/'
+
+                    //determine if this has dependencies
+
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        dataType: 'json',
+                        data: {
+
+                            ProjectID: CurrentProjectID,
+                            MilestoneFieldID: CurMilestoneFieldID
+
+                        },
+                        success: function (data) {
+
+                            var r = data;
+                            var executed = false;
+                            if (parseInt(data) == '1') {
+
+                                var suggestion = '<div><h6>Are you sure you want to change the due date for ' + CurMileName + ' to ' + CurDueDate + ' ?</h6></div>'
+                                if (ParentSize == 1) { suggestion = '<div><h6>Are you sure you want to change the due date for ' + CurMileName + ' to ' + CurDueDate + 'with Parent' + ParentName + '?</h6></div>' }
+                                //if no action taken or cancel checked reset the due date.
+
+                                $('<div></div>').appendTo('body')
+                                  .html(suggestion)
+                                  .dialog({
+                                      modal: true, title: 'Confirm Milestone Due Date Change', zIndex: 10000, autoOpen: true,
+                                      width: 'auto', resizable: true,
+                                      buttons: {
+                                          UpdateKeepingDependencies: function () {
+                                              AjaxSingleProjectUpdateKeepingDependants(CurrentProjectID, CurrentMilestoneValueID, CurDueDate, CurMileName);
+                                              executed = true;
+                                              $(this).dialog("close");
+                                          },
+                                          UpdateBreakingDependencies: function () {
+                                              AjaxSingleProjectUpdateBreakingDependants(CurrentProjectID, CurrentMilestoneValueID, CurDueDate, CurMileName);
+                                              executed = true;
+                                              $(this).dialog("close");
+                                          },
+
+                                          Cancel: function () {
+
+                                              ResetMilestoneValue(CurrentMilestoneValueID, CurOldDate);
+                                              $(this).dialog("close");
+                                          }
+
+
+                                      },
+
+                                      close: function (event, ui) {
+                                          if (!executed) {
+
+
+
+                                          }
+                                          $(this).remove();
+                                      }
+                                  });
+
+
+
+
+
+                            }
+
+                                //No Dependancies ...tests ok
+                            else {
+
+
+                                if (CurDueDate != '') {
+
+                                    var suggestion = '<div><h6>Are you sure you want to change the due date for ' + CurMileName + ' to ' + CurDueDate + ' ?</h6></div>'
+                                    if (ParentSize == 1) {
+                                        suggestion = '<div><h6>Are you sure you want to change the due date for ' + CurMileName + ' to ' + CurDueDate +
+                                            ' with Parent' + ParentName + '?</h6></div>'
+                                    }
+                                    //start
+                                    $('<div></div>').appendTo('body')
+                                  .html(suggestion)
+                                  .dialog({
+                                      modal: true, title: 'Confirm Milestone Due Date Change', zIndex: 10000, autoOpen: true,
+                                      width: 'auto', resizable: false,
+                                      buttons: {
+                                          Yes: function () {
+                                              AjaxNoDependencySimpleUpdate(CurrentProjectID, CurMilestoneFieldID, CurDueDate, CurMileName);
+                                              $(this).dialog("close");
+                                          },
+                                          No: function () {
+                                              ResetMilestoneValue(CurrentMilestoneValueID, CurOldDate);
+                                              $(this).dialog("close");
+                                          }
+                                      },
+                                      close: function (event, ui) {
+                                          $(this).remove();
+                                      }
+                                  });
+
+                                    //stop
+
+                                }
+
+                            }
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            alert(xhr.status);
+                            alert('Error: ' + xhr.responseText);
+                        }
+
+                    });
+
+                    //stop
+
+
+                }
+
+
+            });
+
+            //js stop
+
+        });
+
+    </script>
+
+
+
+}

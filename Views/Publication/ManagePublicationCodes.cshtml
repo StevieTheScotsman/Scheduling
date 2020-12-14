@@ -1,0 +1,137 @@
+﻿@model List<Scheduling.Models.PublicationCode>
+@{
+    ViewBag.Title = "Publication Code Listing";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    List<Scheduling.Models.Printer> PrinterList = Scheduling.Database.Utility.GetAllPrinters();
+
+}
+
+<div class='container'>
+
+    <div class='sixteen columns scroll-to-on-load'>
+
+        <p style='font-style:italic'>Publications with no Parent Pub are typically annuals or SIPS.</p>
+        <p style='font-style:italic'>Only Active Pub Codes are shown here</p>
+        <p style='font-weight:bold'>Only Publications that are not tied to any projects can be deleted</p>
+
+        <table class='condensed zebra-striped'>
+            <caption style='background-color: #ddd'>Publication Codes</caption>
+            <thead>
+                <tr><th>Name</th><th>Description</th><th>Printer</th><th>Profit Center</th><th>Parent Pub</th><th>Show In N/S Report</th><th>Report Offset</th><th>Annual</th><th>Active</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (Scheduling.Models.PublicationCode pc in Model)
+                {
+                    int Count = Scheduling.Database.Utility.GetAllProjects().Where(x => x.PubCodeFK == pc.ID).Count();
+                    bool ShowDelete = Count == 0;
+
+                    string ProfitCenter = "n/a";
+                    string ParentPub = "n/a";
+                    string Printer = "n/a";
+                    string ShowInReportStr = "Y";
+                    string IsAnnualStr = "N";
+                    string CustomOffStr = "N";
+
+                    string ActiveStr = "N";
+                    //was initially set as nullable 
+                    if (pc.IsActive.HasValue)
+                    {
+                        
+                        if(pc.IsActive.Value.ToString()=="1")
+                        {
+                            ActiveStr = "Y";
+                        
+                        
+                        }
+                    }
+                    
+
+                    if (pc.PrinterFK.HasValue)
+                    {
+                        Scheduling.Models.Printer p = PrinterList.Where(x => x.ID == pc.PrinterFK).First();
+                        Printer = string.Format("{0} ({1})", p.Company, p.Address);
+                    }
+
+                    if (pc.ProfitCenter.HasValue)
+                    {
+                        ProfitCenter = pc.ProfitCenter.Value.ToString();
+                    }
+
+                    if (pc.ParentPub.HasValue)
+                    {
+                        ParentPub = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == pc.ParentPub.Value).First().LongDesc;
+                    }
+
+                    if (pc.ShowInNewsStandReport == 0) { ShowInReportStr = "N"; }
+
+                    if (pc.IsAnnual == 1) { IsAnnualStr = "Y"; }
+
+                    if (pc.HasCustomOffset == 1) { CustomOffStr = "Y"; }
+
+                    <tr>
+                       
+                        <td>@pc.ShortDesc</td>
+                        <td>
+                            @pc.LongDesc
+                        </td>
+                        <td>
+                            @Printer
+                        </td>
+                        <td>
+                            @ProfitCenter
+                        </td>
+                        <td>
+                            @ParentPub
+                        </td>
+                        <td>
+                            @ShowInReportStr
+                        </td>
+                        <td>
+                            @CustomOffStr
+                        </td>
+                        <td>
+                            @IsAnnualStr
+                        </td>
+                        <td style="display:none">
+                            @{ Html.BeginForm("ManagePublicationSubItemReport", "Publication", FormMethod.Post, new { enctype = "multipart/form-data" });
+                            <input type='hidden' value='@pc.ID' name="id" />
+                                <input type="submit" value='SORT ORDER' />
+                    Html.EndForm();
+                            }
+                        </td>
+                        <td>@ActiveStr</td>
+
+
+
+                        <td>
+                            @{ Html.BeginForm("EditPublication", "Publication", FormMethod.Post, new { enctype = "multipart/form-data" });
+                            <input type='hidden' value='@pc.ID' name="id" />
+                                <input type="submit" value='EDIT' />
+                    Html.EndForm();
+                            }
+                        </td>
+                        <td>
+                            @{if (ShowDelete)
+                            {
+                                Html.BeginForm("DeleteSinglePublication", "Publication", FormMethod.Post, new { enctype = "multipart/form-data" });
+                                <input type='hidden' value='@pc.ID' name="id" />
+                                <input type="submit" value='DELETE' />
+                                Html.EndForm();
+                            }
+
+                            }
+
+
+
+                        </td>
+                    </tr>
+
+
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+
+</div>

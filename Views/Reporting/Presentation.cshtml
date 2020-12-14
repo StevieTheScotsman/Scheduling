@@ -1,0 +1,242 @@
+﻿@model List<Scheduling.Models.MainSubItemSort>
+
+@{
+    ViewBag.Title = "Reporting Presentation";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+}
+
+
+<div class="container">
+
+    <div class='sixteen columns'>
+
+
+        @{ Html.BeginForm("AddReportingPresentation", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", name = "AddReportingPresentation", id = "AddReportingPresentation" }); }
+
+        <input type="submit" value="Add Reporting Presentation" />
+
+        @{ Html.EndForm(); }
+    </div>
+
+</div>
+
+
+@{
+
+    foreach (Scheduling.Models.PublicationCode pc in ViewBag.PubCodes)
+    {
+        List<Scheduling.Models.MainSubItemSort> SubSort = Model.Where(d => d.PubCodeFK == pc.ID).ToList();
+        List<Scheduling.Models.MainSubItemSort> SubSortWithTimeline = Model.Where(d => d.PubCodeFK == pc.ID).Where(t => t.ProjectRangeFK.HasValue).ToList();
+        List<Scheduling.Models.MainSubItemSort> SubSortNoTimeline = SubSort.Except(SubSortWithTimeline).ToList();
+
+        string CurrentPubCode = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == pc.ID).First().LongDesc;
+
+        if (SubSort.Count > 0)
+        {
+
+            if (SubSortNoTimeline.Count > 0)
+            {
+
+                <div class='container'>
+
+                    <div class="sixteen columns">
+
+                        <div class="twelve columns">
+                            <h2>@CurrentPubCode</h2>
+                        </div>
+
+                        <div class="twocolumns">
+
+                            @{ Html.BeginForm("DeleteSubSortWithPubcodeOnly", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteSubSortWithTimeline" }); }
+                            <input type="hidden" value="@pc.ID" name="hfPubCode" />
+                            <input type="submit" value="Remove" style="position:relative;top:30px;" />
+                            @{Html.EndForm();}
+
+                        </div>
+                    </div>
+
+                    <div class='sixteen columns'>
+
+
+
+                        <table class='condensed zebra-striped' id='results'>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        SubItem
+                                    </th>
+                                    <th>
+                                        SortOrder
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @{  foreach (Scheduling.Models.MainSubItemSort ss in SubSort.Where(x => !x.ProjectRangeFK.HasValue).OrderBy(x => x.ProjectRangeFK).ThenBy(x => x.SortOrder))
+                                  {
+
+                                    <tr>
+                                        <td>
+                                            @Scheduling.Database.Utility.GetAllMainSubItems().Where(x => x.ID == ss.MilestoneFieldSubItemFK).First().Description
+                                        </td>
+                                        <td>
+                                            @ss.SortOrder
+                                        </td>
+
+                                    </tr>
+
+                                  }
+
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            }
+
+            if (SubSortWithTimeline.Count > 0)
+            {
+
+                List<int?> UniqueTimelines = SubSortWithTimeline.Select(x => x.ProjectRangeFK).Distinct().ToList();
+
+                foreach (int? ni in UniqueTimelines)
+                {
+                    if (ni.HasValue)
+                    {
+                        Scheduling.Models.Timeline CurrentTimeline = Scheduling.Database.Utility.GetAllProjectRanges().Where(x => x.ID == ni.Value).First();
+                        List<Scheduling.Models.MainSubItemSort> CurrentSort = SubSortWithTimeline.Where(x => x.ProjectRangeFK == ni.Value).OrderBy(x => x.SortOrder).ToList();
+                        string TimelineStr = CurrentTimeline.ShortDesc;
+
+                        <div class='container'>
+                            <div class="sixteen columns">
+
+                                <div class="twelve columns">
+                                    <h2>@CurrentPubCode @TimelineStr Timeline</h2>
+
+                                </div>
+
+                                <div class="twocolumns">
+
+                                    @{ Html.BeginForm("DeleteSubSortWithTimelineAndPubcode", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteSubSortWithTimeline" }); }
+                                    <input type="hidden" value="@ni.Value" name="hfTimeline" />
+                                    <input type="hidden" value="@pc.ID" name="hfPubCode" />
+                                    <input type="submit" value="Remove" style="position:relative;top:30px;" />
+                                    @{Html.EndForm();}
+
+                                </div>
+
+                                <table class='condensed zebra-striped' id='results'>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                SubItem
+                                            </th>
+                                            <th>
+                                                SortOrder
+                                            </th>
+
+
+                                    </thead>
+                                    <tbody>
+
+
+                                        @{  foreach (Scheduling.Models.MainSubItemSort cs in CurrentSort)
+                                          {
+
+                                            <tr>
+                                                <td>
+                                                    @Scheduling.Database.Utility.GetAllMainSubItems().Where(x => x.ID == cs.MilestoneFieldSubItemFK).First().Description
+                                                </td>
+                                                <td>
+                                                    @cs.SortOrder
+                                                </td>
+
+
+                                            </tr>
+
+
+                                          }
+
+                                        }
+
+
+
+                                    </tbody>
+
+                                </table>
+
+
+                            </div>
+                        </div>
+
+
+
+
+                    }
+
+
+                }
+            
+
+            }
+
+        }
+
+        else
+        {
+            List<Scheduling.Models.MainSubItemSort> DefaultSort = Scheduling.Database.Utility.GetAllMilestoneFieldMainSubItemsForReportSorting().Where(x => !x.ProjectRangeFK.HasValue).Where(x => !x.PubCodeFK.HasValue).OrderBy(x => x.SortOrder).ToList();
+
+            <div class='container'>
+
+                <div class="sixteen columns"><h2>@CurrentPubCode (Uses Default Configuration)</h2></div>
+
+                <div class='sixteen columns'>
+
+
+
+                    <table class='condensed zebra-striped' id='results'>
+                        <thead>
+                            <tr>
+                                <th>
+                                    SubItem
+                                </th>
+                                <th>
+                                    SortOrder
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @{  foreach (Scheduling.Models.MainSubItemSort ss in DefaultSort)
+                              {
+
+                                <tr>
+                                    <td>
+                                        @Scheduling.Database.Utility.GetAllMainSubItems().Where(x => x.ID == ss.MilestoneFieldSubItemFK).First().Description
+                                    </td>
+                                    <td>
+                                        @ss.SortOrder
+                                    </td>
+
+                                </tr>
+
+                              }
+
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        }
+
+    }
+
+
+}

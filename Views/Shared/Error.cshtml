@@ -1,0 +1,17 @@
+﻿<!--model needs to be lowercase-->
+<!--This works only if custom errors is turned ON (http://www.prideparrot.com/blog/archive/2012/5/exception_handling_in_asp_net_mvc)-->
+@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<p>An error has occured inside the Mvc Pipeline ( 500 Error)</p>
+
+
+@if(Model !=null)
+{
+    string ExcStr = string.Format("{0} thrown in {1} controller on action method {2}", Model.Exception.GetType().Name, Model.ControllerName, Model.ActionName);
+    
+       <p>@ExcStr</p>
+}

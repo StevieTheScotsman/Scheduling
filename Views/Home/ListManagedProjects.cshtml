@@ -1,0 +1,97 @@
+﻿@model List<Scheduling.Models.ReadOnlyProjectWithMilestones>
+@{
+    ViewBag.Title = "Project Listing ";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    
+}
+
+ 
+ 
+<div class='container'>
+    <div class="sixteen columns">
+        <div class='three columns'>
+            @{ Html.BeginForm("ListManagedProjects", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ListProjects", id = "ListProjectFormFilter" }); }
+
+            <!--Filter by status-->
+
+            <select name='status' class='list-project-select-filter'>
+             <option value=''>All Project Statuses</option>
+              @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedProjectStatusDropdown(ViewBag.CurrentStatus))
+            </select>
+          </div>
+         <div class='three columns'>
+
+            <!--Filter by timeline-->
+            <select name='timeline' class='list-project-select-filter'>
+                <option value=''>All Timelines</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedProjectRangeDropdown(ViewBag.CurrentTimeline))
+            </select>
+        </div>
+        <!--Filter by pubcode-->
+        <div class='three columns'>
+            <select name='pubcode' class='list-project-select-filter'>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPublicationDropdown(ViewBag.CurrentPubcode))
+            </select>
+        </div>
+        <!--Filter by year-->
+        <div class='three columns'>
+            <select name='year' class='list-project-select-filter'>
+                @*<option value=''>All Years</option>*@
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedYearDropdown(ViewBag.CurrentYear))
+            </select>
+        </div>
+        <!--Filter by type-->
+        <div class='three columns'>
+        <select name='project-type' class='list-project-select-filter'>
+        <option value=''>All Baseline Types</option>
+          @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedProjectTypeDropdown(ViewBag.CurrentProjectType))
+        </select>
+        </div>
+        
+
+        @{ Html.EndForm(); }
+    </div>
+
+
+    </div>
+     
+
+
+<div> 
+
+         @{
+             
+             if(Model.Count==0)
+             {
+                 
+                 <p class='bold'>There are no results</p>
+                 
+             }
+             
+             
+             else
+                 
+             {
+
+                 int Counter = 0;
+                 ViewBag.ProjectCount=Model.Count;
+             
+             foreach(Scheduling.Models.ReadOnlyProjectWithMilestones rop in Model)
+             {
+                 Counter++;
+                 ViewBag.Counter = Counter;
+                 
+                 @Html.Partial("_ListManagedProjectsSummaryPartial", ViewData["rop"] = rop);
+                 @Html.Partial("_ListManagedProjectsMainMilestonesPartial", ViewData["ProjectID"] = rop.ID);
+                 @Html.Partial("_ListManagedProjectsDependancySummaryPartial", ViewData["ProjectID"] = rop.ID);                                                                                                              
+                 @Html.Partial("_ListManagedProjectsMilestoneSliderPartial", ViewData["ProjectID"] = rop.ID);
+                 
+                 <div style='clear:both' />
+             }
+             
+             }
+             
+         }
+
+</div>
+

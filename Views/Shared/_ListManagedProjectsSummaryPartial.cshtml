@@ -1,0 +1,139 @@
+﻿@{
+    Scheduling.Models.ReadOnlyProjectWithMilestones rop = (Scheduling.Models.ReadOnlyProjectWithMilestones)ViewData["rop"];
+
+    Scheduling.Models.ProjectDisplay pd = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == rop.ID).First();
+
+    string CurrentProjectName = pd.Name;
+
+    int CurrentProjectStatus = pd.CurrentProjectStatus;
+    string CurrentProjectStatusName = Scheduling.Database.Utility.GetAllProjectStatuses().Where(x => x.ID == CurrentProjectStatus).First().Description;
+
+    bool IsLinkable = Scheduling.Database.Utility.AreLinkableProjectsAvailableByProjectID(rop.ID);
+    bool HasPendingRequests = Scheduling.Database.Utility.ArePendingChangeRequestsAvailableByProjectID(rop.ID);
+    int ScheduleApprovedStatusID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("ProjectStatusApprovedOnSaleID"));
+}
+<div style='padding-top: 10px; border-bottom: 3px double #ccc'>
+    <p style='text-align: left; text-decoration: underline; color: #0f566f; font-size: 1.2em;'>
+        @string.Format("Project {0} of {1} ({2}) {3}", ViewBag.Counter, ViewBag.ProjectCount, CurrentProjectName, rop.Year)
+    </p>
+
+
+    <!--hide for now todo steve v4-->
+    <div class='icon-help-container' style="border-top:1px solid #ddd;border-bottom:1px solid #ddd;padding:10px;display:none">
+        <img src="@Url.Content("~/images/help_75.png")" style='width: 25px;display:block;' alt='help' class='image-help' title='Show Help Display' />
+
+        <div class="image-help-content" style="overflow:hidden;display:none">
+            <div style="padding-top:20px">
+                <img src="@Url.Content("~/images/manage-single-project.jpg")" alt='Not Clickable Help Only' height='30px' class='manage-single-project' title='Not Clickable Help Only' />
+                <span>New Functionality added in Jan 2015 which allows user to manage the due dates inside the scrollable container (desktop mode) in a new browser tab</span>
+            </div>
+
+            <div style="padding-top:20px">
+                <img src="@Url.Content("~/images/project-edit-button.png")" alt='Not Clickable Help Only' height='30px' class='manage-single-project' title='Not Clickable Help Only' />
+                <span>Bring up screen that allows you to add/remove milestones,manage due dates in responsive mode,manage notes,edit basic project information and look at the project history</span>
+            </div>
+        </div>
+    </div>
+
+    <div style='overflow: hidden'>
+
+        <!--Add manage single project desktop link-->
+        <div style="float:left;padding:10px;position:relative;top:-3px;">
+            <a href="javascript:openwindow(@rop.ID)">
+                <img src="@Url.Content("~/images/manage.png")" alt='edit project' height='30px' class='manage-single-project' title='Edit Project Dates in Desktop Mode' style="border-radius:5px" />
+            </a>
+
+
+        </div>
+
+        <!--Hide for now new functionality is project area rewritten for version 4-->
+        <div style='float: left;padding:10px;display:none'>
+            @{Html.BeginForm("ManageSingleProject", "Home", FormMethod.Post, new
+              {
+                  enctype = "multipart/form-data",
+                  name = "ListProjects",
+                  id = "ListProjectFormFilter"
+              }); }
+            <img src="@Url.Content("~/images/project-edit-button.png")" alt='edit project' class='manage-single-project' title='Edit Project' />
+            <input type='hidden' name='id' value='@rop.ID' />
+            @{ Html.EndForm(); }
+        </div>
+        <div style='float: left;padding:10px;display:none'>
+            @{
+                Html.BeginForm("ManageSingleProjectNotes", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageSingleProjectNotes", @class = "AdvancedProjects" }); }
+            <img src="@Url.Content("~/images/edit-notes.png")" alt='edit advanced project' class='advanced-manage-single-project' title='Edit Project Notes Link' height='25px' />
+            <input type='hidden' name='id' value='@rop.ID' />
+            @{ Html.EndForm(); }
+        </div>
+        <!--linking-->
+        @{
+
+
+            <!--button click is managed by code that reacts to having class of manage-single-project on the img to be clicked'-->
+            if (IsLinkable)
+            {
+                <div style='float:left;padding:10px'>
+                    @{Html.BeginForm("ManageSingleProjectLinking", "Linking", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageSingleProjectLinking", @class = "AdvancedProjects" });}
+                    <img src="@Url.Content("~/images/link.png")" height='25px' alt='edit advanced project' class='manage-single-project' title='Create Link to Primary Project' />
+                    <input type='hidden' name='id' value='@rop.ID' />
+                    @{Html.EndForm();
+                    }
+                </div>
+            }
+
+
+
+        }
+        <!--lock start-->
+        @{
+            if (pd.IsLocked.HasValue)
+            {
+
+                if (pd.IsLocked.Value == 1)
+                {
+                    <div style='float:left;padding:10px'>
+                        <img src="@Url.Content("~/images/locked.gif")" alt='locked' title='Project Is Locked (No Link)' height='25px' />
+                    </div>
+
+                }
+
+
+            }
+
+        }
+        <!--stop-->
+        <!--cr logic start-->
+        @{
+
+            if (HasPendingRequests)
+            {
+                <div style='float:left;padding:10px'>
+                    @{Html.BeginForm("ProcessManageChangeRequests", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageSingleProjectLinking", @class = "ManageSingleProjectChangeRequestPartial" });}
+                    <img src="@Url.Content("~/images/request.png")" height='25px' alt='has requests' class='image-change-request-partial' title='Edit Change Requests Link' />
+                    <input type='hidden' name='project' value='@rop.ID' />
+                    @{Html.EndForm();}
+
+                </div>
+
+            }
+
+        }
+
+        <!--stop-->
+
+    </div>
+    <!--stop-->
+
+    <!--To be able to close tab we need to create using window.open hence this code-->
+  
+    <!--start-->
+    <script type="text/javascript">
+
+        function openwindow(id) {
+            var url = baseUrl + '/project/managesingleproject/' + id;
+            window.open(url);
+
+        }
+
+    </script>
+</div>

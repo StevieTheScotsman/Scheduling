@@ -1,0 +1,260 @@
+﻿<script src="@Url.Content("~/Scripts/jquery-1.10.2.min.js")" type="text/javascript"></script>
+
+<!--These style changes are a moving target put changes here for ease of  deployment -->
+
+<style type="text/css">
+    .descList {
+        font-weight: bold;
+    }
+
+    .topRowDueDate {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .subItemDates {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+</style>
+
+@model List<Scheduling.Models.ProjectDisplay>
+@using Scheduling.Models;
+@{
+    ViewBag.Title = "Excel Style Project Listing ";
+    int NewsstandID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue"));
+
+
+}
+@{
+    //break on every pubcode change or 3 tables with the same pubcode.
+    int StartingVal = 0;
+    ProjectDisplay FirstProject = Model.First();
+    int? FirstPubCode = FirstProject.PubCodeFK;
+    if (FirstPubCode.HasValue)
+    {
+        StartingVal = FirstPubCode.Value;
+
+    }
+
+    int RunningCounter = 0;
+    bool CreatePageBreak = false;
+    foreach (ProjectDisplay pd in Model)
+    {
+        if (RunningCounter == 0)
+        {
+            @Html.Partial("_PDFExcelStyleReportsPageHeader", pd)
+            CreatePageBreak = false;
+        }
+
+
+        RunningCounter++;
+        int MajorMilestoneCount = Scheduling.Html.ReportingUtilities.GetNumberOfMajorMilestonesForProject(pd.ID);
+        int NextIndex = Model.IndexOf(pd) + 1;
+        if (NextIndex < Model.Count)
+        {
+            ProjectDisplay NextPD = Model[NextIndex];
+            int? NextPubCodeFK = NextPD.PubCodeFK;
+            if (NextPubCodeFK.Value != pd.PubCodeFK.Value)
+            {
+                CreatePageBreak = true;
+                RunningCounter = 0;
+
+            }
+        }
+
+
+
+        if (RunningCounter == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("ItemsPerPage")))
+        {
+            CreatePageBreak = true;
+            RunningCounter = 0;
+
+        }
+
+
+
+        List<Scheduling.Models.ProjectNote> CurrentNotes = Scheduling.Database.Utility.GetProjectNotesFromProjectID(pd.ID);
+        <div style="@(CreatePageBreak ? "page-break-after: always" : "")">
+
+
+            <!--start -->
+            @if (CurrentNotes.Count() > 0)
+            {
+
+                <table cellspacing='0' cellpadding='0' class='notes-table'>
+                    <tr style='width: 100%'>
+                        <td style='border: none'></td>
+                        <!--Kpc Job No start-->
+                        @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.KPCJobNumber).Count() > 0)
+                        {
+                            string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.KPCJobNumber).First().NoteValue;
+                            string DisplayStr = string.Format("KPC Project Number : {0}", CurrentVal);
+                            <td style='border: blue; font-weight: bold;' colspan='3'>
+                                <p style='padding-right:20px;padding-bottom:10px;padding-top:5px'>@DisplayStr</p>
+                            </td>
+                        }
+
+                        <!--Quad Job No start-->
+                        @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.QuadJobNumber).Count() > 0)
+                        {
+                            string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.QuadJobNumber).First().NoteValue;
+                            string DisplayStr = string.Format("Quad Job # : {0}", CurrentVal);
+                            <td style='border: blue; font-weight: bold;' colspan='3'>
+                                <p style='padding-right:20px;padding-bottom:10px;padding-top:5px'>@DisplayStr</p>
+                            </td>
+                        }
+                        <!--Cross Promo Ads start-->
+                        @if (CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.NextIssueAndCrossPromo).Count() > 0)
+                        {
+                            string CurrentVal = CurrentNotes.Where(x => x.NoteLabelID == (int)Scheduling.Enums.MagazineNoteLabel.NextIssueAndCrossPromo).First().NoteValue;
+                            string DisplayStr = string.Format("Next Issue And Cross Promo Ads : {0}", CurrentVal);
+                            <td style='border: blue; font-weight: bold;' colspan='6'>
+                                <p style='padding-right:20px;padding-bottom:10px;padding-top:5px'>@DisplayStr</p>
+                            </td>
+                        }
+                    </tr>
+                </table>
+
+            }
+            <!--stop-->
+            <table cellpadding='2' cellspacing='0' class='replicate-view-table' style='background-color: #efefef;
+            margin-bottom: 20px; font-size: 11px;'>
+                @{
+
+
+        if (MajorMilestoneCount > 0)
+        {
+            List<Scheduling.Models.MilestoneValue> MilestoneValueWithoutParents = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(pd.ID).Where(p => p.ParentID == null).OrderByDescending(x => x.DisplaySortOrder).ToList();
+            int NewColspanVal = MajorMilestoneCount + 1;
+            <tr>
+                <td colspan='@NewColspanVal' style='border-right:1px solid #fff;font-weight:bold;'>
+                    @Scheduling.Html.ReportingUtilities.GenerateMonthYearHeaderForSingleProject(pd)
+            </td>
+        </tr>
+
+                <!--Get Description-->
+                    <tr>
+                        @{
+                            <td style="border-bottom: 2px solid #000; border-top: 2px solid #000"></td>
+            foreach (Scheduling.Models.MilestoneValue TopItem in MilestoneValueWithoutParents)
+            {
+                string TopValue = Scheduling.Database.Utility.GetAllMilestoneFields().Find(x => x.ID == TopItem.MilestoneFieldFK).Description;
+                if (TopItem.MilestoneFieldFK == NewsstandID)
+                {
+                    TopValue = Scheduling.Database.Utility.GetAliasByPubCodeAndMilestoneField(pd.PubCodeFK, TopItem.MilestoneFieldFK, TopValue);
+
+                }
+                <td style="text-align: center; border-bottom: 2px solid #000; border-top: 2px solid #000;padding:10px;">
+                    @TopValue
+            </td>
+
+            }
+
+
+
+                        }
+                    </tr>
+
+                <!--Get Due Date -->
+                    <tr>
+                        @{
+                            <td></td>
+            foreach (Scheduling.Models.MilestoneValue TopItem in MilestoneValueWithoutParents)
+            {
+                <td style="text-align:center;font-weight:bold">
+                    @if (!string.IsNullOrWhiteSpace(TopItem.DueDate))
+                    {
+                        string[] sa = TopItem.DueDate.Split('/');
+                        if (TopItem.MilestoneFieldFK == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+                        {
+                            <span>@string.Format("{0}/{1}/{2}", sa[0], sa[1], sa[2])</span>
+
+                        }
+
+                        else
+                        {
+                            <span>@string.Format("{0}/{1}", sa[0], sa[1])</span>
+
+                        }
+
+                    }
+                </td>
+
+            }
+
+                        }
+                    </tr>
+
+            List<string> DescList = Scheduling.Html.ReportingUtilities.GetDistinctSubItemDescriptions(pd.ID);
+
+            //Get Sorted List
+
+            string SortSubItems = System.Configuration.ConfigurationManager.AppSettings["SortSubItemsForReporting"];
+
+            if (SortSubItems.ToUpper() == "TRUE")
+            {
+                //ReportingSortingUpdate 7/30/2014
+                // DescList = Scheduling.Sorting.DisplaySorting.GetSortedDisplaySequenceBasedOnPubID(pd.PubCodeFK, DescList);
+                DescList = Scheduling.Sorting.DisplaySorting.GetSortedDisplaySequenceFromDbBasedOnPubCodeAndTimeline(pd);
+            }
+
+            //stop
+            int i = 0;
+            foreach (string s in DescList)
+            {
+                <tr @if (i % 2 == 0) { <text> style="background-color: #ddd" </text>    } @if (i % 2 != 0) { <text> style="background-color: #fff" </text>    }>
+                    <td class="descList">
+                        @s
+                    </td>
+                    @{foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueWithoutParents)
+                    {
+                        string insert = Scheduling.Html.ReportingUtilities.GetDateBasedOnSubItemDescAndParentIDForSpecificProject(s, pd.ID, mv.MilestoneFieldFK);
+                        <td style="text-align:center" class="subitemdates">
+                            @insert
+                        </td>
+
+                    }
+
+
+
+                    }
+                </tr>
+                    i++;
+            }
+
+
+        }
+
+
+                }
+            </table>
+
+            @{
+        bool IsLastProject = false;
+        if (Model.IndexOf(pd) == Model.Count - 1)
+        {
+
+            IsLastProject = true;
+        }
+
+        if (RunningCounter == 0 || IsLastProject)
+        {
+            @Html.Partial("_PDFExcelStyleReportsPageFooter", pd)
+
+        }
+
+
+            }
+
+
+        </div>
+
+
+    }
+
+
+
+
+
+}

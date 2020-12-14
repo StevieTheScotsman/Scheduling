@@ -1,0 +1,76 @@
+﻿@model List<Scheduling.Models.ActivityDisplay>
+@{
+    ViewBag.Title = "List Activites";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+
+@{ if (Model.Count==0)
+   {
+       <p>There are no results</p>
+    }
+}
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Activities")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                            Message
+                        </th>
+                        <th>
+                            Date Modified
+                        </th>
+                        <th>
+                            Modified By
+                        </th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.ActivityDisplay ad in Model)
+                        { 
+           
+                        <tr>
+                            <td>@ad.Message
+                            </td>
+                            <td>@ad.DateModified
+                            </td>
+                            <td>@ad.ModifiedBy
+                            </td>
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+
+        <div id="pageNavPosition"></div>
+  
+        <script type="text/javascript"><!--
+            var pager = new Pager('results', 10);
+            pager.init();
+            pager.showPageNav('pager', 'pageNavPosition');
+            pager.showPage(1);
+       </script>
+
+</div>

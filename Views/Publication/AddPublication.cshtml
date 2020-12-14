@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Add Publication";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    
+}
+
+
+<div class="container">
+    <div class='row clearfix'>
+        <h2>
+            Add Publication
+        </h2>
+        
+    </div>
+    <div style="font-weight:bold">@Html.ValidationSummary()</div>
+    
+    <!--form start-->
+    @{ Html.BeginForm("ProcessAddPublication", "Publication", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessAddPublication" }); }
+    <div class='row'>
+        <!--steps one thro four-->
+        <div class='eight columns'>
+            <!--short desc-->
+            <p>
+                Short Description
+            </p>
+            @Html.TextBox("ShortDesc")
+            <!--long desc-->
+            <p>
+                Long Description
+            </p>
+            @Html.TextBox("LongDesc")
+
+            <!--report desc-->
+            <p>
+                Report Description
+            </p>
+            @Html.TextBox("ReportDesc")
+            <p>
+
+                <!--Is Active -->
+                Is Active
+            </p>
+           
+            @Html.CheckBox("IsActive",true)
+
+            <!--Custom Offset -->
+            <p style='padding-top:10px;'>
+                Has  Custom Offset
+            </p>
+            @Html.CheckBox("HasCustomOffset", false)
+        </div>
+        <div class='eight columns'>
+            <!--right hand column -->
+            <!--printer-->
+            <p>
+                Printer (Optional)
+            </p>
+            <select name="Printer">
+                <option value=''>--Choose--</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPrinterDropdownForPublication(null))
+            </select>
+
+            <!--profit center -->
+            <p>
+                Profit Center
+            </p>
+            @Html.TextBox("ProfitCenter")
+
+            <!--Parent Pub -->
+            <p>
+                Parent Pub
+            </p>
+            <select name="ParentPub">
+                <option value=''>--No Parent Pub--</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedParentPubForPublication(null))
+            </select>
+
+            <!--Is Annual -->
+            <p>
+                Is Annual
+            </p>
+           @Html.CheckBox("IsAnnual",false)
+
+            <!--Show In Newsstand -->
+            <p style='padding-top:10px;'>
+                Show In Newsstand
+            </p>
+           @Html.CheckBox("ShowInNewsStand",true)
+
+            <br />
+            <input type='submit' value='Add Publication' style='margin-top:10px;' />
+        </div>
+    </div>
+    @{ Html.EndForm(); }
+</div>

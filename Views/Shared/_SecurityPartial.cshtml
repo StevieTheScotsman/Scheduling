@@ -1,0 +1,321 @@
+﻿<!--Control Access on link by link basis to ease management-->
+<!-- 10/6/14..REMOVE Notifications link and change request link as this functionality is not currently required on production.-->
+@{
+    int CurrentRoleID = Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID();
+}
+<!--********************************USERS*************************************-->
+<h2>
+    Users
+</h2>
+<div class='res-tabs-user'>
+    <ul>
+        @{
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+                <li>@Html.ActionLink("Add User(s)", "AddSingleUser", "Home")</li>
+                <li>@Html.ActionLink("Manage Users", "EditUsers", "Home")</li>
+                <li>@Html.ActionLink("Manage Groups", "ManageGroups", "Home")</li>
+                <li>@Html.ActionLink("Manage Group Associations", "ManageGroupAssociations", "Home")</li>
+            }
+
+        }
+        <li>@Html.ActionLink("View Users", "ListUsers", "Home")</li>
+        <li class='default'>@Html.ActionLink("View Departments", "ListDepartments", "Home")</li>
+        <li class='default'>@Html.ActionLink("View Groups", "ListGroups", "Home")</li>
+        <li class='default'>@Html.ActionLink("View Roles", "ListRoles", "Home")</li>
+        <li class='default'>@Html.ActionLink("View Group Associations", "ListGroupAssociations", "Home")</li>
+    </ul>
+</div>
+<!--********************************PROJECTS*************************************-->
+<h2>
+    Projects
+</h2>
+<!-- Show View Projects if not in admin or super admin role-->
+<div class='res-tabs-project'>
+    <ul>
+
+        @{
+
+            if (CurrentRoleID != (int)Scheduling.Enums.Role.Admin && CurrentRoleID != (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+                @*<li>@Html.ActionLink("Manage Reviewable Projects", "ManageReviewableProjects", "Home")</li>*@
+                <li>@Html.ActionLink("View Projects", "ListProjects", "Home")</li>
+            }
+
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+                @*<li>@Html.ActionLink("Manage Linked Projects", "ManageLinkedProjects", "Linking")</li>*@
+                <li>@Html.ActionLink("Delete Project Entries", "ResetProjects", "Home")</li>
+                <li>@Html.ActionLink("Manage Projects", "ListManagedProjects", "Home")</li>
+                <li>@Html.ActionLink("Create Multiple Projects From Single Baseline", "CreateMultipleStepOne", "Home")</li>
+                @*<li>@Html.ActionLink("Manage Projects With Approved NewsStand Dates", "ManageProjectsWithOnSaleDateApprovedStatus", "Home")</li>*@
+
+            }
+
+        }
+    </ul>
+</div>
+<!--********************************ACTIVITY*************************************-->
+@{
+    if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+    {
+        <h2>
+            Activity
+        </h2>
+        <div class='res-tabs-activity'>
+            <ul>
+                @*<li>@Html.ActionLink("View History For All Projects", "ViewAllProjectHistory", "Home")</li>*@
+                <li>@Html.ActionLink("View Activity Log", "ListActivities", "Home")</li>
+                <li class='delete-activity'>@Html.ActionLink("Delete Activity Log", "DeleteAllActivity", "Home")</li>
+            </ul>
+        </div>
+    }
+
+
+}
+<!--********************************BASELINES*************************************-->
+@{
+
+    if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+    {
+        <h2>
+            Baselines
+        </h2>
+        <div class='res-tabs-profile-type'>
+            <ul>
+                @*<li>@Html.ActionLink("View Baseline Types", "ListProfileTypes", "Home")</li>*@
+                <li>@Html.ActionLink("Manage Baselines", "ManageMilestoneTreeSettingProfiles", "Home")</li>
+                <li>@Html.ActionLink("Create Baseline Based on Baseline Type", "AddSingleMilestoneTreeSettingProfile", "Home")</li>
+            </ul>
+        </div>
+
+    }
+
+
+}
+<!--********************************CHANGE REQUESTS*************************************-->
+<div style='display:none'>
+    <h2>
+        Change Requests
+    </h2>
+    <div class='res-tabs-change-request'>
+        <ul>
+            <li class='default'>@Html.ActionLink("View Change Requests", "ListChangeRequests", "Home")</li>
+            <li class='default'>@Html.ActionLink("Create Change Requests", "CreateChangeRequest", "Home")</li>
+            @{
+
+                if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+                {
+            <li class='default'>@Html.ActionLink("Manage Change Requests", "ManageChangeRequests", "Home")</li>
+                }
+
+
+                if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+                {
+            <li class='default'>@Html.ActionLink("Remove Change Requests", "RemoveChangeRequests", "Home")</li>
+                }
+
+            }
+        </ul>
+    </div>
+</div>
+<!--********************************NOTIFICATIONS*************************************-->
+<div style='display:none'>
+    <h2>
+        Notifications
+    </h2>
+    <div class='res-tabs-change-notification'>
+        <ul>
+            <li class='default'>@Html.ActionLink("View Messaging Settings", "ListMessagingSettings", "Messaging")</li>
+            @{
+
+                if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+                {
+
+            <li class='default'>@Html.ActionLink("Manage Messaging Settings", "ManageMessagingSettings", "Messaging")</li>
+            <li class='default'>@Html.ActionLink("Manage Events", "ManageMessagingEvents", "Messaging")</li>
+
+                }
+
+
+            }
+        </ul>
+    </div>
+</div>
+<!--********************************REPORTING*************************************-->
+<h2>
+    Reporting
+</h2>
+<div class='res-tabs-change-reporting'>
+
+    <ul>
+        <!--Removed by steve 1.29.2015 --Existing functionality still exists-->
+        <!--<li class='default'>@Html.ActionLink("Projects With Newstand Dates", "ProjectsNewsStand", "Reporting")</li>-->
+        <!--<li class='default'>@Html.ActionLink("Projects With Status Of Created", "ProjectsCreated", "Reporting")</li>-->
+        <li class='default'>@Html.ActionLink("Excel Style Reports", "ExcelStyleReports", "Reporting")</li>
+    </ul>
+</div>
+<h2>
+    Administration
+</h2>
+<div class='res-tabs-change-administation'>
+    <div class="baselines">
+        <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+            Baseline Types
+        </p>
+        <ul>
+            <li>@Html.ActionLink("View Baseline Types", "ListProfileTypes", "Home")</li>
+        </ul>
+    </div>
+    <!--milestones-->
+    <div class="milestone">
+        <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+            Milestones
+        </p>
+        <ul>
+
+            @{
+                if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                {
+                    <li class='default'>@Html.ActionLink("Manage Major Milestones", "ManageMajorMilestones", "Home")</li>  }
+
+            }
+        </ul>
+    </div>
+    <!--Publication-->
+    <div class="publication">
+        <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+            Publications
+        </p>
+        <ul>
+            <li class="default">@Html.ActionLink("View Publication Information", "ListPublicationCodes", "Home")</li>
+
+            @{
+                if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                {
+                <li class="default">@Html.ActionLink("Add Publication", "AddPublication", "Publication") </li>
+                <li class='default'>@Html.ActionLink("Manage Publications", "ManagePublicationCodes", "Publication")</li>  }
+
+            }
+
+        </ul>
+    </div>
+
+    <!--Logging-->
+    <div class="logging">
+        <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+            Logging
+        </p>
+        <ul>
+            <li class="default">@Html.ActionLink("View Application Log", "ShowApplicationLog", "Logging")</li>
+            <li class="default">@Html.ActionLink("View Application Error Log", "ShowApplicationErrorLog", "Logging")</li>
+            <li class="default">@Html.ActionLink("Reset Application Log", "ResetApplicationLog", "Logging")</li>
+            <li class="default">@Html.ActionLink("Reset Application Error Log", "ResetApplicationErrorLog", "Logging")</li>
+        </ul>
+    </div>
+
+    <!--Testing-->
+    <div class="testing">
+        <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+            Testing
+        </p>
+        <ul>
+            <li class="default">@Html.ActionLink("Verify Email Connection", "Email", "Test")</li>
+            <li class="default">@Html.ActionLink("Verify Global Exception Handler Filter", "Exception", "Test")</li>
+        </ul>
+
+
+    </div>
+
+    <!--holidays-->
+    <div class="holiday">
+        @{
+
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+                <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+                    Holidays
+                </p>
+                <ul>
+                    <li class='default'>@Html.ActionLink("Manage Holidays", "ManageHolidays", "Home")</li>
+                    <li class='default'>@Html.ActionLink("Manage Holiday Live Change", "ManageHolidayLiveChange", "Home")</li>
+                </ul>
+
+            }}
+    </div>
+    <!--field aliases-->
+    <div class="fieldalias">
+        <p style="color: white; font-weight: bold; text-align: center; background-color: #808080">
+            Field Aliases
+        </p>
+        <ul>
+            <li class="default">@Html.ActionLink("View Field Aliases", "ListFieldAliases", "Home")</li>
+        </ul>
+    </div>
+    <!--There is a manage link settings view that is no longer linked to-->
+    <div style="display:none;">
+        <div class="linking">
+            <p style="background-color: #ccc; color: white; font-weight: bold; text-align: center;
+            background-color: #808080">
+                Linking
+            </p>
+            <ul>
+                @{ if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+                 {
+                    <li>@Html.ActionLink("Manage Link Settings", "ManageLinkSettings", "Linking")</li>
+                 }
+
+                 else
+                 {
+                    <li>@Html.ActionLink("View Link Settings", "ListLinkSettings", "Linking")</li>
+
+                 }
+                }
+            </ul>
+        </div>
+    </div>
+
+    <!--Reporting Presentation-->
+    <div class="reporting-presentation">
+        <p style="background-color: #ccc; color: white; font-weight: bold; text-align: center;
+            background-color: #808080">
+            Reporting
+        </p>
+        <ul>
+
+            <li>@Html.ActionLink("Manage Reporting Presentation", "Presentation", "Reporting")</li>
+
+        </ul>
+    </div>
+
+    <div class="data-integrity">
+        <p style="background-color: #ccc; color: white; font-weight: bold; text-align: center;
+            background-color: #808080">
+            Data Integrity
+        </p>
+        <ul>
+
+            <li>@Html.ActionLink("Check For Project Duplicates", "DataIntegrity", "Reporting")</li>
+
+        </ul>
+    </div>
+
+</div>
+<h2>
+    Documentation
+</h2>
+<div class='res-tabs-change-documentation'>
+    <ul>
+        @{
+
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+            {
+                <li class='default'>@Html.ActionLink("Application Settings", "AppSettings", "Documentation")</li>
+                <li class='default'>@Html.ActionLink("Developer Notes", "DeveloperNotes", "Documentation")</li>
+                <li class='default'>@Html.ActionLink("User Information", "UserInformation", "Documentation")</li>
+            }
+
+
+        }
+    </ul>
+</div>

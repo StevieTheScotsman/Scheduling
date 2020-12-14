@@ -1,0 +1,105 @@
+﻿@model List<Scheduling.Models.ProjectLinkSettingDisplay>
+
+@{
+    ViewBag.Title = "Manage Link Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<div class='container'>
+
+    <div class='sixteen columns'>
+    <p style='font-style:italic'>Only Link Settings that are NOT assigned to projects can be deleted</p>
+    </div>
+
+    <!--automatically invoked find out why todo -->
+    <div class='sixteen columns'>
+    <a href='/linking/addlinksetting' title='Add Link Setting'><img alt='add-link-setting' src="@Url.Content("~/images/add-item.png")" width='30px' style='display:block;padding:10px 0px' class='img-add-link-setting'/></a>
+    
+    </div>
+    <div class='sixteen columns scroll-to-on-load'>
+        @{
+            if (Model.Count > 0)
+            {
+            
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Manage Link Settings")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>
+                           Primary Profile Type
+                        </th>
+                        <th>Primary Milestone</th>
+                          <th>
+                           Secondary Profile Type
+                        </th>
+                        <th>Secondary Milestone</th>
+                        <th>Calculation Offset</th>
+                        <th>Publication Code</th>
+                        <th>Timeline(Month)</th>
+                        
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.ProjectLinkSettingDisplay s in Model)
+                        { 
+           
+                        <tr>
+                            <td>@s.Name</td>
+                            <td>@s.PrimaryProfileType
+                            </td>
+                             <td>@s.PrimaryMilestone
+                            </td>
+                             <td>@s.SecondaryProfileType</td>
+                             <td>@s.SecondaryMilestone
+                            </td>
+                            <td>@s.Calculation</td>
+                            <td>@s.PubCode</td>
+                            <td>@s.Timeline</td>
+                            <td>
+                             @if (Scheduling.Database.Utility.IsLinkSettingAvailableForDeletion(s.ID))
+                             {
+                                 Html.BeginForm("DeleteSingleLinkSetting", "Linking", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteGroupEntry", id = "DeleteGroupEntry" });
+
+                                 <input type='hidden' value='@s.ID' name="id" />
+                                 <img src="@Url.Content("~/images/remove-item.png")"  alt='remove item' style='width:30px' class='remove-link-setting'/>
+                                 
+                                 Html.EndForm();
+
+                             }
+                             
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+            else
+            {
+                <p style="font-style:italic">There are no current settings</p>
+                
+            }
+
+
+        }
+
+       
+    </div>
+    <div id="pageNavPosition">
+    </div>
+      <script type="text/javascript"><!--
+          var pager = new Pager('results', 10);
+          pager.init();
+          pager.showPageNav('pager', 'pageNavPosition');
+          pager.showPage(1);
+    </script>
+</div>

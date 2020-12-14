@@ -1,0 +1,173 @@
+﻿@model List<Scheduling.Models.EditProjectWithMilestones>
+@{
+    ViewBag.Title = "Create Change Request";
+    int counter = 0;
+    Layout = "~/Views/Shared/_EditProjectLayout.cshtml";
+}
+<h2>
+    Create Project Change Requests</h2>
+@Html.Partial("_TableHeaderPartial", ViewData["header"] = "Projects")
+<div style='border-bottom: 4px solid #ccc; padding: 15px 0px'>
+    @{ Html.BeginForm("CreateChangeRequest", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditProjects", id = "EditProjectFormFilter" }); }
+    <!--Filter by timeline-->
+    <select name='timeline' class='edit-project-select-filter'>
+        <option value=''>All Timelines</option>
+        @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedProjectRangeDropdown(ViewBag.CurrentTimeline))
+    </select>
+    <!--Filter by pubcode-->
+    <select name='pubcode' class='edit-project-select-filter'>
+        <option value=''>All Pubcodes</option>
+        @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPublicationDropdown(ViewBag.CurrentPubcode))
+    </select>
+    <!--Filter by year-->
+    <select name='year' class='edit-project-select-filter'>
+        <option value=''>All Years</option>
+        @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedYearDropdown(ViewBag.CurrentYear))
+    </select>
+    @{ Html.EndForm(); }
+    <p class='italic'>
+        Only Projects that have a Project Status Greater Than Schedule Created AND Not Locked Are Open To Change Requests</p>
+</div>
+@if (Model.Count == 0)
+{
+    <p class='italic'>
+        No Results
+    </p>
+}
+
+else
+{
+    <p class='italic'>
+        Found @Model.Count Project(s)</p>
+    
+      
+
+}
+<div class='edit-projects-container'>
+    @foreach (Scheduling.Models.EditProjectWithMilestones epm in Model)
+    {
+
+
+        counter = counter + 1;
+        <p class='bold'>
+            Project @counter of @Model.Count</p>
+        
+        <!--start-->
+        <div style='padding-bottom:10px'>
+            <img src="@Url.Content("~/images/create-request.gif")" alt='show-requests' class='img-edit-projects-generate-request-click'
+                style='width: 40px; display: block' />
+            <div class='request-container' style='padding: 15px 0px;'>
+                @{ Html.BeginForm("ProcessChangeRequest", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ProcessChangeRequest", @class = "form-request-submit" }); }
+                <textarea name='RequestorComment' cols='50' rows='4' class='request-textarea' style='max-width: 250px'></textarea>
+                <input type='hidden' value='@epm.ID' name='ProjectID'/>
+                <input type='button' value='Create Request' class='button-request-submit' style='display: block;
+                    margin-top: 10px' />
+                @{ Html.EndForm(); }
+            </div>
+        </div>
+        
+        <!--stop-->    
+        
+        <div class='edit-projects-show-history-container'>
+            <img src="@Url.Content("~/images/history.png")" alt='show-history' />
+            <div class='edit-project-show-history'>
+                @{
+                   List<Scheduling.Models.ProjectHistory> HisList = Scheduling.Database.Utility.GetProjectHistoryFromProjectID(epm.ID);
+
+                   int HisCounter = 0;
+
+                   foreach (Scheduling.Models.ProjectHistory ph in HisList)
+                   {
+                       HisCounter = HisCounter + 1;
+                    <div class='edit-history-item-container'>
+                        <div class='edit-history-item'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    Date</p>
+                            }
+                            <p>@ph.EntryDate</p>
+                        </div>
+                        <div class='edit-history-item is-comment'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    Comments</p>
+                            }
+                            <p>@ph.Comments</p>
+                        </div>
+                        <div class='edit-history-item'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    UserName</p>
+                            }
+                            <p>@ph.Username</p>
+                        </div>
+                    </div>
+                   }
+                }
+            </div>
+        </div>
+        <div class='edit-projects-inner-container'>
+            @{ Html.BeginForm("ProcessEditSingleProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditSingleProject" }); }
+            <div class='column-container'>
+                <p>
+                    Year</p>
+                @epm.Year
+            </div>
+            <div class='column-container'>
+                <p>
+                    Version</p>
+                @epm.CurrentVersion
+            </div>
+            <div class='column-container'>
+                <p>
+                    Creation Date</p>
+                @epm.DateCreated
+            </div>
+            <div class='column-container'>
+                <p>
+                    Name</p>@Html.TextBox("Name", epm.Name, new { @disabled = "disabled" })</div>
+            <div class='column-container'>
+                <p>
+                    Project Status</p>
+                @Html.TextBox("Name", Scheduling.Database.Utility.GetAllProjectStatuses().Where(x => x.ID == epm.CurrentProjectStatus).First().Description, new { @disabled = "disabled" })
+            </div>
+            <input type='hidden' value='@epm.ID' name='ID'/>
+            @{ Html.EndForm(); }
+        </div>
+        <!--end single project main properties container-->
+        
+     
+        <div style='clear: both' />
+               //form submit triggered by image click in editprojects.js
+        <div class='edit-projects-milestone-container'>
+            <div class='edit-projects-expand-logo-container'>
+                <img alt='toggle' src="@Url.Content("'~/images/toggle.gif")" class='milestone-toggle' />
+            </div>
+            @foreach (Scheduling.Models.MilestoneValue mv in epm.MileValueList)
+            {
+                <div class='milestone-item'>
+                    @{
+                Scheduling.Models.MilestoneField MilestoneField = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mv.MilestoneFieldFK).First();
+                        <p>@MilestoneField.Description</p>
+                
+                string CurrentDateVal = string.Empty;
+                        <!--Get the due date of this field -->
+                if (!string.IsNullOrWhiteSpace(mv.DueDate))
+                {
+                    CurrentDateVal = mv.DueDate;
+
+                } 
+                 
+                        <input type='text'  disabled="disabled" value='@CurrentDateVal' />                    
+                    }
+                </div>
+   
+            }
+        </div>
+        
+           
+    }
+</div>

@@ -1,0 +1,152 @@
+﻿/*Header Section Start*/
+
+
+			body {
+				background: #fff;
+				color: #333;
+				padding:15px 20px;
+				font-family: Helvetica, Arial, sans-serif;
+				line-height: 1.5em;
+				
+			}
+			a { color: #0496b6}
+
+			h1, h2 { margin: 1em 0 1.5em 0; color: #0f556f}
+			.tabs h1, .tabs h2 { color: #333; margin-bottom: 1em;}
+			.tabs ul, .tabs ol, .tabs p { margin-top:0; padding-top: 1em;}
+			.tabs ul li, .tabs ol li { margin-bottom: 0.5em;}
+
+			hgroup h1 { margin-bottom:0; margin-top:0; line-height: 1.2em;}
+			
+			hgroup h2 { font-size: 1.1em; font-weight: normal; position: absolute; top: 16px; right:20px;}
+
+			.btn { display: block; float: left;  padding: 10px 15px; background: #0496b6; font-size: 1.5em; color: #fff; font-weight: bold; text-decoration: none; border-radius: 5px;  text-align: center; box-shadow: 2px 2px 2px #eee;}
+			.btn:hover { background: #3cb7d3}
+			.clearfix {
+			  *zoom: 1;
+			}
+
+			.clearfix:before,
+			.clearfix:after {
+			  display: table;
+			  content: "";
+			}
+
+			.clearfix:after {
+			  clear: both;
+			}
+			.intro { margin: 20px 0; background: #c9f6f9; border: 1px solid #ccc; box-shadow: 2px 2px 2px #eee; padding: 5px 15px 10px 15px; }
+			p.demo-intro { font-size: 1.2em; margin-bottom: -0.5em; font-weight: bold; }
+
+			@media (max-width: 767px) {
+				hgroup h1 { margin-top: 25px;}
+				hgroup h2 { top: 0; left: 5px; font-size:12px;}
+			 	.btn { width: 80%; margin: 20px auto; float:none;}
+			}
+
+/*Header Section Stop */
+
+/*Responsive Tabs Start */
+
+
+/* REQUIRED for core functionality */
+
+.responsive-tabs__heading { display: none;}
+.responsive-tabs__list__item { display: inline; cursor:pointer;}
+
+
+@media (max-width: 1400px) {
+	.responsive-tabs__list { display: none;}
+	.responsive-tabs__heading { display: block; cursor: pointer; }
+	.responsive-tabs__panel--closed-accordion-only { display: none;}
+}
+
+@media (min-width: 1401px) {
+	.responsive-tabs__panel--closed-accordion-only { display: block !important;}
+}
+
+/* END - Required for core functionality */
+
+
+/* OPTIONAL - Basic Skin */
+
+.responsive-tabs-wrapper { 
+	clear: both;
+	zoom: 1; 
+}
+.responsive-tabs-wrapper:before,
+.responsive-tabs-wrapper:after {
+    content: "";
+    display: table;
+} 
+.responsive-tabs-wrapper:after {
+    clear: both;
+}
+
+.responsive-tabs__heading:focus,
+.responsive-tabs__list__item:focus { outline: 1px solid #ccc;  }
+
+.responsive-tabs__heading--active:focus,
+.responsive-tabs__list__item--active:focus { outline: none !important;}
+
+.responsive-tabs__list { font-size: 1.2em; margin: 2em 0 0 0; padding: 0;border-bottom: 1px solid #ddd; padding-bottom:11px; line-height: 1em;}
+.responsive-tabs__list__item { background: #eee; padding: 10px 20px;  margin-right: 1em; border-top-left-radius: 5px; border-top-right-radius: 5px;border: 1px solid #ddd; }
+.responsive-tabs__list__item:hover {background: #efefef }
+.responsive-tabs__list__item--active, 
+.responsive-tabs__list__item--active:hover {  background: #fff; border-bottom-color: #fff;}
+
+.responsive-tabs__panel { margin-bottom: 50px;}
+
+@media (max-width: 1400px) {
+	.responsive-tabs__heading { 
+		padding: 0.5em; border-radius: 5px; border: 1px solid #ccc; box-shadow: 0px 2px 3px rgba(0,0,0,0.4);
+		background: #ddd;
+		position: relative;
+	}
+
+	.responsive-tabs__heading:after {
+		content:"";
+		display: block;
+		position: absolute;
+		right: 20px;
+		top: 40%;
+		width: 0; 
+		height: 0; 
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-top: 10px solid #000;
+	}
+	.responsive-tabs__heading:hover,
+	.responsive-tabs__heading--active:hover { background-color: #efefef}
+	.responsive-tabs__heading--active { background: #fff;}
+	.responsive-tabs__heading--active:after {
+		border-bottom: 10px solid #000;
+		border-top:0;
+	 }
+}
+
+
+/*Responsive Tabs Stop */
+
+
+/*added by steve */
+.responsive-tabs__panel
+{
+   padding:15px;
+    
+}
+
+.responsive-tabs__panel ul li a 
+{
+   text-decoration:none;
+   color:#0f566f;
+    
+}
+
+.responsive-tabs__panel ul li a:hover
+{
+   text-decoration:underline;
+   font-size:1.2em;
+   font-weight:bold;
+    
+}

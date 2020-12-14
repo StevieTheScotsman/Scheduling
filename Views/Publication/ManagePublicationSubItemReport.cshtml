@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Manage Sort Order";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int NumDropdowns = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NumSortItemsOnManagePublicationPage"));
+    int PubID=ViewBag.PubID;
+    string ReportDesc=Scheduling.Database.Utility.GetPubCodeReportDescFromID(PubID);
+    
+}
+
+<div class="container">
+    <div class='row clearfix'>
+        <h2>
+            @ReportDesc Sorting Configuration
+        </h2>
+
+        <p style="font-style:italic">Select only the number of columns that are required for this pubcode</p>
+
+    </div>
+    <div style="font-weight:bold">@Html.ValidationSummary()</div>
+        
+    <!--form start-->
+    @{ Html.BeginForm("ProcessManagePublicationSubItemReport", "Publication", FormMethod.Post, new { enctype = "multipart/form-data", id = "ManageSortOrder" }); }
+    
+      <input type="hidden" name="NumItems" value="@NumDropdowns" />
+      <input type="hidden" name="id" value="@PubID" />
+      @{
+          for (int i = 1; i <= NumDropdowns;i++ )
+          {
+              <div>
+                  <p>Sub Item @i</p>
+              <select name="dropdown_@i" >
+              <option value="">--N/A--</option>
+               @Html.Raw(Scheduling.Html.ViewDropdown.BuildSubItemReportingDropdown())
+              </select>
+               </div>
+          }
+          
+      }
+     <input type="submit" value="Save Configuration"/>
+
+    @{ Html.EndForm(); }
+</div>

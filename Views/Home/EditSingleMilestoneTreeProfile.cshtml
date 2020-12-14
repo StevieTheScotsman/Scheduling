@@ -1,0 +1,304 @@
+﻿@model List<Scheduling.Models.MilestoneTreeSetting>
+@{
+    ViewBag.Title = "EditSingleMilestoneTreeProfile";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<div class='container'>
+
+     
+
+    <div class='sixteen columns'>
+        <h2 style='border-bottom: 3px solid #ccc; padding-bottom: 15px'>
+            Manage @ViewBag.MilestoneTreeSettingsProfile.Description Baseline</h2>
+        <img style='display: block' title='Show Milestone View' class='edit-profile-eye-click' alt='view records' src="@Url.Content("~/images/eye.png")"
+            width='50px' />
+    </div>
+
+
+        <div class='row clearfix'>
+            <div style='overflow: hidden;display:none;padding: 10px;' id='edit-profile-eye-container'>
+            </div>
+            
+        </div>
+
+    <!--Error Container-->
+    <div class='row clearfix edit-profile-error'>
+        <p style='color: Red; font-weight: bold;'>
+        </p>
+    </div>
+    <!--Dummy Add Milestone-->
+    <div id="DummyMilestoneDisplay">
+        <div class='row clearfix edit-profile-item-record orig-dummy'>
+            <div class='one column' style='padding-top:35px'>
+                <img title='Remove Milestone' src="@Url.Content("~/images/remove-milestone.png")" style="width:25px" class="edit-profile-remove-click"  alt="remove milestone" />
+            </div>
+            <!--Milestone Field start-->
+            <div class='three columns '>
+                <p>
+                    Milestone</p>
+                <select name='edit-profile-select-milestone-field' class='edit-profile-select-milestone-field'>
+                    <option value=''>Choose a milestone</option>
+                    @{
+                                  
+                        foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                        {
+                                
+                        <option value='@mf.ID'>@mf.Description</option>
+
+                        }
+                    }
+                </select>
+            </div>
+            <!--stop-->
+            <!--start -->
+            <div class='three columns'>
+                <p>
+                    Dependancy</p>
+                <select name='edit-profile-select-dep-field' class='edit-profile-select-dep-field'>
+                    <option value=''>Choose a milestone</option>
+                    @{
+                                  
+                        foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                        {
+                                
+                        <option value='@mf.ID'>@mf.Description</option>
+
+                        }
+                    }
+                </select>
+            </div>
+            <!--stop-->
+            <!--calc start-->
+            <div class='three columns'>
+                <p>
+                    Calculation</p>
+                <select name='edit-profile-select-calc-field' class='edit-profile-select-calc-field'>
+                    <option value=''>Choose a Calculation</option>
+                    @{
+                
+                        //Calc Fields Start
+                        foreach (Scheduling.Models.Calculation c in ViewBag.CalcList)
+                        {
+                        <option selected='selected' value='@c.ID'>@c.ShortDesc</option>
+
+                        }
+
+                    }
+                </select>
+            </div>
+            <!--stop-->
+            <!--fir order start-->
+            <div class='two columns'>
+                <p>
+                    Calc Order</p>
+                <input type='text' maxlength='3' value='' class='edit-profile-fire-order' />
+            </div>
+            <!--stop-->
+            <!--Display Order-->
+            <div class='two columns' style='padding-left: 25px'>
+                <p>
+                    Display Order</p>
+                <input type='text' maxlength='3' value='' class='edit-profile-display-order' />
+            </div>
+            <div class='one column' style='padding-top: 35px'>
+                <img src="@Url.Content("~/images/check.png")"style='width: 25px' class='edit-profile-img-check' alt='check' />
+            </div>
+        </div>
+        <!--end record-->
+    </div>
+    <div id="RegularDisplay">
+        @{      foreach (Scheduling.Models.MilestoneTreeSetting mts in Model)
+                {
+            <div class='row clearfix edit-profile-item-record'>
+                <div class='one column' style='padding-top: 35px'>
+                    <img src="@Url.Content("~/images/remove-milestone.png")" style='width: 25px' class='edit-profile-remove-click'
+                        alt='remove milestone' />
+                </div>
+                <!--Milestone Field start-->
+                <div class='three columns '>
+                    <p>
+                        Milestone</p>
+                    <select name='edit-profile-select-milestone-field' class='edit-profile-select-milestone-field'>
+                        <option value=''>Choose a milestone</option>
+                        @{
+                
+                                  
+                    foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                    {
+                        int CurrentMfSel = mts.MilestoneField;
+
+                        if (mf.ID == CurrentMfSel)
+                        {
+                            <option selected='selected' value='@mf.ID'>@mf.Description</option>
+
+                        }
+
+                        else
+                        {
+
+                            <option value='@mf.ID'>@mf.Description</option>
+
+                        }
+
+                    }
+                 
+                        }
+                    </select>
+                </div>
+                <!--stop-->
+                <!--start -->
+                <div class='three columns'>
+                    <p>
+                        Dependancy</p>
+                    <select name='edit-profile-select-dep-field' class='edit-profile-select-dep-field'>
+                        <option value=''>Choose a Dependancy</option>
+                        @{
+                
+                    //Milestone Fields Start
+                    foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                    {
+                        int? CurrentMfSel = mts.MilestoneFieldDependantUpon;
+
+                        if (CurrentMfSel.HasValue)
+                        {
+
+                            if (mf.ID == CurrentMfSel)
+                            {
+                            <option selected='selected' value='@mf.ID'>@mf.Description</option>
+
+                            }
+
+                            else
+                            {
+
+                            <option value='@mf.ID'>@mf.Description</option>
+
+                            }
+
+                        }
+
+                    }
+                 
+                 
+                
+                        }
+                    </select>
+                </div>
+                <!--stop-->
+                <!--calc start-->
+                <div class='three columns'>
+                    <p>
+                        Calculation</p>
+                    <select name='edit-profile-select-calc-field' class='edit-profile-select-calc-field'>
+                        <option value=''>Choose a Calculation</option>
+                        @{
+                
+                    //Calc Fields Start
+                    foreach (Scheduling.Models.Calculation c in ViewBag.CalcList)
+                    {
+                        int? CurrentMfSel = mts.CalculationID;
+
+                        if (CurrentMfSel.HasValue)
+                        {
+
+                            if (c.ID == CurrentMfSel)
+                            {
+                            <option selected='selected' value='@c.ID'>@c.ShortDesc</option>
+
+                            }
+
+                            else
+                            {
+
+                            <option value='@c.ID'>@c.ShortDesc</option>
+
+                            }
+
+                        }
+
+                    }
+                 
+                 
+                
+                        }
+                    </select>
+                </div>
+                <!--stop-->
+                <!--fir order start-->
+                <div class='two columns'>
+                    <p>
+                        Calc Order</p>
+                    @{
+                                
+                    string CurrentFiringOrder = string.Empty;
+                    if (mts.CalcFiringOrder.HasValue)
+                    {
+
+                        CurrentFiringOrder = mts.CalcFiringOrder.ToString();
+                    }
+                                
+                    }
+                    <input type='text' maxlength='3' value='@CurrentFiringOrder'  class='edit-profile-fire-order'/>
+                </div>
+                <!--stop-->
+                <!--Display Order-->
+                <div class='two columns' style='padding-left: 25px'>
+                    <p>
+                        Display Order</p>
+                    @{
+                                
+                    string CurrentDisplayOrder = "1";
+                    if (mts.DisplayOrder.HasValue)
+                    {
+
+                        CurrentDisplayOrder = mts.DisplayOrder.ToString();
+                    }
+                                
+                    }
+                    <input type='text' maxlength='3' value='@CurrentDisplayOrder'  class='edit-profile-display-order'/>
+                </div>
+                <div class='one column' style='padding-top: 35px'>
+                    <img src="@Url.Content("~/images/check.png")" style='width: 25px' class='edit-profile-img-check' alt='check' />
+                </div>
+            </div>
+            <!--end record-->
+               
+
+
+                }
+            
+        }
+    </div>
+    <!--end regular Display-->
+    <div id='ActionDisplay'>
+        <!--Action Display-->
+        <!--bottom row-->
+        <div class='row clearfix edit-profile-bottom-row'>
+            <div class='six columns edit-profile-add-click'>
+                <img src="@Url.Content("~/images/add-milestone.png")"class='edit-profile-img-add-click' style='width: 25px;
+                    display: block' alt='add-dep' />
+                <p>
+                    Add Milestone</p>
+            </div>
+            <div class='five columns edit-profile-add-dep-click'>
+                <img src="@Url.Content("~/images/add-milestone.png")" class='edit-profile-img-add-dep-click' style='width: 25px;
+                    display: block' alt='add-dep' />
+                <p>
+                    Add Milestone With Dependancy</p>
+            </div>
+            <div class='one column edit-profile-val-click'>
+                <img src="@Url.Content("~/images/validate.png")"class='edit-profile-img-val-click' style='width: 25px;
+                    display: block' alt='add-dep' />
+                <p>
+                    Validate</p>
+            </div>
+            <div class='one column edit-profile-sub-click'>
+                <input type='hidden'  value='@ViewBag.MilestoneTreeSettingsProfile.ID' name="hf-profile-id" id="hf-profile-id"/>
+                <input type='button' value='Save Main Items' class='edit-profile-save-click' /></div>
+            <div class='one column edit-profile-success'>
+                <img src="@Url.Content("~/images/success.png")"style='display: block; width: 50px;' alt='success' />
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end container-->

@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "Add Single Milestone Tree Setting Profile";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<h2>
+    Add Baseline</h2>
+@Html.ValidationSummary()
+@{ Html.BeginForm("ProcessAddSingleMilestoneTreeSettingProfile", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "AddSingleMilestoneSetting" }); }
+<p>
+    Description</p>
+@Html.TextBox("Description")
+<p>
+    Baseline Type</p>
+@{
+    <!--During testing we wanted to ensure only the magazine type was selectable-->
+    <select name='ProjectType' id='ProjectType'>
+        @{
+            string cv = Scheduling.StringFunctions.Utility.GetAppSettingValue("ShowMagazineOptionsOnly").ToUpper();
+
+            if (cv == "TRUE")
+            {
+                int MagInt = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType"));
+                Scheduling.Models.ProjectProfileType pt = Scheduling.Database.Utility.GetAllProjectProfileTypes().Where(x => x.ID == MagInt).First();
+            <option  value='@pt.ID'>@pt.Description</option>
+                     
+            }
+
+            else
+            {
+
+                foreach (Scheduling.Models.ProjectProfileType p in ViewBag.ProfileTypes)
+                {
+                    <option  value='@p.ID'>@p.Description</option>
+                           
+                }
+
+            }
+                 
+           
+        }
+    </select>
+       
+}
+<div class='add-single-submit-container'>
+    <input type="submit" value='Add Baseline' />
+</div>
+@{ Html.EndForm(); }

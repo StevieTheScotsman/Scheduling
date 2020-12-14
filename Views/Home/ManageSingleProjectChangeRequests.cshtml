@@ -1,0 +1,97 @@
+﻿@model List<Scheduling.Models.ChangeRequest>
+@{
+    ViewBag.Title = "Manage Single Project Change Requests";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<div class="container">
+
+    <h2>Manage Change Requests for @ViewBag.ProjectDisplay.Name</h2>
+
+    @{
+        
+        
+        if(Model.Count ==0)
+        {
+            
+            <p>There are no change requests for this project</p>
+            
+        }
+        
+    }
+
+
+    @{   
+    
+        foreach (Scheduling.Models.ChangeRequest cr in Model)
+        {
+        <div class="sixteen columns" style='border-bottom:2px double #ccc;padding:5px'>
+
+           
+           @{
+            if (Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID() >= (int)Scheduling.Enums.Role.Admin)
+            {   <div class='one column'>
+                @{Html.BeginForm("DeleteSingleProjectRequest", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "AdvancedProjects" }); } 
+           
+              
+                     <img src="@Url.Content("~/images/remove-note.png")" width='20px' alt='edit advanced project' class='manage-single-project-request-remove' />
+                    <input type='hidden' name='id' value='@cr.ID' />
+                    <input type='hidden' name='ProjectFk' value='@ViewBag.ProjectDisplay.ID' />
+                
+                @{Html.EndForm();
+            }
+                </div>
+            }
+               
+               
+               
+        }
+
+            <div class="three columns">
+           @cr.RequestorComment
+            </div>
+
+            <!--The radio button needs to be unique -->
+            <div class="ten columns">
+            @{
+                
+            Html.BeginForm("EditSingleProjectRequest", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "AdvancedProjects", @class = "AdvancedProjects" });
+
+            foreach (Scheduling.Models.ChangeRequestStatus s in ViewBag.RequestStatusList)
+            {
+                     
+                    <span>@s.Description</span>            
+                if (s.ID == cr.RequestStatus)
+                {
+                      
+                       <input type="radio" name="RequestStatus-@cr.ID" value="@s.ID" checked="checked" />
+
+                }
+
+
+                else
+                {
+                          
+                           <input type="radio" name="RequestStatus-@cr.ID" value="@s.ID" />
+
+
+                }
+
+            }
+                
+                <img src="@Url.Content("~/images/save.png")" style='width:30px;position:relative;left:5px;top:10px' alt='edit advanced project' class='advanced-manage-single-project' />
+                <input type='hidden' name='id' value='@cr.ID' />
+                <input type='hidden' name='ProjectFk' value='@ViewBag.ProjectDisplay.ID' />
+
+            Html.EndForm();
+                
+                
+        }
+            </div>
+
+
+        </div>
+        }
+    
+    
+    }
+</div>

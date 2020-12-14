@@ -1,0 +1,136 @@
+﻿
+.help-overview
+{
+    padding: 10px 0px 0px 0px;
+}
+
+.help-header-container
+{
+    border-bottom: 1px solid #ccc;
+}
+
+
+.help-img
+{
+    width: 100%;
+}
+
+
+
+/*General Styles*/
+.bottomborder
+{
+    border-bottom: 1px solid #ccc;
+}
+
+.topborder
+{
+    border-top: 1px solid #ccc;
+}
+
+.larger-font
+{
+    font-size: 1.3em;
+}
+
+.italic
+{
+    font-style: italic;
+}
+
+.blue
+{
+    color: #0F556F;
+}
+
+.vertical-padding
+{
+    padding: 10px 0px;
+}
+
+
+
+ul.list-disc
+{
+    list-style: disc outside none;
+    padding: 10px 10px 10px 25px;
+}
+
+.nodisc
+{
+    list-style: none;
+}
+
+.top-padding-only
+{
+    padding-top: 10px;
+}
+
+.float-container
+{
+    overflow: hidden;
+}
+
+.floatleft
+{
+    float: left;
+    margin-left: 10px;
+}
+
+/*Nav Help Links */
+
+a.helplink-background
+{
+background: -moz-linear-gradient(center top , rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.2) 100%) repeat scroll 0 0 #EEEEEE;
+text-decoration:none;
+padding:10px;
+margin:10px;
+}
+
+
+a.helplink:link
+{
+    color: #0F556F;
+    
+}
+a.helplink:visited
+{
+    color: #0F556F;
+}
+a.helplink:hover
+{
+    color: #0F556F;
+    font-style:italic;
+    text-decoration:underline;
+}
+/* mouse over link */
+a.helplink:active
+{
+    color: #0F556F;
+}
+/* selected link */
+
+.block
+{
+    display:block;
+}
+
+.toggle-span
+
+{
+    font-weight:bold;
+    padding-left:5px;
+    
+}
+
+
+.rounded-corners {
+     -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+}
+
+
+
+

@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Application Information";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    
+}
+
+<p style="padding:10px;border-top:1px solid #ddd;border-bottom:1px solid #ddd;">Current Work Summary</p>
+
+
+<p style="font-style:italic">The First Number for the bugfix relates to the version of the application</p>
+
+<p style="font-style:italic;color:#00f">Application is currently at Version 4.0</p>
+
+<pre>
+
+Implementation
+----------------
+I4.1 Add ability to add a publication
+I4.2 Add ability to edit a publication
+I4.3 Add ability to delete a publication if it has no projects assigned.
+I4.4 Add ability to manage a publication report sorting order. 
+I4.5 Get Link And Calculate Working on Initial Project Creation..currently they create the projects and it is a separate step to run calculation using the newsstand date
+
+Future Roadmap
+------------------
+F1  Solid Caching Implementation 
+F2 Move home from scdevel
+
+Ongoing Notes
+----------------------
+Updating Documentation for user and developers
+
+</pre>
+     
+
+<p style="padding:10px;border-top:1px solid #ddd;border-bottom:1px solid #ddd;margin-top:20px">Developer Debugging</p>
+
+<pre>You can run in VS Studio Debugger(cassini) or use  Scheduling.Database.Utility.CreateApplicationLoggingEntry/Create ApplicationErrorLoggingEntry and view the results in the logging section under the administration tab.   
+
+</pre>
+
+
+<p style="padding:10px;border-top:1px solid #ddd;border-bottom:1px solid #ddd;margin-top:20px">Version 4 Updates</p>
+
+<pre>
+--Allow ability to have 5 projects on one page and a single header
+--Update UI so that a single project can be managed on a single page
+</pre>
+
+
+<p style="padding:10px;border-top:1px solid #ddd;border-bottom:1px solid #ddd;margin-top:20px">Developer Reminders</p>
+
+    <pre>
+
+Navigation Items
+================================
+Administration
+	-Minor Milestone Fields(Uses ifCreatedbyuser flag which is set when an additional field is added for a profile or a project)
+	-Manage Major Milestones(Sorted alphabetically and are used when building profiles,pulled from dbo.milestonefield where iscreatedbyuser is null)
+	-Manage Holidays(No deletion and sorted by descending year,Responsive Ok,Add Holiday OK,pulls from dbo.holiday)
+	
+	
+Reporting
+	-Project With Newsstand Dates(PDF Output uses trial software by EO Objects and uses attribute on controller which renders view in pdf format,uses E0.PDF.dll))
+	-Project With Newsstand Dates(Spreadsheet(csv)) (Generates files in CSVExport Folder suffixed with Generation Date and can be opened by application assigned to open csv files,Information Specific Header configured in App Settings,files can be opened or saved,uses file helpers dll,in excel opens in a header,works on android device),.
+	
+Notifications
+	-View Messaging Settings(Responsive down to 800px,Shows user,role,group and dept recipients,on delivery only distinct users entries will be notified)
+	-Manage Messaging Settings(Responsive down to 800px,one shot deal,to edit create a new entry which will wipe the old one)
+	-Manage Events(Logic dictates when events can be removed)
+	
+Change Requests 
+	-All Change Requests broken down by Project.(Needs a filter)
+	-Create Change Request(Shows History of the project and current milestones).Projects Have to have a status Greater Than  ScheduleCreated And Not be Locked. 
+	-Manage Change Request(Broken down by Project If not in a created status,decision radio button appears).Filtered by Projects(system pulls projects with CR's).Can Filter by projects that have pending entries.This filter overrides the project one.The projects dropdown will be switched to all when this is checked
+	The project specific screen can be invoked from the project manage screen also.
+	
+Schedule Baselines
+	-List Profile Types(Current Logic is for Magazine & Digital);
+	-View Link Settings(Current Entry Links File Delivery Date for Digital to be 5 less than N/s For Magazine.Currently Controlled by Database).
+	-Manage Baselines(Logic dictates which baselines can be removed,Verify runs only for magazine type baselines,ensures n/s is first entry,runs on entries with calc firing order,basically validates firing order.Edit Baseline needs to be clicked after entries are added/removed.In the case of adding subitems if there are no existing entries then default firing order is 5.)
+	-Create Baseline Based on Baseline Type(Dropdown pulls from baseline table)
+	
+Activity
+	-View Activity Log(Should be NON Project Activity,To stop huge tables activity log is only for last 30 days)
+	-Delete Activity Log(Typically Used For Testing)
+	
+Projects
+	-View Projects  (Dropdowns should be relevant to existing projects,Filter by status,timeline,pubcode,year,baseline type,links will only show if they exist,notes will only show when they exist,top level milestones have no parent can be toggled,dependencies can be toggled,name and status are shown underlined)
+    
+	-Manage Linked Projects  (Allow User To remove project link)
+	-Delete Project Entries (Allows Projects And Project History To Be Removed From A Project.Entries remain for status of project created)
+	-Manage Projects(View Projects + Manage Notes + Edit) 
+		--Manage Projects--Notes(Show current notes and allow ability to add notes,uses notion of label and value
+		
+		--Manage Projects--Edit(Opening shows notes,history...Allows ability to 1/View/Recalculate dates,2/View/Add/Remove Milestones,3/Revert to Baseline(removing changes (n.b sets due dates to null,removes added milestones,readds milestones then calculates new values from n/s date),4/Alter ProjectName/Status/Lock Status.
+		
+		--Manage Project Linkable Icon(This will show if link setting is set up.Will show if PubCode/Year Matches and Primary Project matches,(select count(*) from dbo.Project where pubcodefk={0} and yearfk={1} and milestonetreesettingsprofilefk in ( select ID from milestonetreesettingsprofile where profiletypefk=(select primaryprofiletypeid from projectlinksettings where secondaryprofiletypeid ={2}))).The title tag will give user an indication of which profile/field we can link to.If there is a pubcode match them the option will be preselected.
+		
+		--Manage Project Locked Icon (Indicates if the project is locked.Can be unlocked by clicking green edit button)
+		
+    --Create Multiple Projects From Single Baseline
+	--Manage Reviewable Projects(Used by Jerry) Jerry has the option to Accept and Reject all or individually.Only shows Projects with Status of onsaledate in review. 
+	--Manage Projects with Approved Newsstand Dates(Used by Helene)
+	
+	-Manage Reviewable Projects
+		
+	
+Users
+
+	--Add users (Add user providing email,role)
+	--Manage Users(Dropdown associations will be highlighted)
+	--Manage Groups(Groups can only be deleted if they are Not Assigned To Users,Not Used in Group Notifications and not used in a Group Association)
+	--Manage Group Associations(If we assign groups to departments we can easy assign events to departments)
+	--View Users
+	--View Groups
+	--View Roles
+	--View Group Associations(Used by notification logic .the project will always have a pubcode )
+	
+</pre>
+
+
+    <pre>
+Exception Handling(Tested 9/17/2013)
+====================================
+
+For Testing debug is set to true and custom errors to off.
+On deployment debug will be false,custom errors will be on and exception information will be emailed to online
+
+</pre>
+
+
+    <pre>
+
+Main And Minor Milestones
+==========================
+Main Milestones and Minor Milestones are differentiated by the parent milestone id in the database.
+The verify baseline function will use this to test for correct baseline set up for the main items.
+
+</pre>
+
+
+   
+  

@@ -1,0 +1,73 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>@ViewBag.Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+    <!--JS All scripts in scripts/bundled are in bundledscripts-->
+    @Html.Partial("_JsFiles")
+
+
+    <!--start-->
+    <!--Google Fonts-->
+    <link href='http://fonts.googleapis.com/css?family=Original+Surfer' rel='stylesheet'
+          type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Condiment' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Unkempt:700' rel='stylesheet'
+          type='text/css' />
+    <!--css Only Responsive Tabs is currently in bundle-->
+    <link href="@Url.Content("~/Content/Skeleton/base.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Skeleton/layout.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Skeleton/skeleton.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Skeleton/tables.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Slider/Slider.css")" rel="stylesheet" type="text/css" />
+
+    <!--datepicker and dialog 10.3 is the smoothness theme was previously 1.10.2-->
+    <link href="@Url.Content("~/Content/smoothness/jquery-ui-1.10.3.custom.css")" rel="stylesheet" type="text/css" />
+
+    <!--Responsive Layout Custom -->
+    <link href="@Url.Content("~/Content/Skeleton/prodschedcustom.css")" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/ResponsiveTabs/ResponsiveTabs.css")" />
+
+    <!--Help Docs-->
+    <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/Help/help.css")" />
+    <!--stop-->
+    @Html.Partial("_NoScriptPartial")
+
+    <!--spinner-->
+    <script type='text/javascript'>
+        $(window).load(function () {
+            $('#cover').fadeOut(1);
+        });
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class=" headerContainer">
+            @Html.Partial("_Header")
+        </div>
+        <div class="gridContainer" id="divMainGrid">
+            <div class="gridRow mainContentGrid">
+              @RenderBody() 
+            </div>
+        </div>
+        <div class="push"></div>
+    </div>
+
+    <div class="gridContainer footerContainer">
+        @Html.Partial("_Footer")
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('a.go-to-root').attr('href', baseUrl);
+
+            var d = new Date();
+            var currentYear = d.getFullYear();
+            document.getElementById("currentYear").innerHTML = currentYear;
+        });
+    </script>
+    <script type="text/javascript" src="~/Scripts/dropDownMenu.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+
+    List<Scheduling.Models.ProjectLink> ProjLinks = Scheduling.Database.Utility.GetAllProjectLinks();
+
+    bool IsPrimaryLink = ProjLinks.Where(x => x.PrimaryProjectID == CurrentProject).Count() > 0;
+    bool IsSecondaryLink = ProjLinks.Where(x => x.SecondaryProjectID == CurrentProject).Count() > 0;
+    
+}
+@{
+      
+    if (IsSecondaryLink || IsPrimaryLink)
+    {
+      
+    <img src="@Url.Content("~/images/toggle.gif")" style='width: 30px' alt='toggle' class='list-project-links' /> <span
+        class='bold'>Project Links</span>
+   
+        if (IsPrimaryLink)
+        {
+            List<int> SecLinkList = ProjLinks.Where(x => x.PrimaryProjectID == CurrentProject).Select(x => x.SecondaryProjectID).ToList();
+
+            string ResString = string.Empty;
+
+            foreach (int i in SecLinkList)
+            {
+                ResString += Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == i).First().Name + ",";
+
+            }
+
+            ResString = ResString.Substring(0, ResString.Length - 1);
+            
+    <p class='list-project-links'>@string.Format("This is a primary project that is linked to the {0} secondary project(s)", ResString)</p>
+            
+        }
+
+
+        if (IsSecondaryLink)
+        {
+            List<int> PrimLinkList = ProjLinks.Where(x => x.SecondaryProjectID == CurrentProject).Select(x => x.PrimaryProjectID).ToList();
+
+            string ResString = string.Empty;
+
+            foreach (int i in PrimLinkList)
+            {
+                ResString += Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == i).First().Name + ",";
+
+            }
+
+            ResString = ResString.Substring(0, ResString.Length - 1);
+            
+    <p class='list-project-links'>@string.Format("This is a secondary project that is linked to the {0} primary project", ResString)</p>
+            
+        }
+    }
+        
+}

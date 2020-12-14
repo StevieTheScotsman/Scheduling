@@ -1,0 +1,247 @@
+﻿
+.dropdown.create-multiple-step-one
+{
+
+    height:250px;
+
+}
+
+div.create-project-column p
+{
+    
+    font-weight:bold;
+}
+
+div.reset-project-delete img
+{
+    width:25px;
+}
+
+/*hide certain columns below 767*/
+ @media only screen and (max-width: 767px) 
+ {
+     
+     .hideoncenterlimit
+     {
+         display:none;
+     }   
+     
+ }
+ 
+ /*hide certain columns below 767*/
+ @media only screen and (max-width: 480px) 
+ {
+     
+     .hideonlowerlimit
+     {
+         display:none;
+     }   
+     
+ }
+ 
+ /*show bottom border on profile creation*/
+
+.bottom-grey-border
+{
+    
+    border-bottom:3px double #ccc;
+    
+}
+
+/*Style invalid model state */
+div.validation-summary-errors ul li
+{
+    color:Red;
+}
+
+
+/*Rounded Corners*/
+.rounded-corners {
+     -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+}
+
+
+#cover {
+    background: url("images/ajax-loader.gif") no-repeat scroll center center #FFF;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color:#ccc;
+}
+
+/*Edit profile item record*/
+
+div.edit-profile-item-record
+{
+    
+    border-bottom:2px double #ccc;
+    
+}
+
+
+
+/*  List Managed Projects */
+
+img.manage-single-project-change-request
+{
+    position:relative;
+    top:-5px;
+    
+}
+
+
+/*View Projects */
+
+.bold
+{
+ 
+ font-weight:bold;   
+    
+}   
+
+
+/*Pager css */
+
+
+    .pg-normal {
+                color: black;
+                font-weight: normal;
+                text-decoration: none;    
+                cursor: pointer;
+                
+                  
+            }
+            .pg-selected {
+                color: black;
+                font-weight: bold;        
+                cursor: pointer;
+                background-color:#ccc;
+                 
+            }
+    
+ /* pager div */
+ #pageNavPosition span
+ 
+ {
+     position:relative;
+     top:10px;
+     background-color:#f5f5f5;
+     
+     
+ }
+ 
+ 
+ /*General */
+ .italic
+ {
+     font-style:italic;
+ }
+ 
+ /*Footer Styles */
+ .loadtime
+ {
+     display:none;
+     
+ }
+ 
+ .backtotop
+ {
+     padding:10px;
+     margin-top:15px;
+     
+ }
+ 
+ /*Slider Style */
+ .slider-p-duedate
+ {
+     color:#0f556f;
+     font-size:1.5em;
+     text-decoration:none;
+     border-bottom:4px solid white;
+ }
+ 
+ .slider-p-header
+ {
+     font-size:1.5em;
+     text-decoration:none;
+     border-bottom:4px solid white;
+ }
+ 
+ .change-request-container
+ 
+ { 
+     float:left;
+     padding-right:10px;
+ }
+ 
+ 
+ .change-request-container
+ {
+     float:left;padding-right:10px;
+     
+ }
+ 
+ .change-request-container span
+ {
+     font-style:italic;
+     
+ }
+
+
+/*Excel Reporting*/
+
+.excel-style-results {width:100%;}
+.excel-style-results .project-container {border:none;}
+.excel-style-results .project-container .main-header{padding:20px 0px;}
+.excel-style-results .project-container .name-header {font-style:italic;color:#444;}
+.excel-style-results .project-container table {border-collapse:collapse;table-layout:fixed;word-wrap:break-word;}
+.excel-style-results .project-container td.top-item {border:1px solid #f8f8f8;padding:10px;}
+
+.excel-style-results .project-container .top-item-container{border-top:none;border-bottom:none;}
+.excel-style-results .project-container td.top-item {font-size:0.8em;padding:3px;font-weight:bolder;}
+.excel-style-results .project-container td.empty {border:none;border-right:1px solid #ccc;width:100px;}
+/*Ready For Production */
+.excel-style-results .project-container td.top-item32{background-color:#ccc;color:#000;}
+/*File Approval */
+.excel-style-results .project-container td.top-item9,
+/*Ad Closing */
+.excel-style-results .project-container td.top-item3{background-color:#000;color:#fff;}
+
+.excel-style-results .project-container td.col-one-width {width:100px;}
+
+.excel-style-results .project-container tr.parent-due-date {font-weight:bold;}
+
+.excel-style-results-selector span.pubcode-year-filter {color:#ccc;}
+.excel-style-results-selector .error-message {color:#f00;font-weight:bold;}
+
+#ExcelStyleReportsFormFilterByTimelineRange .excel-style-submit-form-timeline-range {position:relative;top:-5px;}
+
+/*Information Container */
+span.db-info {}
+
+/*Print styles to be confirmed 
+
+body{width:100%;border:1px solid blue;*/
+    
+    
+/*General Classes*/
+a.no-underline {text-decoration:none;}
+
+/* 10/20/2014 Update excel style reports (not pdf) */
+
+
+.excel-style-results table.top-item-container td
+ {
+     text-align:center;
+     font-size:1.1em;
+ }
+
+ .excel-style-results table.calculation td.calcValue{
+
+    text-align:center;
+    font-size:1.1em;
+}
+

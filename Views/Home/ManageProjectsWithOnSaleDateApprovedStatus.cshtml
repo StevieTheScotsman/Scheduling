@@ -1,0 +1,76 @@
+﻿@model List<Scheduling.Models.ProjectDisplay> 
+
+@{
+    ViewBag.Title = "Manage Projects With OnSaleDate Approved Status";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int MilestoneFieldID = Convert.ToInt32(ViewBag.MilestoneFieldID);
+    string DueDateStr = "Due Date";
+    if (MilestoneFieldID == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+    {DueDateStr = "NewsStand Date";
+    }
+}
+
+@if (Model.Count == 0)
+{
+
+   <p style='font-style:italic'>There Are No Projects With A Current Status of On Sale Date Approved</p>
+}
+
+
+@{if (Model.Count > 0)
+  {
+
+      //start
+       <div>
+   
+   <input type='checkbox' value='Accept All' name='ReviewAcceptAllAndSubmitScheduleApproved' id='ReviewAcceptAllAndSubmitScheduleApproved'/><span style='margin-left:10px;font-weight:bold'>Accept All And Submit Changes</span>
+   </div> 
+    
+@Html.Partial("_TableHeaderPartial", ViewData["header"] = "Projects With Approved " +  DueDateStr)
+<table id="review-table">
+    <tr>
+        <th id="th-name">
+            Project Name
+        </th>
+        <th id="th-duedate">
+            @DueDateStr
+        </th>
+        
+    </tr>
+    @{ foreach (Scheduling.Models.ProjectDisplay p in Model)
+       {
+           string DueDate = "---";
+           DueDate = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(p.ID).Where(x => x.MilestoneFieldFK == MilestoneFieldID).First().DueDate;
+           if (!string.IsNullOrWhiteSpace(DueDate))
+           {
+
+               DueDate = Convert.ToDateTime(DueDate).ToLongDateString();
+
+           }
+        <tr>
+            <td>@p.Name
+            </td>
+            <td>@DueDate
+            </td>
+            <td>
+                @{ Html.BeginForm("ProcessManageProjectsWithOnSaleDateApprovedStatus", "Home", FormMethod.Post, new { enctype = "multipart/form-data", @class = "ManageProjectsWithApprovedNewsStandStatus" }); }
+                <input type='submit' value='Update Status To Schedule Approved' />
+                <input type='hidden' name='ProjectID' value='@p.ID' class='hf-project-id'/>
+                @{ Html.EndForm(); }
+            </td>
+        </tr>
+       
+       }
+    }
+</table>
+      
+      
+      //stop      
+
+  }
+    
+    
+    
+    
+    
+}

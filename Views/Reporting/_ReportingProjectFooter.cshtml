@@ -1,0 +1,126 @@
+﻿@{
+
+    Scheduling.Models.ProjectDisplay CurrentItem = Model;
+}
+
+
+@{
+    int? PrinterVal = null;
+    int MajorMilestoneCount = Scheduling.Html.ReportingUtilities.GetNumberOfMajorMilestonesForProject(CurrentItem.ID);
+    
+    int rowSize = 0;
+    switch (MajorMilestoneCount)
+    {
+        case 10:
+            rowSize = (MajorMilestoneCount * 130);
+            break;    
+        case 11:
+            rowSize = (MajorMilestoneCount * 134);
+            break;    
+        case 12:
+            rowSize = (MajorMilestoneCount * 128);
+            break;
+        case 13:
+            rowSize = (MajorMilestoneCount * 122);
+            break;
+        case 14:
+            rowSize = (MajorMilestoneCount * 116);
+            break;
+        case 15:
+            rowSize = (MajorMilestoneCount * 110);
+            break;            
+        case 16:
+            rowSize = (MajorMilestoneCount * 104);
+            break;
+        case 17:
+            rowSize = (MajorMilestoneCount * 98);
+            break;
+        case 18:
+            rowSize = (MajorMilestoneCount * 92);
+            break;
+        case 19:
+            rowSize = (MajorMilestoneCount * 86);
+            break;
+        case 20:
+            rowSize = (MajorMilestoneCount * 80);
+            break;
+        case 21:
+            rowSize = (MajorMilestoneCount * 74);
+            break;
+        case 22:
+            rowSize = (MajorMilestoneCount * 68);
+            break;
+        case 23:
+            rowSize = (MajorMilestoneCount * 62);
+            break;
+        case 24:
+            rowSize = (MajorMilestoneCount * 56);
+            break;
+        case 25:
+            rowSize = (MajorMilestoneCount * 50);
+            break;
+
+    }
+    
+    if (MajorMilestoneCount == 22)
+    {
+        rowSize = (MajorMilestoneCount * 68);
+    }
+    Scheduling.Models.ProjectDisplay FooterItem = Model;
+    int? FooterPubID = FooterItem.PubCodeFK;
+    if (FooterPubID.HasValue)
+    {
+        PrinterVal = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == FooterPubID.Value).First().PrinterFK;
+    }
+}
+
+<table class="footerTable" style="margin-bottom:5px;">
+    <tr>
+        <td><div style="width:86px;"></div></td>
+        <td class='bottom-footer-class' style="border-bottom: 1px solid #999; border-left: 1px solid #999; border-right: 1px solid #999;width:@rowSize">
+            <div style='overflow: hidden; font-weight: bold; font-size: 0.9em; width: 100%;'>
+                <div style="width: 100%; ">
+                    <div style="float: left; margin-left: 2px;font:bold 0.95em/1.5em arial;">
+                        <!--if there is a note show it-->
+                        @{
+                            string FooterReportNote = Scheduling.Database.Utility.GetReportFooterNoteByProjectID(FooterItem.ID);
+
+                            if (!string.IsNullOrWhiteSpace(FooterReportNote))
+                            {
+
+                                <div style='float:left;margin-left:2px;'><span>@Html.Raw(FooterReportNote)</span></div>
+                            }
+
+                        }
+                    </div>
+                    <div style="float:right;margin-right:2px;">
+                        @if (PrinterVal != null)
+                        {
+
+
+                            Scheduling.Models.Printer FooterPrinter = Scheduling.Database.Utility.GetAllPrinters().Where(x => x.ID == PrinterVal).First();
+
+                            <div style='float:right;'>
+                                @string.Format("Printer: {0} , {1}", FooterPrinter.Company, FooterPrinter.Address)
+                            </div>
+
+
+
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+        </td>
+    </tr>
+</table>
+
+<!--Use Js To Get Page Layout
+    Working-->
+<script type="text/javascript">
+
+    $('.footer-note-container p').css('margin', '0').css('padding', '0');
+    $('.footer-note-container').each(function () { $(this).find('p').first().css('padding-top', '5px'); });
+
+</script>

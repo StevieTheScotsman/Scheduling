@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Auto Generate KPC Job Numbers For Next Isssue Ads And Cross Promo Ads";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+
+
+<div class='container' style='border-bottom:3px double #ccc;margin-bottom:15px'>
+
+<h4>Auto Generate KPC Job Numbers For Next Isssue Ads And Cross Promo Ads</h4>
+   
+    <p style='font-style:italic'>This utility will automatically generate the Kpc Job Number for Next Issue Ads And Cross Promo Ads for magazine profile types<br />
+     <br />
+     e.g On the ASY report it will create the value CIR-ADH-[ASY]NEXT.The value in square brackets is the pubcode.
+
+    Currently this utility works on <span style='font-weight:bold'>ALL projects</span>
+    </p>
+
+
+    <div class='sixteen columns'>
+        
+     @{ Html.BeginForm("ProcessAutoGenerateKPCJobNumbersForNextIssueAdsAndCrossPromoAds", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "AutoGenerateKPCJobNumbersForNextIssueAdsAndCrossPromoAds", id = "AutoGenerateKPCJobNumbersForNextIssueAdsAndCrossPromoAds" }); }
+          
+     <input type="submit" value="Go" />
+
+
+      @{ Html.EndForm(); }
+    </div>
+    
+</div>
+

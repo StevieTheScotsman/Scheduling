@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Verify Baseline";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<div class='container'>
+    <div class='sixteen columns'>
+
+    <p class='italic'>This test ensures that Newsstand Date is the first entry and that Newsstand Date is the first calculation<br />
+    as well as ensuring the main calculations are in the correct order.
+
+    </p>
+        @{
+            
+            string CurrentMessage=ViewBag.CurrentMessage;
+            if(string.IsNullOrWhiteSpace(CurrentMessage))
+            {
+                CurrentMessage = "The Verification Test Ran Successfully";
+                
+            }
+            
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Baseline Verification")
+            <table class='condensed zebra-striped'>
+                <thead>
+                    <tr>
+                       <th>Result for @ViewBag.CurrentProfile</th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr><td>@Html.Raw(CurrentMessage)</td></tr>
+                </tbody>
+            </table> 
+
+
+        }
+    </div>
+</div>

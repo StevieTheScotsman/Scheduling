@@ -1,0 +1,79 @@
+﻿@model List<Scheduling.Models.DeptToGroupsToPubCodeDisplay>
+@{
+    ViewBag.Title = "List Groups";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+
+@{ if (Model.Count==0)
+   {
+       <p>There are no results</p>
+    }
+}
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Group Associations")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                           Group
+                        </th>
+
+                         <th>
+                           Department
+                        </th>
+
+                        <th>Pub Code</th>
+                                               
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.DeptToGroupsToPubCodeDisplay d in Model)
+                        { 
+           
+                        <tr>
+                            <td>@d.GroupName
+                            </td>
+
+                            <td>@d.DeptName
+                            </td>
+                            
+                             <td>@d.PubCodeName
+                            </td>
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+
+   <div id="pageNavPosition"></div>
+
+    </div>
+
+          <script type="text/javascript">
+              var pager = new Pager('results', 3);
+              pager.init();
+              pager.showPageNav('pager', 'pageNavPosition');
+              pager.showPage(1);
+    </script>
+
+    
+</div>

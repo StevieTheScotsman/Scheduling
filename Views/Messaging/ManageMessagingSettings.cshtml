@@ -1,0 +1,260 @@
+﻿@model List<Scheduling.Models.MessagingSettingDisplay>
+@{
+    ViewBag.Title = "List Messaging Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+
+<div class='container' style='border-bottom:3px double #ccc;margin-bottom:15px'>
+   
+    <div class='sixteen columns'>
+
+    @Html.ValidationSummary()
+     @{ Html.BeginForm("ProcessManageMessagingSettings", "Messaging", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageMessagingSettings", id = "ManageMessagingSettings" }); }
+
+      <!--Event-->
+       @{   List<Scheduling.Models.MessagingEvent> EventList = ViewBag.EventList as List<Scheduling.Models.MessagingEvent>;
+            <p class='bold'>Event</p>
+            <select name="event" >
+            @foreach (Scheduling.Models.MessagingEvent me in EventList)
+            {
+                <option value='@me.ID'>@me.ShortDesc</option>
+                
+            }
+            </select>
+           
+            }
+
+
+
+            <!--Action-->
+
+
+            @{
+                
+                List<Scheduling.Models.MessagingAction> ActionList =ViewBag.ActionList as List<Scheduling.Models.MessagingAction>;
+                
+                <p class='bold'>Action</p>
+                <select name="action">
+                @foreach(Scheduling.Models.MessagingAction ma in ActionList)
+                {
+                    <option value='@ma.ID'>@ma.ShortDesc</option>
+                    
+                }
+                </select>
+                
+                
+            }
+
+       <!--User List Dropdown -->
+      @{
+          
+          List<Scheduling.Models.User> UserList = ViewBag.UserList as List<Scheduling.Models.User>;
+          if(UserList !=null)
+          {
+              
+           if(UserList.Count > 0)
+           {   <p class='bold'>User(s) </p>
+               <select name="users" multiple="multiple">
+               @foreach (Scheduling.Models.User u in UserList)
+               {
+                   <option value="@u.ID" >@u.UserName</option>
+               }
+               </select>
+           }   
+              
+          }
+          
+              
+              
+          
+      }
+
+
+      <!--Role Dropdown-->
+
+        @{
+          
+          List<Scheduling.Models.Role> RoleList = ViewBag.RoleList as List<Scheduling.Models.Role>;
+          if(RoleList !=null)
+          {
+              
+           if(RoleList.Count > 0)
+           {   <p class='bold'>Role(s) </p>
+               <select name="roles" multiple="multiple">
+               @foreach (Scheduling.Models.Role r in RoleList)
+               {
+                   <option value="@r.ID" >@r.ShortDesc</option>
+               }
+               </select>
+           }   
+              
+          }
+          
+              
+              
+          
+      }
+
+      <!--Group Dropdown -->
+
+       @{
+          
+          List<Scheduling.Models.Group> GroupList = ViewBag.GroupList as List<Scheduling.Models.Group>;
+          if(GroupList !=null)
+          {
+              
+           if(GroupList.Count > 0)
+           {   <p class='bold'>Group(s)</p>
+               <select name="groups" multiple="multiple">
+               @foreach (Scheduling.Models.Group g in GroupList)
+               {
+                   <option value="@g.ID" >@g.Description</option>
+               }
+               </select>
+           }   
+              
+          }
+          
+              
+              
+          
+      }
+
+
+      <!--Department-->
+
+       
+
+       @{
+          
+          List<Scheduling.Models.Department> DepList = ViewBag.DepList as List<Scheduling.Models.Department>;
+          if(DepList !=null)
+          {
+              
+           if(DepList.Count > 0)
+           {   <p class='bold'>Dept(s)</p>
+               <select name="depts" multiple="multiple">
+               @foreach (Scheduling.Models.Department d in DepList)
+               {
+                   <option value="@d.ID" >@d.Description</option>
+               }
+               </select>
+           }   
+              
+          }
+          
+          
+      }
+
+       <input type='submit' value='Add Setting' />
+
+
+      @{ Html.EndForm(); }
+    </div>
+</div>
+
+
+
+@{ if (Model.Count == 0)
+   {
+    <p>
+        There are no current entries</p>
+   }
+}
+
+
+
+
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Messaging Settings")
+                
+            <table class='condensed zebra-striped' id="results">
+                <thead>
+                    <tr>
+                        <th>
+                            Event
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                        <th>
+                            User Recipient
+                        </th>
+                        <th>
+                            Role Recipient
+                        </th>
+                        <th>
+                            Group Recipient
+                        </th>
+                        <th>
+                            Dept Recipient
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.MessagingSettingDisplay msd in Model)
+                        { 
+           
+                        <tr>
+                            <td>@msd.EventName
+                            </td>
+                            <td>@msd.ActionName
+                            </td>
+                            <td>@msd.UserName
+                            </td>
+                            <td>@msd.RoleName
+                            </td>
+                            <td>@msd.GroupName
+                            </td>
+                            <td>@msd.DeptName
+                            </td>
+                           
+                             <td>
+                                <!-- //as a failsafe have the undelete events in the app setting since logic is associated with these.   -->
+                                @{
+                                   
+                            Html.BeginForm("ManageMessagingSettingsRemoveSingleEntry", "Messaging", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageMessagingSettingsRemoveSingleEntry", id = "ManageMessagingSettingsRemoveSingleEntry" }); 
+                                    <input type='hidden' value='@msd.ID' name='id' />
+                                    <input type='submit' value='Remove Entry' />
+                                Html.EndForm();
+                                         
+                                }
+                            </td>
+                            
+                            
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+
+
+        <div id="pageNavPositionMessagingSetting">
+    </div>
+    <script type="text/javascript"><!--
+        var mmsPager = new Pager('results', 3);
+        mmsPager.init();
+        mmsPager.showPageNav('mmsPager', 'pageNavPositionMessagingSetting');
+        mmsPager.showPage(1);
+    </script>
+
+</div>

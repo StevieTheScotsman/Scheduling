@@ -1,0 +1,207 @@
+﻿@{
+    ViewBag.Title = "Create Milestone Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<html>
+<head>
+    <title>Create Milestone Settings</title>
+</head>
+<body>
+    <div class='container'>
+        @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Assign Milestones to Milestone Profile")
+        @{ Html.BeginForm("ProcessCreateMilestoneSettings", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessCreateMilestoneSettings" }); }
+        <!--Profile Type Start -->
+        <div class='row clearfix'>
+            <div style='overflow: hidden; padding: 10px;' id='eye-container'>
+            </div>
+            <div style='overflow: hidden; padding: 10px;' id='eye-sort-container' class='eye-sort-container'>
+            </div>
+        </div>
+        <div class='row clearfix'>
+            <div class='sixteen columns' style='padding: 10px 0px'>
+                <img src="@Url.Content("~/images/help_75.png")" alt="help"style='width: 25px' class='create-milestone-help' />
+                <img src="@Url.Content("~/images/reset.png")" alt="reset" style='width: 25px; padding-left: 40px' class='create-milestone-reset' />
+                <img src="@Url.Content("~/images/eye.png")" alt="view" style='width: 25px; padding-left: 40px' class='create-milestone-eye' />
+                <p class='p-help'>
+                    For Validation Errors please check the following:<br />
+                    <br />
+                    Each Milestone field is Required and Has to Be Unique<br />
+                    If a dependancy is selected it has to have a calculation and a Unique Firing Order<br />
+                    A milestone and a dependancy need to be different<br />
+                    <br />
+                    Only Unassigned Profiles can be created<br />
+                    <br />
+                    <span style='font-style: italic'>There is no edit mode for milestone profiles at the
+                        moment.If you wish to remove the milestone profile please go to <a href='/Home/ManageMilestoneTreeSettingProfiles'>
+                            Manage Tree Setting Profiles</a><br />
+                    </span>
+                </p>
+            </div>
+        </div>
+        <div class='row clearfix error'>
+            <p style='color: Red; font-weight: bold;'>
+            </p>
+        </div>
+        <div class='row clearfix'>
+            <div class='sixteen columns'>
+                <!--Choose Profile Type-->
+                <p>
+                    Baseline</p>
+                <select name='MilestoneProfile' id='MilestoneProfile'>
+                    <option value=''>--Choose a Baseline--</option>
+                    @{
+                        foreach (Scheduling.Models.MilestoneTreeSettingsProfile p in ViewBag.MilProfileList)
+                        {
+                        <option value='@p.ID'>@p.Description</option>
+                  
+                        }
+               
+                    }
+                </select></div>
+            <!--profile type stop-->
+        </div>
+        <!--milestone field sections -->
+        @{ int NumRows = Convert.ToInt32(ViewBag.NumOfMilestoneSettings);
+
+           for (int i = 0; i < NumRows; i++)
+           {
+               int j = i + 1;
+               string MfStr = string.Format("MilestoneField-{0}", j.ToString());
+               string DepStr = string.Format("DepField-{0}", j.ToString());
+               string ParStr = string.Format("ParentField-{0}", j.ToString());
+               string CalcStr = string.Format("CalcField-{0}", j.ToString());
+               string FirOrdStr = string.Format("FirOrderField-{0}", j.ToString());
+               string RangeStr = string.Format("RangeField-{0}", j.ToString());
+               string DivStr = string.Format("DivField-{0}", j.ToString());
+               string RemoveIconStr = string.Format("RemoveField-{0}", j.ToString());
+               string CheckIconStr = string.Format("CheckField-{0}", j.ToString());
+               string DisplayStr = string.Format("DisplayField-{0}", j.ToString());
+               
+               
+            <div class='sixteen columns'>
+                <div class='row clearfix bottom-grey-border item-record' id='@DivStr' >
+                    <div class='one column' style='padding-top: 35px'>
+                        <img src="@Url.Content("~/images/remove-milestone.png")" style='width:25px' id='@RemoveIconStr' class='remove-click' alt='remove milestone'/>
+                    </div>
+                    <div class='two columns'>
+                        <p>
+                            Milestone</p>
+                        <select name='@MfStr' class='select-create-milestone-setting' id='@MfStr'>
+                            <option value=''>Choose a milestone</option>
+                            @foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                            {
+                                <option value='@mf.ID'>@mf.Description</option>
+                            }
+                        </select>
+                    </div>
+                    <div class='two columns'>
+                        <p>
+                            Dependancy</p>
+                        <select name='@DepStr' class='select-dep-create-milestone-setting' id='@DepStr'>
+                            <option value=''>Choose Dependant</option>
+                            @foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                            {
+                                <option value='@mf.ID'>@mf.Description</option>
+                            }
+                        </select>
+                    </div>
+                    <div class='two columns'>
+                        <p>
+                            Parent
+                        </p>
+                        <select name='@ParStr' class='select-parent-create-milestone-setting' id='@ParStr'>
+                            <option value=''>Choose Parent</option>
+                            @foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+                            {
+                                <option value='@mf.ID'>@mf.Description</option>
+                            }
+                        </select>
+                    </div>
+                    <div class='two columns'>
+                        <p>
+                            Calculation</p>
+                        <select name='@CalcStr' class='select-calc-create-milestone-setting' id='@CalcStr'>
+                            <option value=''>Choose a Calculation</option>
+                            @foreach (Scheduling.Models.Calculation c in ViewBag.CalcList)
+                            {
+                                <option value='@c.ID'>@c.ShortDesc</option>
+                            }
+                        </select>
+                    </div>
+                    <div class='two columns'>
+                        <p>
+                            Firing Order</p>
+                        <select name='@FirOrdStr' class='select-order-create-milestone-setting' id='@FirOrdStr'>
+                            <option value=''>Choose a Firing Order</option>
+                            @foreach (int f in ViewBag.FiringOrderList)
+                            {
+                                <option value='@f'>@f</option>
+                            }
+                        </select>
+                    </div>
+                    <div class='two columns'>
+                        <p>
+                            Date Range</p>
+                        <select name='@RangeStr' class='select-range-create-milestone-setting' id='@RangeStr'>
+                            <option value=''>Choose a Calculation</option>
+                            @foreach (Scheduling.Models.Calculation calc in ViewBag.DateRangeCalcList)
+                            {
+                                <option value='@calc.ID'>@calc.ShortDesc</option>
+                            }
+                        </select>
+                    </div>
+                    <div class='one column'>
+                        <p>
+                            Order</p>
+                        <input type='text' maxlength='3' id='@DisplayStr' name='@DisplayStr' value='@j' class='textbox-display'/>
+                    </div>
+                    <!--start-->
+                    <div class='one column' style='padding-top: 35px'>
+                        <img src="@Url.Content("~/images/check.png")" style='width:25px' id='@CheckIconStr' class='img-check' alt='check'/>
+                    </div>
+                    <!--stop-->
+                    <!--stop-->
+                </div>
+            </div>
+                 
+           }
+             
+             
+        }
+        <input type='hidden' value='n' name='hf-can-submit' id='hf-can-submit' />
+        <input type='hidden' value='' name='hf-num-records' id='hf-num-records' />
+        <input type='hidden' value='' name='hf-milestone-profile' id='hf-milestone-profile' />
+         <input type='hidden' value='' name='hf-first-field-value' id='hf-first-field-value' />
+        
+        <div class='row clearfix bottom-row'>
+            <div class='six columns add-click'>
+                <img src="@Url.Content("~/images/add-milestone.png")" class='img-add-click' style='width: 25px; display: block'
+                    alt='add-dep' />
+                <p>
+                    Add Milestone</p>
+            </div>
+            <div class='six columns add-dep-click'>
+                <img src="@Url.Content("~/images/add-milestone.png")" class='img-add-dep-click' style='width: 25px;
+                    display: block' alt='add-dep' />
+                <p>
+                    Add Milestone With Dependancy</p>
+            </div>
+            <div class='two columns val-click'>
+                <img src="@Url.Content("~/images/validate.png")" class='img-val-click' style='width: 25px; display: block'
+                    alt='add-dep' />
+                <p>
+                    Validate</p>
+            </div>
+            <div class='two columns sub-click'>
+                <input type='submit' value='create milestone settings' /></div>
+        </div>
+        @{ Html.EndForm(); }
+    </div>
+    <!--Configuration Hidden fields-->
+    <div>
+        <input type='hidden' value='@ViewBag.MagProjTypeValue' name='hf-MagProjTypeValue' id='hf-MagProjTypeValue'/>
+        <input type='hidden' value='@ViewBag.NewstandValue' name='hf-NewstandValue' id='hf-NewstandValue'/>
+        <input type='hidden' value='@ViewBag.DefaultMilestoneValue' name='hf-NumDefaultMilestones' id='hf-NumDefaultMilestones' />
+    </div>
+</body>
+</html>

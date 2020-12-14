@@ -1,0 +1,95 @@
+﻿@{
+    int CurrentProject = Model.ID;
+
+   // List<Scheduling.Models.ProjectNote> ProjNotes = Scheduling.Database.Utility.GetProjectNotesFromProjectID(CurrentProject);
+    //List<Scheduling.Models.ProjectNoteLabel> ProjLabelList = Scheduling.Database.Utility.GetAllProjectNoteLabels();
+    List<int> NoteKeyValues = Scheduling.Database.Utility.GetProjectNoteKeyValues(Model.ID);
+    List<Scheduling.Models.ProjectNote> NoteList = Scheduling.Database.Utility.GetProjectNotesFromProjectID(Model.ID);
+}
+
+<div>
+    <h4 class='bold'>@string.Format("Manage Notes for {0} {1}", Model.Name, Model.Year)</h4>
+</div>
+   
+    @foreach (int i in NoteKeyValues)
+    {
+        string CurrentNoteValue = string.Empty;
+
+        int NoteCountForCurrentEntry = NoteList.Where(x => x.NoteLabelID == i).Count();
+        if (NoteCountForCurrentEntry == 1)
+        {
+            CurrentNoteValue = NoteList.Where(x => x.NoteLabelID == i).First().NoteValue;
+
+        }
+
+        <div style='overflow: hidden; padding: 10px 0px' class='note-container'>
+            <input type='hidden' name='note-identifier' value='@i' class='note-identifier' />
+            <input type='hidden' name='project-identifier' value='@CurrentProject' class='project-identifier' />
+            <div style='float: left; font-weight: bold;'>@Scheduling.Database.Utility.GetProjectNoteLabelBasedOnID(i)</div>
+            <div style='float: left; margin-left: 20px;'>
+                <input type='text' class='note-field-value' value='@CurrentNoteValue' />
+            </div>
+            <img style='display: block; margin-left: 10px; margin-right: 5px;width:23px;float: left; margin-top: 2px'
+                 alt='Save Note' src="@Url.Content("~/images/save.png")" class='save-note' />
+            <img style='display: none; width: 30px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success' />
+        </div>
+
+    }
+
+    <script type="text/javascript">
+    
+        $(function()
+        {
+            $('.save-note').on("click", function () {
+                var url = baseUrl + '/Ajax/AjaxUpdateNoteField/';
+                var currentElem = $(this);
+                var CurrentProjectID = $(this).parents('.note-container').find('.project-identifier').val();
+                var CurrentNoteLabelID = $(this).parents('.note-container').find('.note-identifier').val();
+                var CurrentNoteValue = $(this).parents('.note-container').find('.note-field-value').val();
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID: CurrentProjectID,
+                        NoteLabelID: CurrentNoteLabelID,
+                        NoteValue: CurrentNoteValue
+
+
+                    },
+                    success: function (data) {
+                        $(currentElem).parents('.note-container').find('.img-ajax-success').show().fadeOut(2000);
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert(xhr.status);
+                        alert('Note Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+                //ajax stop
+
+
+            });
+            
+
+        });
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+

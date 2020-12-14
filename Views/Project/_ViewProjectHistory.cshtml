@@ -1,0 +1,40 @@
+﻿
+    @{
+        List<Scheduling.Models.ProjectHistory> HisList = Scheduling.Database.Utility.GetProjectHistoryFromProjectID(Model.ID);
+
+        int HisCounter = 0;
+
+        foreach (Scheduling.Models.ProjectHistory ph in HisList)
+        {
+            HisCounter = HisCounter + 1;
+            <div style="overflow:hidden;border-bottom:1px solid #ddd;padding-top:10px">
+                <div style="float:left;width:25%">
+                    @if (HisCounter == 1)
+                    {
+                        <p class='bold'>
+                            Date
+                        </p>
+                    }
+                    <p>@ph.EntryDate</p>
+                </div>
+                <div style="float:left;width:50%;margin-right:30px">
+                    @if (HisCounter == 1)
+                    {
+                        <p class='bold'>
+                            Comments
+                        </p>
+                    }
+                    <p>@ph.Comments</p>
+                </div>
+                <div style="float:left;">
+                    @if (HisCounter == 1)
+                    {
+                        <p class='bold'>
+                            UserName
+                        </p>
+                    }
+                    <p>@ph.Username</p>
+                </div>
+            </div>
+        }
+    }

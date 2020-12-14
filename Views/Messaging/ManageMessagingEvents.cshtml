@@ -1,0 +1,134 @@
+﻿@model List<Scheduling.Models.MessagingEvent>
+@{
+    ViewBag.Title = "ManageMessagingEvents";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<div style='border-bottom: 1px solid #ccc'>
+    <p style='font-style: italic; font-weight: normal; font-size: 0.8em'>
+        Events are used in conjunction with custom logic to create a notification in the
+        system<br />
+        Users receiving the notification will be configurable(STD) and can be viewed in
+        View Notification Settings.<br />
+        There is a list of events in the AppSettings Table that cannot be deleted.
+        Current list contains CreateChangeRequest
+        </p>
+</div>
+@{ if (Model.Count == 0)
+   {
+    <p>
+        There are no results</p>
+   }
+}
+<div class='container' style='border-bottom: 3px double #ccc; margin-bottom: 15px;
+    padding-top: 5px'>
+    <div class='sixteen columns'>
+        @Html.ValidationSummary()
+        @{ Html.BeginForm("ManageMessagingEventsAddEntry", "Messaging", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageMessagingEvent", id = "ManageMessagingEvent" }); }
+        <p>
+            Short Desc</p>
+        <input type='text' name="ShortDesc" />
+        <p>
+            Long Desc</p>
+        <input type='text' name="LongDesc" />
+        <p>
+            Method</p>
+        <input type='text' name="Method" />
+        <input type="submit" value="Add Messaging Event" />
+        @{ Html.EndForm(); }
+    </div>
+</div>
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+            
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Messaging Events")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                            Short Description
+                        </th>
+                        <th>
+                            Long Description
+                        </th>
+                        <th>
+                            Method
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.MessagingEvent me in Model)
+                        { 
+           
+                        <tr>
+                            <td>@me.ShortDesc
+                            </td>
+                            <td>
+                              
+                            @{
+                            if (string.IsNullOrWhiteSpace(me.LongDesc))
+                            {
+
+                               <p>-----</p>
+
+                            }
+
+                            else
+                            {
+
+                                <p>@me.LongDesc</p>
+
+                            }
+                            }
+                           
+                            </td>
+                            <td>@me.Method
+                            </td>
+                            <td>
+                                <!-- //as a failsafe have the undelete events in the app setting since logic is associated with these.   -->
+                                @{
+                                     
+                            if (Scheduling.Event.Utility.CanEventBeDeleted(me.ID))
+                            {
+                                
+                                Html.BeginForm("ManageMessagingEventsRemoveEntry", "Messaging", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageMessagingEventRemoveEntry", id = "ManageMessagingEventRemoveEntry" }); 
+                                    <input type='hidden' value='@me.ID' name='id' />
+                                    <input type='submit' value='Remove Event' />
+                                Html.EndForm();
+
+
+
+
+                            }
+                                         
+                                         
+                                }
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+    <div id="pageNavPositionMessagingEvent">
+    </div>
+    <script type="text/javascript"><!--
+        var mePager = new Pager('results', 5);
+        mePager.init();
+        mePager.showPageNav('mePager', 'pageNavPositionMessagingEvent');
+        mePager.showPage(1);
+    </script>
+</div>

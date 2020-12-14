@@ -1,0 +1,89 @@
+﻿@model List<Scheduling.Models.MilestoneField>
+@{
+    ViewBag.Title = "List Major Milestones";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    
+    }
+
+@{ if (Model.Count==0)
+   {
+       <p>There are no results</p>
+    }
+}
+
+
+<div class='container' style='border-bottom:3px double #ccc;margin-bottom:15px'>
+   
+    <div class='sixteen columns scroll-to-on-load'>
+
+    @Html.ValidationSummary()
+     @{ Html.BeginForm("ProcessAddMajorMilestoneField", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageMajorMilestoneFields", id = "ManageMajorMilestoneFields" }); }
+
+     <input type='text'  name="field"/>
+     <input type="submit" value="Add Major Milestone Field" />
+
+
+      @{ Html.EndForm(); }
+    </div>
+</div>
+
+
+
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Major Milestones")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                          
+                        </th>
+                                               
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.MilestoneField f in Model)
+                        { 
+           
+                        <tr>
+                            <td>@f.Description
+                            </td>
+                            
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+       <div id="pageNavPosition"></div>
+  
+        <script type="text/javascript"><!--
+            var pager = new Pager('results', 10);
+            pager.init();
+            pager.showPageNav('pager', 'pageNavPosition');
+            pager.showPage(1);
+       </script>
+
+
+    
+</div>
+
+
+

@@ -1,0 +1,136 @@
+﻿@model List<Scheduling.Models.ChangeRequest>
+@{
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    ViewBag.Title = "List Change Requests";
+    List<int> ids = Model.Select(x => x.ProjectFK).Distinct().ToList();
+    List<Scheduling.Models.ProjectDisplay> PdList = Scheduling.Database.Utility.GetAllProjects().Where(y => ids.Contains(y.ID)).ToList();
+    bool FilterByStatus = Convert.ToBoolean(ViewBag.FilterByStatus);
+    
+}
+
+    @{
+           
+        if (Model.Count == 0)
+        {
+               
+        <p>
+            There are no results</p>
+               
+        }
+
+        else
+        {
+            //start 
+            <div class='container'>
+        <div class='sixteen columns'>
+            <div class='six columns'>
+                @{   
+            if (ViewBag.CurrentProject == null)
+            {
+                ViewBag.CurrentProject = string.Empty;
+            }
+
+            Html.BeginForm("ProcessListChangeRequests", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ProcessListChangeRequests", id = "ProcessListChangeRequests" });
+            
+            
+                }
+                <p>
+                    Projects With Change Requests</p>
+                <select name='project' class='list-select-change-request-project'>
+                    <option value=''>-All-</option>
+                    @Html.Raw(Scheduling.Html.ViewDropdown.BuildProjectsWithChangeRequestsDropdown(ViewBag.CurrentProject.ToString()))
+                </select>
+            </div>
+            <div class='six columns'>
+                <div style='margin-top: 40px'>
+
+                     @if (FilterByStatus)
+                     {
+                         
+                         <input type='checkbox' checked='checked' name='FilterByPendingChangeRequests' id='FilterByPendingChangeRequests' value='FilterOnPendingOnly' /><span style='margin-left: 10px; font-weight: bold'>Filter Pending Projects</span>
+                         
+                     }
+
+
+                     else
+                     {
+                              <input type='checkbox' name='FilterByPendingChangeRequests' id='FilterByPendingChangeRequests' value='FilterOnPendingOnly' /><span style='margin-left: 10px; font-weight: bold'>Filter Pending Projects</span>
+                         
+                     }                                         
+                       
+                    
+                </div>
+            </div>
+            @{
+                
+                     Html.EndForm();
+                
+            }
+        </div>
+    </div>    
+            
+            
+            
+                     //stop
+
+                     foreach (Scheduling.Models.ProjectDisplay pd in PdList)
+                     {
+       <div style='padding:15px'>   <table class='condensed zebra-striped'>
+            <caption style='background-color: #ddd'>
+                @pd.Name</caption>
+            <thead>
+                <tr>
+                    <th>
+                        Comment
+                    </th>
+
+                     <th>
+                        Requestor
+                    </th>
+
+                    <th>Date of Request</th>
+
+                    <th>Request Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            @{
+                
+                         List<Scheduling.Models.ChangeRequest> CurrentChangReqList = Model.Where(x => x.ProjectFK == pd.ID).ToList();
+                         List<Scheduling.Models.ChangeRequestStatus> StatusList = Scheduling.Database.Utility.GetAllChangeRequestStatuses().ToList();
+
+                         foreach (Scheduling.Models.ChangeRequest CrItem in CurrentChangReqList)
+                         {
+                    <tr><td>@CrItem.RequestorComment</td><td>@CrItem.CreatedBy</td><td>@CrItem.DateRequested.ToShortDateString()</td>
+                   
+                     @{
+                             Scheduling.Models.ChangeRequestStatus crs = StatusList.Where(x => x.ID == CrItem.RequestStatus).First();
+                             string CurrentStatus = crs.Description;
+                        
+                         <td>@CurrentStatus </td>
+                         
+                         }
+                         
+                         
+                    </tr>
+                         }
+                
+                
+                }
+             
+            </tbody>
+        </table>
+
+        </div>
+                   
+                     }
+
+
+
+        }
+           
+           
+           
+    }
+

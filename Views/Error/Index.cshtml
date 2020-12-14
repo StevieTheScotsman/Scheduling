@@ -1,0 +1,21 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    ViewBag.Title = "Index";
+    Layout = "_ResponsiveLayout.cshtml";
+}
+<h2>
+    The system has encountred an Exception in the testing phase</h2>
+<p>
+</p>
+<p>
+    Controller: @Model.ControllerName
+</p>
+<p>
+    Action: @Model.ActionName
+</p>
+<p>
+    Message: @Model.Exception.Message
+</p>
+<p>
+    Stack Trace: @Model.Exception.StackTrace
+</p>

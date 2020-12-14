@@ -1,0 +1,90 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+
+    bool HasChangeRequests = Scheduling.Database.Utility.GetAllChangeRequests().Where(x => x.ProjectFK == CurrentProject).Count() > 0;
+    
+    
+}
+@{
+      
+    if (HasChangeRequests)
+    {
+        List<Scheduling.Models.ChangeRequest> CrList = Scheduling.Database.Utility.GetAllChangeRequests().Where(x => x.ProjectFK == CurrentProject).OrderBy(x => x.RequestStatus).ThenByDescending(x => x.DateRequested).ToList();
+    
+    <div class='change-request-container-partial'>
+        <img src="@Url.Content("~/images/toggle.gif")" style='width: 30px' alt='toggle' class='list-project-change-requests' />
+        <span class='bold'>Change Requests</span>
+        <div class='change-request-information'>
+            <table class='condensed zebra-striped'>
+                <thead>
+                    <tr>
+                        <th>
+                            Date
+                        </th>
+                        <th>
+                            Requestor
+                        </th>
+                        <th>
+                            Comment
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+        foreach (Scheduling.Models.ChangeRequest cr in CrList)
+        {
+            int CurrentStatus = cr.RequestStatus;
+            string StatusStr = Scheduling.Database.Utility.GetAllChangeRequestStatuses().Where(x => x.ID == cr.RequestStatus).First().Description;
+                        <tr>
+                            <td>@string.Format("{0} @ {1}", cr.DateRequested.ToLongDateString(), cr.DateRequested.ToShortTimeString())
+                            </td>
+                            <td>@cr.CreatedBy
+                            </td>
+                            <td>@cr.RequestorComment
+                            </td>
+                            <td>
+                                @{ if (CurrentStatus == (int)Scheduling.Enums.ChangeRequestStatus.Created)
+                                   {
+                                
+                                    <p style='color:#ffa500'>@StatusStr</p>
+                                    
+                                   }
+                                
+                                }
+
+                                @{ if (CurrentStatus == (int)Scheduling.Enums.ChangeRequestStatus.Rejected)
+                                   {
+                                
+                                    <p style='color:#f00'>@StatusStr</p>
+                                    
+                                   }
+                                
+                                }
+
+                                   @{ if (CurrentStatus == (int)Scheduling.Enums.ChangeRequestStatus.Accepted)
+                                   {
+                                
+                                    <p style='color:#004a1d'>@StatusStr</p>
+                                    
+                                   }
+                                
+                                }
+
+                                
+                            </td>
+                        </tr>
+                       
+        }
+            
+            
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+   
+    }
+}

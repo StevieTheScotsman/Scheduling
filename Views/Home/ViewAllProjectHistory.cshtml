@@ -1,0 +1,83 @@
+﻿@model List<int>
+@{
+    ViewBag.Title = "ViewAllProjectHistory";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+@{
+    if(Model.Count > 0)
+        
+    {
+        
+        
+       <div class='container'>
+       <p style='font-size:0.95em'>This page shows recent project history ordered by the creation date of the project in descending order<br/>
+       Paging can be incorporated later if desired.</p>
+
+       <div class='sixteen columns'>
+       
+       
+       @foreach (int i in Model)
+       {
+           List<Scheduling.Models.ProjectHistory> CurrentList = Scheduling.Database.Utility.GetProjectHistoryFromProjectID(i);
+           <div style='padding:25px 0px'>
+         <table class='condensed zebra-striped' id='results'>
+         <caption style='font-style:italic;font-weight:bold;font-size:1.2em'>@Scheduling.Database.Utility.GetAllProjects().Where(x=>x.ID==i).First().Name</caption>
+         <thead>
+                    <tr>
+                        <th>
+                            Message
+                        </th>
+                        <th>
+                            Modified By
+                        </th>
+                        <th>
+                            Date Modified
+                        </th>
+                       
+                    </tr>
+                </thead>
+
+                <tbody>
+                
+                @foreach(Scheduling.Models.ProjectHistory ph in CurrentList)
+                    
+                {
+                    <tr>
+                            <td>@ph.Comments
+                            </td>
+                            <td>@ph.Username
+                            </td>
+                            <td>@ph.EntryDate
+                            </td>
+                           
+                        </tr>
+                    
+                    }
+                </tbody>
+
+         </table>
+           
+          </div>
+
+       }
+       </div>
+       
+       </div>
+        
+        
+        
+        
+    }
+    
+    else
+        
+        
+    {
+        <p style='font-weight:bold;'>There are no current projects in the system</p>
+        
+    }
+    
+    
+}
+

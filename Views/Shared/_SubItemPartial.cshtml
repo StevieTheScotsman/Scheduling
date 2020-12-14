@@ -1,0 +1,150 @@
+﻿<div class='sixteen columns' style='padding: 15px 0px; border-bottom: 3px double #ccc'>
+    @{ 
+       
+        List<Scheduling.Models.Calculation> CalcList = Scheduling.Database.Utility.GetAllCalculationFields();
+        
+        //Get Parent Reference
+        int CurrentParent = Convert.ToInt32(ViewData["parent"]);
+        int CurrentProfile = Convert.ToInt32(ViewBag.mtsp.ID);
+
+        Scheduling.Models.MilestoneField CurrentParentMilestone = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == CurrentParent).First();
+        string CurrentParentDesc = CurrentParentMilestone.Description;
+
+        //Get List of Children
+        IEnumerable<Scheduling.Models.MilestoneTreeSetting> CurrentMtsList = Scheduling.Database.Utility.GetMilestoneTreeSettingsByProfileID(CurrentProfile).Where(p => p.MilestoneParentField == CurrentParent);
+    
+        <div>
+            <table class='condensed zebra-striped'>
+                <caption style='background-color: #ddd'>
+                    @CurrentParentDesc</caption>
+                <thead>
+                    <tr>
+                        <th>
+                            Sub Item
+                        </th>
+                        <th>
+                            Depends On
+                        </th>
+                        <th>
+                            Calculation
+                        </th>
+                        <th>
+                            CalcFiringOrder
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ foreach (Scheduling.Models.MilestoneTreeSetting mst in CurrentMtsList)
+                       {
+                           string CurrentDesc = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mst.MilestoneField).First().Description;
+
+                           string DepDesc = "N/A";
+                           int DepCount = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mst.MilestoneFieldDependantUpon).Count();
+                           if (DepCount > 0)
+                           {
+
+                               DepDesc = Scheduling.Database.Utility.GetAllMilestoneFields().Where(x => x.ID == mst.MilestoneFieldDependantUpon).First().Description;
+
+                           }
+
+                           string CalcDesc = "N/A";
+                           int CalcCount = Scheduling.Database.Utility.GetAllCalculationFields().Where(x => x.ID == mst.CalculationID).Count();
+                           if (CalcCount > 0)
+                           {
+                               CalcDesc = Scheduling.Database.Utility.GetAllCalculationFields().Where(x => x.ID == mst.CalculationID).First().ShortDesc;
+
+                           }
+
+                           string CalcFiringOrder = "N/A";
+
+                           if (mst.CalcFiringOrder.HasValue)
+                           {
+
+                               CalcFiringOrder = mst.CalcFiringOrder.ToString();
+
+                           }
+                           
+                        <tr>   @{ Html.BeginForm("EditSingleMilestoneTreeSubItemFiringOrder", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                            <td>
+                                @CurrentDesc
+                            </td>
+                            <td>
+                               
+                                @DepDesc
+
+                              
+                            </td>
+                            <td> <!--start-->
+                            
+                               @{
+                                   if(mst.MilestoneFieldDependantUpon.HasValue)
+                                   {
+                                       <select name='CalcID'>
+                                       @{
+                                        int? CurrentVal = mst.CalculationID;
+                                        foreach(Scheduling.Models.Calculation c in CalcList)
+                                        {
+                                            if(CurrentVal.HasValue)
+                                            {
+                                                if(c.ID==CurrentVal.Value)
+                                                {
+                                                    
+                                                    <option selected='selected' value='@c.ID'>@c.ShortDesc</option>
+                                                    
+                                                }
+
+                                                else
+                                                {
+                                                       <option value='@c.ID'>@c.ShortDesc</option>
+
+                                                }
+
+                                            }
+
+
+
+                                        }
+                                       
+                                       }
+                                       
+                                       
+                                       </select>
+                                   }
+
+                                   else
+                                   {
+                                       <input type='text' value='N/A' readonly='readonly' name='CalcID'/>
+                                       
+                                   }
+                                   
+                                   
+                                   }
+                             
+                                 <!--stop-->
+                            </td>
+                         
+                            <td>
+                                <input type="text" value="@CalcFiringOrder" name="CalcFiringOrder" />
+                            </td>
+                            <td>
+                                <input type='hidden' value='@mst.ID' name='ID'/>
+                                <input type='hidden' value='@ViewBag.mtsp.ID' name='ProfileID'/>
+                                <input type='submit' value='Update CalcAndFiringOrder' />
+                                @{ Html.EndForm(); }
+                            </td>
+                            <td>
+                                @{ Html.BeginForm("DeleteSingleMilestoneTreeSubItem", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }); }
+                                <input type='hidden' value='@mst.ID' name='ID'/>
+                                <input type='hidden' value='@ViewBag.mtsp.ID' name='ProfileID'/>
+                                <input type='submit' value='Remove Sub Item' />
+                                @{ Html.EndForm(); }
+                            </td>
+                        </tr>
+                       }
+                    }
+                </tbody>
+            </table>
+        </div>
+    
+    }
+</div>

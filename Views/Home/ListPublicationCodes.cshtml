@@ -1,0 +1,82 @@
+﻿@model List<Scheduling.Models.PublicationCode>
+@{
+    ViewBag.Title = "Publication Code Listing";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    List<Scheduling.Models.Printer> PrinterList=Scheduling.Database.Utility.GetAllPrinters();
+    
+}
+
+<div class='container'>
+
+<div class='sixteen columns scroll-to-on-load'>
+
+<p style='font-style:italic'>Publications with no Parent Pub are typically annuals or SIPS.</p>
+
+<table class='condensed zebra-striped'>
+                <caption style='background-color: #ddd'>Publication Codes</caption>
+                <thead>
+                <tr><th>Name</th><th>Description</th><th>Printer</th><th>Profit Center</th><th>Parent Pub</th><th>Show In N/S Report</th><th>Report Offset</th><th>Annual</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (Scheduling.Models.PublicationCode pc in Model)
+                    {
+                        string ProfitCenter = "n/a";
+                        string ParentPub = "n/a";
+                        string Printer = "n/a";
+                        string ShowInReportStr = "Y";
+                        string IsAnnualStr= "N";
+                        string CustomOffStr = "N";
+                        
+                        if (pc.PrinterFK.HasValue)
+                        {
+                            Scheduling.Models.Printer p = PrinterList.Where(x => x.ID == pc.PrinterFK).First();
+                            Printer= string.Format("{0} ({1})", p.Company, p.Address);
+                        }
+                       
+                        if (pc.ProfitCenter.HasValue)
+                        {
+                            ProfitCenter = pc.ProfitCenter.Value.ToString();
+                        }
+
+                        if (pc.ParentPub.HasValue)
+                        {
+                            ParentPub=Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == pc.ParentPub.Value).First().LongDesc;
+                        }
+
+                        if (pc.ShowInNewsStandReport == 0) { ShowInReportStr = "N"; }
+
+                        if (pc.IsAnnual == 1) { IsAnnualStr = "Y"; }
+
+                        if (pc.HasCustomOffset == 1) { CustomOffStr = "Y";}
+                        
+                        <tr>
+                            <td>@pc.ShortDesc</td>
+                            <td>@pc.LongDesc
+                            </td>
+                            <td>@Printer
+                            </td>
+                             <td>@ProfitCenter
+                            </td>
+                             <td>@ParentPub
+                            </td>
+                            <td>
+                                @ShowInReportStr
+                        </td>
+                            <td>
+                                @CustomOffStr
+                            </td>
+                            <td>
+                                @IsAnnualStr
+                            </td>
+                        </tr>
+               
+               
+                    }
+                </tbody>
+            </table>
+
+</div>
+
+
+</div>
+

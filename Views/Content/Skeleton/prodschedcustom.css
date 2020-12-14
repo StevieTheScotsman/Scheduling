@@ -1,0 +1,183 @@
+﻿div.create-project-column p
+{
+    
+    font-weight:bold;
+}
+
+div.reset-project-delete img
+{
+    width:25px;
+}
+
+/*hide certain columns below 767*/
+ @media only screen and (max-width: 767px) 
+ {
+     
+     .hideoncenterlimit
+     {
+         display:none;
+     }   
+     
+ }
+ 
+ /*hide certain columns below 767*/
+ @media only screen and (max-width: 480px) 
+ {
+     
+     .hideonlowerlimit
+     {
+         display:none;
+     }   
+     
+ }
+ 
+ /*show bottom border on profile creation*/
+
+.bottom-grey-border
+{
+    
+    border-bottom:3px double #ccc;
+    
+}
+
+/*Style invalid model state */
+div.validation-summary-errors ul li
+{
+    color:Red;
+}
+
+
+/*Rounded Corners*/
+.rounded-corners {
+     -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -khtml-border-radius: 20px;
+    border-radius: 20px;
+}
+
+
+#cover {
+    background: url("images/ajax-loader.gif") no-repeat scroll center center #FFF;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color:#ccc;
+}
+
+/*Edit profile item record*/
+
+div.edit-profile-item-record
+{
+    
+    border-bottom:2px double #ccc;
+    
+}
+
+
+
+/*  List Managed Projects */
+
+img.manage-single-project-change-request
+{
+    position:relative;
+    top:-5px;
+    
+}
+
+
+/*View Projects */
+
+.bold
+{
+ 
+ font-weight:bold;   
+    
+}   
+
+
+/*Pager css */
+
+
+    .pg-normal {
+                color: black;
+                font-weight: normal;
+                text-decoration: none;    
+                cursor: pointer;
+                
+                  
+            }
+            .pg-selected {
+                color: black;
+                font-weight: bold;        
+                cursor: pointer;
+                background-color:#ccc;
+                 
+            }
+    
+ /* pager div */
+ #pageNavPosition span
+ 
+ {
+     position:relative;
+     top:10px;
+     background-color:#f5f5f5;
+     
+     
+ }
+ 
+ 
+ /*General */
+ .italic
+ {
+     font-style:italic;
+ }
+ 
+ /*Footer Styles */
+ .loadtime
+ {
+     display:none;
+     
+ }
+ 
+ .backtotop
+ {
+     padding:10px;
+     margin-top:15px;
+     
+ }
+ 
+ /*Slider Style */
+ .slider-p-duedate
+ {
+     color:#0f556f;
+     font-size:1.5em;
+     text-decoration:none;
+     border-bottom:4px solid white;
+ }
+ 
+ .slider-p-header
+ {
+     font-size:1.5em;
+     text-decoration:none;
+     border-bottom:4px solid white;
+ }
+ 
+ .change-request-container
+ 
+ { 
+     float:left;
+     padding-right:10px;
+ }
+ 
+ 
+ .change-request-container
+ {
+     float:left;padding-right:10px;
+     
+ }
+ 
+ .change-request-container span
+ {
+     font-style:italic;
+     
+ }

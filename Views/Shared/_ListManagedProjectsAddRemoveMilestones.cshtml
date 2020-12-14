@@ -1,0 +1,139 @@
+﻿@{
+    int CurrentProject = Convert.ToInt32(ViewData["ProjectID"]);
+    string CurrentProjectName = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == CurrentProject).First().Name;
+    // List<Scheduling.Models.MilestoneValue> MilestoneValueList = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject).Where(x => x.CalcFiringOrder != null && x.DependantUpon != null).OrderBy(x => x.CalcFiringOrder).ToList();
+    List<Scheduling.Models.MilestoneValue> MilestoneValueList = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject);
+    List<Scheduling.Models.MilestoneField> MilestoneFieldList = Scheduling.Database.Utility.GetAllMilestoneFields();
+    List<Scheduling.Models.MilestoneField> MajorMilestoneFieldList = MilestoneFieldList.Where(x => x.IsCreatedByUser == null).ToList();
+    List<Scheduling.Models.MilestoneField> MajorAvailableFieldList = Scheduling.Database.Utility.GetAvailableMajorProjectMilestonesForDropdown(CurrentProject);
+    List<Scheduling.Models.Calculation> CalcList = Scheduling.Database.Utility.GetAllCalculationFields();
+
+    string MaxDisplayValStr = string.Empty;
+    int? MaxDisVal = MilestoneValueList.Select(x => x.DisplaySortOrder).Max();
+    if (MaxDisVal.HasValue)
+    {
+        MaxDisplayValStr = (MaxDisVal.Value + 5).ToString();
+    }     
+}
+<div class='edit-project-outer-container'>
+
+         <!--Message Container-->
+        @{
+            if (ViewBag.AddRemoveMessage != null)
+            {
+               
+                string CurrentMessage = ViewBag.AddRemoveMessage.ToString();
+                if (CurrentMessage.Contains("Success"))
+                {
+            <div style='padding-top: 20px;margin-left:-10px'>
+                <img src="@Url.Content("~/images/bordered-check.png")" alt='success' class='add-remove-milestone-success'/>
+            </div>
+                }
+                
+                if(CurrentMessage.Contains("!"))
+                {
+                    
+                    <div style='padding-top: 20px;margin-left:-10px'>
+
+                        <p style='color:Red'>@CurrentMessage</p>
+                    </div>
+                }
+
+            }
+            
+            
+        }
+
+
+    <div class="edit-project-inner-container">
+        <p class='bold'>
+            This Section Deals With Milestone Creation/Removal</p>
+        <div class='row clearfix'>
+            <input type='radio' name='edit-project-radio-group' value='1' />Add Milestone<br />
+            <input type='radio' name='edit-project-radio-group' value='2' />Remove Milestone<br />
+        </div>
+      
+      
+
+        <!--remove start-->
+        <div class='edit-project-inner-container-remove' style='padding: 10px 0px'>
+            <select id='remove-project-milestone-select' name='remove-project-milestone-select'>
+                <option value=''>Choose a Milestone For Removal</option>
+                @{
+                    //current logic involves ajax call to check for a dependancy.Obsolete since we are ensuring they do not have a dependancy before rendering ..TODO Refactor
+                    foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueList)
+                    {
+                        int CurrentMilestone = mv.MilestoneFieldFK;
+                        int Count = MilestoneValueList.Where(x => x.DependantUpon == CurrentMilestone).Count();
+                        if (Count == 0)
+                        {
+                    <option class='sortme' value='@mv.MilestoneFieldFK'>@Scheduling.Database.Utility.GetProjectSpecificDescWithParent(CurrentProject, mv.MilestoneFieldFK)</option>
+                        }
+                    }
+                    
+                }
+            </select>
+        </div>
+        <!--add start-->
+        @{ Html.BeginForm("AddMilestoneToManageSingleProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "AddMiletoneToManageSingleProject", id = "AddMiletoneToManageSingleProject" }); }
+        <div class='edit-project-inner-container-add' style='padding: 10px 0px'>
+            <input type='hidden' value='@CurrentProject' name='ProjectID' />
+            <div>
+                <p style='font-size: 0.8em; font-style: italic'>
+                    If the Major Milestone is not available have an administrator make it available</p>
+                <p>
+                    Milestone</p>
+                <select id='edit-project-add-milestone' name='field'>
+                    <option value=''>Choose a Major Milestone</option>
+                    <!--Only show Unused major Fields-->
+                    @foreach (Scheduling.Models.MilestoneField mf in MajorAvailableFieldList)
+                    {
+              
+                        <option value='@mf.ID'>@mf.Description</option>
+              
+                    }
+                </select>
+            </div>
+            <div>
+                <p>
+                    Parent(Optional)</p>
+                <select id='edit-project-add-milestone-parent' name='parent'>
+                    <option value=''>Choose a Parent</option>
+                    @foreach (Scheduling.Models.MilestoneField mf in MajorMilestoneFieldList)
+                    {
+              
+                        <option value='@mf.ID'>@mf.Description</option>
+              
+                    }
+                </select></div>
+            <div style='padding-top: 20px'>
+                <p>
+                    Dependancy(Optional)</p>
+                <select id='edit-project-add-milestone-dependancy' name='dependency'>
+                    <option value=''>Choose an Existing Project Milestone</option>
+                    @foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueList)
+                    {
+              
+                        <option value='@mv.MilestoneFieldFK' class='sortme'>@Scheduling.Database.Utility.GetProjectSpecificDescWithParent(CurrentProject, mv.MilestoneFieldFK)</option>
+              
+                    }
+                </select></div>
+            <div style='padding: 20px 0px'>
+                <p>
+                    Calculation(Optional)</p>
+                <select id='edit-project-add-milestone-calculation' name='calculation'>
+                    <option value=''>Choose a Calculation</option>
+                    @foreach (Scheduling.Models.Calculation c in CalcList)
+                    {
+              
+                        <option value='@c.ID' class='sortme'>@c.ShortDesc</option>
+              
+                    }
+                </select></div>
+             
+            <input type='hidden' value='@MaxDisplayValStr' name='display' />
+            <input type="submit" value="Add Milestone To @CurrentProjectName" />
+            @{ Html.EndForm(); }
+        </div>
+    </div>
+</div>

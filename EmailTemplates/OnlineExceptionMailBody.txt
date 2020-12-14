@@ -1,0 +1,17 @@
+****************************************
+APPLICATION EXCEPTION ERROR 
+****************************************
+EXCEPTION SOURCE:xSource
+
+EXCEPTION TYPE:xType
+
+----------------------------
+
+EXCEPTION STACKTRACE :xStack
+
+----------------------------
+
+EXCEPTION MESSAGE :xMessage
+
+--------------------------
+

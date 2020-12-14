@@ -1,0 +1,179 @@
+﻿@model List<Scheduling.Models.ReadOnlyProjectWithMilestones>
+@{
+    ViewBag.Title = "Project Listing ";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int MagProfileType=Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType"));
+
+}
+<div class='container'>
+    <div class="sixteen columns">
+        <p style='font-style: italic'>
+            This Screen Allows A Super Admin to Remove A Project Or Remove Project History Entries
+            After The Status of Creation</p>
+        <div class='four columns'>
+            @{ Html.BeginForm("ResetProjects", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ResetProjects", id = "ListProjectFormFilter" }); }
+            <!--Filter by timeline-->
+            <select name='timeline' class='list-project-select-filter'>
+                <option value=''>All Timelines</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedProjectRangeDropdown(ViewBag.CurrentTimeline))
+            </select>
+        </div>
+        <!--Filter by pubcode-->
+        <div class='four columns'>
+            <select name='pubcode' class='list-project-select-filter'>
+                <option value=''>All Pubcodes</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPublicationDropdown(ViewBag.CurrentPubcode))
+            </select>
+        </div>
+        <!--Filter by year-->
+        <div class='four columns'>
+            <select name='year' class='list-project-select-filter'>
+                <option value=''>All Years</option>
+                @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedYearDropdown(ViewBag.CurrentYear))
+            </select>
+        </div>
+        @{ Html.EndForm(); }
+    </div>
+    <div class='sixteen columns'>
+        @{
+      
+            if (Model.Count == 0)
+            {
+         
+            <p>
+                There are no results</p>   
+            } 
+      
+     
+        }
+        @if (Model.Count > 0)
+        {
+            
+            <p class='italic'>Only Projects that do not act as a Primary Link Can Be Deleted</p>
+            
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Projects")
+            <!--header-->
+
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                            Year
+                        </th>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Profile
+                        </th>
+                        <th>
+                            Created By
+                        </th>
+                        <th>
+                            Date Created
+                        </th>
+                        <th>
+                            Pub Code
+                        </th>
+                        <th>
+                            Product
+                        </th>
+                        <th>
+                            Timeline
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                        <th>
+                            NewstandDate
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.ReadOnlyProjectWithMilestones rop in Model)
+                        { 
+           
+                        <tr>
+                            <td>
+                                @if (Scheduling.Database.Utility.GetAllProjectLinks().Where(x => x.PrimaryProjectID == rop.ID).ToList().Count == 0)
+                                {
+
+                                    <div class='reset-project-delete'>
+                                    <img src="@Url.Content("~/images/remove-project.png")" alt='remove-project' class='reset-project-delete' title='delete project'/>
+                                    @{ Html.BeginForm("ResetProjects", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ResetProjects", @class = "reset-project" }); }
+                                    <input type='hidden' value='@rop.ID' name='id'/>
+                                    @{ Html.EndForm(); }
+                                </div>
+                                   
+
+
+
+                                }
+                            </td>
+                            <td>
+                                <div class='reset-project-history'>
+                                    <img src="@Url.Content("~/images/history-clear.png")" alt='remove-project' class='reset-project-history'
+                                        style='width: 25px' title='delete project history'/>
+                                    @{ Html.BeginForm("ResetHistory", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ResetHistory", @class = "reset-project" }); }
+                                    <input type='hidden' value='@rop.ID' name='id'/>
+                                    @{ Html.EndForm(); }
+                                </div>
+                            </td>
+                            <td>@rop.Year
+                            </td>
+                            <td class='project-name-ref'>@rop.Name
+                            </td>
+                            <td>@rop.ProfileDesc
+                            </td>
+                            <td>@rop.CreatedBy
+                            </td>
+                            <td>@rop.DateCreated
+                            </td>
+                            <td>@rop.PubCodeDesc
+                            </td>
+                            <td>@rop.ProductDesc
+                            </td>
+                            <td>@rop.Timeline
+                            </td>
+                            <td>@rop.CurrentProjectStatus
+                            </td>
+
+                            @{
+                               int ProfileType=Scheduling.Database.Utility.GetProfileTypeIDFromProjectID(rop.ID);
+
+                               string NsStr = "N/A";                     
+                               if(ProfileType==MagProfileType)
+                               {
+                                   NsStr = rop.NewstandDate;
+                                   
+                               }
+                              
+                                
+                        }
+                            <td>@NsStr
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+     
+        }
+    </div>
+    <div id="pageNavPosition">
+    </div>
+    <script type="text/javascript"><!--
+        var pager = new Pager('results', 5);
+        pager.init();
+        pager.showPageNav('pager', 'pageNavPosition');
+        pager.showPage(1);
+    </script>
+</div>

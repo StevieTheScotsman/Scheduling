@@ -1,0 +1,126 @@
+﻿@using System.Configuration
+
+@{
+    ViewBag.Title = "Production Schedule Home Page";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+    string MainHeader = "Test Production Schedule";
+    string Disclaimer = "This is NOT the live site and should be used only by the online development team for testing";
+}
+
+@{
+    int CurrentRoleID = Scheduling.Security.Utility.GetCurrentLoggedInUserRoleID();
+    
+    string TestModeResult=System.Configuration.ConfigurationManager.AppSettings["TestMode"];
+    if(!string.IsNullOrWhiteSpace(TestModeResult))
+    {
+        if (TestModeResult.ToUpperInvariant() == "FALSE")  
+        {
+            MainHeader = "Production Schedule";
+            Disclaimer = string.Empty;
+        }
+    }
+}
+<div>
+    <h1 class="mainH1">@MainHeader</h1>
+    <div class="mainPageItems">
+
+        <p>@Disclaimer</p>
+
+        <p class="italic">Please use the subset of options below or the main menu at the top.</p>
+        <p>
+            <strong>Users</strong><br />
+        @{
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+            @Html.ActionLink("Add User(s)", "AddSingleUser", "Home",null, new {@class = "mainLink"}) <span>&#149;</span>
+            @Html.ActionLink("Manage Users", "EditUsers", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Manage Groups", "ManageGroups", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Group Associations", "ManageGroupAssociations", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            }
+        }
+            @Html.ActionLink("View Users", "ListUsers", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("View Departments", "ListDepartments", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("View Groups", "ListGroups", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("View Roles", "ListRoles", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Group Associations", "ListGroupAssociations",null, "Home", new { @class = "mainLink" }) 
+        </p>
+        <p>
+            <strong>Projects</strong><br />
+        @{
+
+            if (CurrentRoleID != (int)Scheduling.Enums.Role.Admin && CurrentRoleID != (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+                @Html.ActionLink("View Projects", "ListProjects", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            }
+
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.Admin || CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin)
+            {
+                @Html.ActionLink("Delete Proj. Entries", "ResetProjects", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+                @Html.ActionLink("Manage Projects", "ListManagedProjects", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+                @Html.ActionLink("Multiple Projects", "CreateMultipleStepOne", "Home",null, new { @class = "mainLink" })
+            }
+
+}
+        </p>
+        <p style="display:none">
+            <strong>Activity</strong><br />
+            @Html.ActionLink("View Activity Log", "ListActivities", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Delete Activity Log", "DeleteAllActivity", "Home",null, new { @class = "mainLink" })
+        </p>
+        <p>
+            <strong>Baselines</strong><br />
+            @Html.ActionLink("View Baseline Types", "ListProfileTypes", "Home",null,new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Manage Baselines", "ManageMilestoneTreeSettingProfiles", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Baseline by Type", "AddSingleMilestoneTreeSettingProfile", "Home",null, new { @class = "mainLink" }) 
+        </p>
+        <p>
+            <strong>Reporting</strong><br />
+            @Html.ActionLink("Excel Style Reports", "ExcelStyleReports", "Reporting", null, new { @class = "mainLink" })
+        </p>
+        <p style="display:none">
+            <strong>Administration</strong><br />
+        @{
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+            {
+                @Html.ActionLink("Major Milestones", "ManageMajorMilestones", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+                @Html.ActionLink("Add Publication", "AddPublication", "Publication",null, new { @class = "mainLink" }) <span>&#149;</span>
+                @Html.ActionLink("Update Publication", "ManagePublicationCodes", "Publication",null, new { @class = "mainLink" }) <span>&#149;</span>
+            }
+        }
+            @Html.ActionLink("View App Log", "ShowApplicationLog", "Logging",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("View App Error Log", "ShowApplicationErrorLog", "Logging",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Reset App Log", "ResetApplicationLog", "Logging",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Reset Error Log", "ResetApplicationErrorLog",null, "Logging", new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Test Email Connection", "Email", "Test",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Test Exception Filter", "Exception",null, "Test", new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Holidays", "ManageHolidays", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Holiday Change", "ManageHolidayLiveChange", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+
+        @{ if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+            {
+                @Html.ActionLink("Manage Settings", "ManageLinkSettings", "Linking",null, new { @class = "mainLink" }) <span>&#149;</span>
+            }
+           else
+           {
+                @Html.ActionLink("View Settings", "ListLinkSettings", "Linking",null, new { @class = "mainLink" }) <span>&#149;</span>
+           }
+        }
+            @Html.ActionLink("Field Aliases", "ListFieldAliases", "Home",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Reports Presentation", "Presentation", "Reporting",null, new { @class = "mainLink" }) <span>&#149;</span>
+            @Html.ActionLink("Check for Duplicates", "DataIntegrity", "Reporting",null, new { @class = "mainLink" }) 
+        </p>
+        <p style="display:none;">
+           <strong>Documentation</strong><br />
+        @{
+            if (CurrentRoleID == (int)Scheduling.Enums.Role.SuperAdmin || CurrentRoleID == (int)Scheduling.Enums.Role.Admin)
+            {
+               @Html.ActionLink("Application Settings", "AppSettings", "Documentation",null, new { @class = "mainLink" }) <span>&#149;</span>
+               @Html.ActionLink("Developer Notes", "DeveloperNotes", "Documentation",null, new { @class = "mainLink" }) <span>&#149;</span>
+               @Html.ActionLink("User Information", "UserInformation", "Documentation",null, new { @class = "mainLink" }) 
+            }
+}
+        </p>
+    </div>
+</div>
+

@@ -1,0 +1,376 @@
+﻿@{
+    ViewBag.Title = "_EditAddRemoveMilestones";
+}
+
+@{
+    int CurrentProject = Model.ID;
+    string CurrentProjectName = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == CurrentProject).First().Name;
+    
+    List<Scheduling.Models.MilestoneValue> MilestoneValueList = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(CurrentProject);
+    List<Scheduling.Models.MilestoneField> MilestoneFieldList = Scheduling.Database.Utility.GetAllMilestoneFields();
+    List<Scheduling.Models.MilestoneField> MajorMilestoneFieldList = MilestoneFieldList.Where(x => x.IsCreatedByUser == null).ToList();
+    List<Scheduling.Models.MilestoneField> MajorAvailableFieldList = Scheduling.Database.Utility.GetAvailableMajorProjectMilestonesForDropdown(CurrentProject);
+    List<Scheduling.Models.Calculation> CalcList = Scheduling.Database.Utility.GetAllCalculationFields();
+    
+    List<int> AvailableParentListInt = MilestoneValueList.Where(x => !x.ParentID.HasValue).Select(y=>y.MilestoneFieldFK).ToList();
+    List<Scheduling.Models.MilestoneField> AvailableParentList = MilestoneFieldList.Where(x => AvailableParentListInt.Contains(x.ID)).ToList();
+    
+    string MaxDisplayValStr = string.Empty;
+    int? MaxDisVal = MilestoneValueList.Select(x => x.DisplaySortOrder).Max();
+    if (MaxDisVal.HasValue)
+    {
+        MaxDisplayValStr = (MaxDisVal.Value + 5).ToString();
+    }
+}
+<div class='edit-project-outer-container'>
+
+    <div class="edit-project-inner-container">
+        <input type="hidden" value="@Model.ID" id="milestone-partial-reference"/>
+        <p class='bold'>
+            This Section Deals With Milestone Creation/Removal
+        </p>
+        <div class='row clearfix'>
+            <input type='radio' name='edit-project-radio-group' value='1' />Add Milestone<br />
+            <input type='radio' name='edit-project-radio-group' value='2' />Remove Milestone<br />
+        </div>
+
+
+
+        <!--remove start-->
+        <div class='edit-project-inner-container-remove' style='padding: 10px 0px'>
+            <select id='remove-project-milestone-select' name='remove-project-milestone-select'>
+                <option value=''>Choose a Milestone For Removal</option>
+                @{
+                    //current logic involves ajax call to check for a dependancy.Obsolete since we are ensuring they do not have a dependancy before rendering ..TODO Refactor
+                    foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueList)
+                    {
+                        int CurrentMilestone = mv.MilestoneFieldFK;
+                        int Count = MilestoneValueList.Where(x => x.DependantUpon == CurrentMilestone).Count();
+                        if (Count == 0)
+                        {
+                            <option class='sortme' value='@mv.MilestoneFieldFK'>@Scheduling.Database.Utility.GetProjectSpecificDescWithParent(CurrentProject, mv.MilestoneFieldFK)</option>
+                        }
+                    }
+
+                }
+            </select>
+            <img style='display: none; width:30px;padding-left:20px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success-remove-milestone' />
+        </div>
+        <!--add start-->
+       
+        <div class='edit-project-inner-container-add' style='padding: 10px 0px'>
+            <input type='hidden' value='@CurrentProject' name='ProjectID' />
+            <div>
+                <p style='font-size: 0.8em; font-style: italic'>
+                    If the Major Milestone is not available have an administrator make it available
+                </p>
+                <p>
+                    Milestone
+                </p>
+                <select id='edit-project-add-milestone' name='field'>
+                    <option value=''>Choose a Major Milestone</option>
+                    <!--Only show Unused major Fields-->
+                    @foreach (Scheduling.Models.MilestoneField mf in MajorAvailableFieldList)
+                    {
+
+                        <option value='@mf.ID'>@mf.Description</option>
+
+                    }
+                </select>
+            </div>
+            <div>
+                <p>
+                    Parent(Optional)
+                </p>
+                <select id='edit-project-add-milestone-parent' name='parent'>
+                    <option value=''>Choose a Parent</option>
+                    @foreach (Scheduling.Models.MilestoneField mf in AvailableParentList)
+                    {
+
+                        <option value='@mf.ID'>@mf.Description</option>
+
+                    }
+                </select>
+            </div>
+            <div style='padding-top: 20px'>
+                <p>
+                    Dependancy(Optional)
+                </p>
+                <select id='edit-project-add-milestone-dependancy' name='dependency'>
+                    <option value=''>Choose an Existing Project Milestone</option>
+                    @foreach (Scheduling.Models.MilestoneValue mv in MilestoneValueList)
+                    {
+
+                        <option value='@mv.MilestoneFieldFK' class='sortme'>@Scheduling.Database.Utility.GetProjectSpecificDescWithParent(CurrentProject, mv.MilestoneFieldFK)</option>
+
+                    }
+                </select>
+            </div>
+            <div style='padding: 20px 0px'>
+                <p>
+                    Calculation(Optional)
+                </p>
+                <select id='edit-project-add-milestone-calculation' name='calculation'>
+                    <option value=''>Choose a Calculation</option>
+                    @foreach (Scheduling.Models.Calculation c in CalcList)
+                    {
+
+                        <option value='@c.ID' class='sortme'>@c.ShortDesc</option>
+
+                    }
+                </select>
+            </div>
+
+            <input type='hidden' value='@MaxDisplayValStr' name='display' class="display-order"/>
+            <input type="button" value="Add Milestone To @CurrentProjectName" class="button-add-milestone"/>
+            <img style='display: none; width:30px;padding-left:20px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success-add-milestone' />
+            
+        </div>
+    </div>
+
+
+    <!--ADD/REMOVE CLIENT SIDE CODE -->
+    <script type="text/javascript">
+
+        
+        $(function () {
+
+            //init
+            $("input[name='edit-project-radio-group']").first().prop('checked', true);
+            $('.edit-project-inner-container-remove').hide();
+            $('.edit-project-inner-container-add').show();
+           
+            //toggle add remove milestone radio button
+            $("input[name='edit-project-radio-group']").on("change", function () {
+
+                var gv = $(this).val();
+
+                if (gv == '1') {
+                    $('.edit-project-inner-container-remove').hide();
+                    $('.edit-project-inner-container-add').show();
+                }
+
+
+
+                if (gv == '2') {
+                    $('.edit-project-inner-container-add').hide();
+                    $('.edit-project-inner-container-remove').show();
+                }
+
+               
+
+            });
+
+        });
+
+
+        $(function () {
+
+
+            //function
+            function ProjectAjaxRemoveProjectMilestone(CurrentProject, CurrentMilestoneField) {
+
+                var url = baseUrl + '/Project/AjaxRemoveMilestone/';
+
+                var CurrentMilestoneField = $('#remove-project-milestone-select').val();
+                var CurrentProject = $('#milestone-partial-reference').val();
+
+                //start 
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID: CurrentProject,
+                        MilestoneFieldID: CurrentMilestoneField
+
+
+                    },
+                    success: function (data) {
+
+                        //start 
+                        setTimeout(function () {
+
+                            alert('ok')
+
+
+                        }, 3000);
+                        //stop
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+
+
+                //stop
+
+
+
+            }
+
+            //remove milestone
+
+            $('#remove-project-milestone-select').on("change", function () {
+
+                var sv = $(this).val();
+                var curChoice = $(this).find('option:selected').text();
+                if (sv != '') {
+                    var CurrentProjectID = $('#ProjectID').val();
+                    var CurrentMilestoneFieldVal = sv;
+                    var url = baseUrl + '/Ajax/HasDependantFields/'
+
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        cache: false,
+                        dataType: 'json',
+                        data: {
+                            ProjectID: CurrentProjectID,
+                            MilestoneFieldID: CurrentMilestoneFieldVal
+
+
+                        },
+                        success: function (data) {
+
+                            if (data == '1') {
+
+                                alert("This milestone has dependencies..Please remove dependencies before deleting the item");
+
+                            }
+
+                            if (data == '0') {
+
+
+                                //start 
+                                $('<div></div>').appendTo('body')
+                              .html('<div><h6>Are you sure you want to remove ' + curChoice + '?</h6></div>')
+                              .dialog({
+                                  modal: true, title: 'Confirm Milestone Removal', zIndex: 10000, autoOpen: true,
+                                  width: 'auto', resizable: true,
+                                  buttons: {
+                                      Yes: function () {
+                                                                                    
+                                          ProjectAjaxRemoveProjectMilestone(CurrentProjectID, CurrentMilestoneFieldVal)
+                                          $(this).dialog("close");
+                                      },
+                                      No: function () {
+                                          $(this).dialog("close");
+                                      }
+
+
+                                  },
+
+                                  close: function (event, ui) {
+
+                                  }
+                              });
+
+
+
+                                //stop
+
+
+                            }
+
+
+
+                        },
+                        error: function (xhr, ajaxOptions, error) {
+                            alert('Error: ' + xhr.responseText);
+                        }
+
+
+
+                    });
+
+
+
+
+                }
+
+            });
+
+            //
+
+        });
+
+
+        //add milestone
+
+        $(function () {
+
+            $('.button-add-milestone').on("click", function () {
+
+                //start
+                var url = baseUrl + '/Project/AjaxAddMilestone/';
+
+                //get values
+                var CurrentProjectID = $('#milestone-partial-reference').val();
+                var CurrentMilestoneFieldID=$('#edit-project-add-milestone').val();
+                var CurrentMilestoneParentID=$('#edit-project-add-milestone-parent').val();
+                var CurrentMilestoneDependencyID=$('#edit-project-add-milestone-dependancy').val();
+                var CurrentMilestoneCalculationID = $('#edit-project-add-milestone-calculation').val();
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    cache: false,
+                    dataType: 'json',
+                    data: {
+                        ProjectID:CurrentProjectID,
+                        MilestoneFieldID: CurrentMilestoneFieldID,
+                        MilestoneParentID: CurrentMilestoneParentID,
+                        DependencyID:CurrentMilestoneDependencyID,
+                        CalculationID: CurrentMilestoneCalculationID
+
+                    },
+                    success: function (data) {
+
+                        alert(data.success);
+                        var successflag = parseInt(data.success);
+                        if (successflag==1)
+                        {
+                            $('.img-ajax-success-add-milestone').show().fadeOut(2000);
+                            setTimeout(location.reload(true), 1500);
+                        }
+                        
+                        else
+                        {
+
+                            alert('Unable to update...' + data.message)
+                            
+                        }
+
+
+                    },
+                    error: function (xhr, ajaxOptions, error) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+
+
+
+                });
+
+                //stop
+
+            });
+
+        });
+
+    </script>
+  
+     
+
+
+</div>
+
+

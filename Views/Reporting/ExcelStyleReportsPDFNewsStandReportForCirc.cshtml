@@ -1,0 +1,522 @@
+﻿
+<!--Decided to use style tag due to ease of deployment Steve C 12.29.14 -->
+
+@using Scheduling.Models;
+@using System.Collections.Generic;
+
+@model List<Scheduling.Models.ProjectDisplay> 
+           
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Summary Report For Circulation</title>
+
+
+
+    <style type="text/css">
+        
+        p.header
+        {
+            margin-left: 30%;
+            font-weight: bold;
+        }
+        
+        
+        table
+        {
+            border-collapse: collapse;
+            padding: 5px;
+        }
+        
+        table td
+        {
+            text-align: center;
+            padding: 5px;
+        }
+        td.pub-desc-td
+        {
+            text-align: left;
+            padding-left: 10px;
+        }
+        
+        /*  Left Header Column */
+        
+        td.pub-desc-td
+        {
+            border-left: 1px solid black;
+        }
+        td.pub-desc-td
+        {
+            border-right: 1px solid black;
+        }
+        td.pub-desc-td
+        {
+            border-bottom: 1px solid black;
+        }
+        
+        td
+        {
+            border: 1px solid black;
+        }
+        
+        
+        td.content-1, td.content-5, td.content-9
+        {
+            border-right: 4px solid black;
+        }
+        
+        td.empty-content
+        {
+            background: #a4a4a4;
+        }
+        
+        
+        td.show-parent-pub
+        {
+            font-style: italic;
+        }
+        
+        td.header-empty
+        {
+            border: 1px solid #000;
+            border-bottom: 4px solid #000;
+        }
+        
+        td.header-with-desc
+        {
+            border-bottom: 4px solid #000;
+            border-top: 1px solid #000;
+            border-right: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!--Documentation Start-->
+    <!-- This report is based on the fact that child items will not be selected unless chosen from the dropdown-->
+    <!--stop-->
+    @{
+        
+
+        bool CanContinue = false;
+
+        List<ProjectDisplay> CurrentProjects = Model;
+
+        if (Model.Count > 0)
+        {
+
+            List<int> DistinctPubIDList = CurrentProjects.Select(x => x.PubCodeFK.Value).Distinct().ToList();
+            List<PublicationCode> CurrentPubCodeList = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => DistinctPubIDList.Contains(x.ID)).ToList();
+
+            int TopLevelPubCodeCount = CurrentPubCodeList.Where(x => !x.ParentPub.HasValue).Count();
+
+            if (TopLevelPubCodeCount > 0) { CanContinue = true; }
+
+        }
+
+        //We need at least one parent pub in order to render this report.
+        if (CanContinue)
+        {
+
+            CurrentProjects = CurrentProjects.OrderBy(x => x.YearFK).ThenBy(x => x.ProjectRangeFK).ToList();
+
+
+            List<Scheduling.Models.ReportingObjects.NewsStandRowHeader> HeaderRows = new List<Scheduling.Models.ReportingObjects.NewsStandRowHeader>();
+
+            List<int> UniqueYears = CurrentProjects.Select(x => x.YearFK).Distinct().ToList();
+
+            List<Scheduling.Models.Year> AllYears = Scheduling.Database.Utility.GetAllYears().ToList();
+            List<Scheduling.Models.Timeline> AllTimelines = Scheduling.Database.Utility.GetAllProjectRanges().ToList();
+
+            foreach (int? y in UniqueYears)
+            {
+                List<int?> UniqueTimelines = CurrentProjects.Where(x => x.YearFK == y).Select(x => x.ProjectRangeFK).Distinct().ToList();
+
+                foreach (int? ui in UniqueTimelines)
+                {
+                    if (ui.HasValue && y.HasValue)
+                    {
+                        HeaderRows.Add(new Scheduling.Models.ReportingObjects.NewsStandRowHeader { TimelineID = ui, YearID = y });
+                    }
+
+                }
+            }
+
+
+            //main mark up start 
+        <div class='outer-container'>
+            <!--Generate Year Header-->
+            <p class='header'>@ViewBag.YearVal On-sale Dates</p>
+            <table>
+                <!--Header tr-->
+                <!--Header-->
+                <tr class='header-row'>
+                    <!--First Empty Cell-->
+                    <td class='header-empty'>
+                        &nbsp;
+                    </td>
+                    @foreach (Scheduling.Models.ReportingObjects.NewsStandRowHeader col in HeaderRows)
+                    {
+                        string CurrentItemContents = string.Empty;
+                        if (col.YearID.HasValue && col.TimelineID.HasValue)
+                        {
+                            string CurrentTimeline = AllTimelines.Where(x => x.ID == col.TimelineID).First().ShortDesc;
+                            string CurrentYear = AllYears.Where(x => x.ID == col.YearID).First().Value.ToString();
+                            CurrentItemContents = string.Format("{0} {1}", CurrentTimeline, CurrentYear);
+                        <td  class='timeline-header-@col.TimelineID header-with-desc' >@CurrentItemContents
+                        </td>
+                        }
+
+
+                    }
+                </tr>
+                <!--Row values-->
+                @{
+                    List<int> DistinctPubIDList = CurrentProjects.Select(x => x.PubCodeFK.Value).Distinct().ToList();
+                    List<PublicationCode> CurrentPubCodeList = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => DistinctPubIDList.Contains(x.ID)).ToList();
+
+                    List<PublicationCode> ParentPubCodeList = CurrentPubCodeList.Where(x => !x.ParentPub.HasValue).Where(x => x.ShowInNewsStandReport == 1).OrderBy(x => x.LongDesc).ToList();
+
+                    //remove first row.
+                    List<Scheduling.Models.ReportingObjects.NewsStandRowHeader> PopulatedHeaderRows = HeaderRows.Where(x => x.TimelineID.HasValue && x.YearID.HasValue).ToList();
+
+                    foreach (PublicationCode ParentPub in ParentPubCodeList)
+                    {
+                        //basic rendering start..no kids just show values
+
+                        int ChildCount = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Count();
+
+                        if (ChildCount == 0)
+                        {
+                    <tr class='@ParentPub.ShortDesc.ToLower()'>
+                        <td class='pub-desc-td'>@ParentPub.LongDesc
+                        </td>
+                        <!--Get Data start -->
+                        @{foreach (Scheduling.Models.ReportingObjects.NewsStandRowHeader item in PopulatedHeaderRows)
+                          {
+
+                              string CurrentContents = "N/A";
+
+                              int count = CurrentProjects.Where(x => x.PubCodeFK == ParentPub.ID && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).Count();
+
+                              //  string classname = string.Format("timeline-range-id-{0} year-id-{1}", item.TimelineID, item.YearID);
+
+                              if (count == 1)
+                              {
+                                  int ProjID = CurrentProjects.Where(x => x.PubCodeFK == ParentPub.ID && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).First().ID;
+
+                                  DateTime? ndt = Scheduling.Database.Utility.GetNullableDateTimeForListedProject(ProjID);
+                                  if (ndt.HasValue)
+                                  {
+                                      CurrentContents = ndt.Value.ToShortDateString();
+                            <td class='content-@item.TimelineID'>@CurrentContents
+                            </td>
+                                  }
+
+                              }
+
+                              else
+                              {
+                            <td class='content-@item.TimelineID empty-content'>
+                                &nbsp;
+                            </td>
+
+                              }
+                          }
+                        
+                        }
+                        <!--stop-->
+                    </tr>
+                     
+                        }
+
+                        if (ChildCount > 0)
+                        {
+                            //eg Loc,mrp,sac
+                            int AnnualChildNoOffsetItemCount = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Where(x => x.IsAnnual == 1).Where(x => x.HasCustomOffset == 0).Count();
+
+                            //eg gmr
+                            int AnnualChildWithOffsetItemCount = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Where(x => x.IsAnnual == 1).Where(x => x.HasCustomOffset == 1).Count();
+
+                            //eg wrk,ct7
+                            int NoAnnualNoOffestChildItemCount = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Where(x => x.IsAnnual == 0).Where(x => x.HasCustomOffset == 0).Count();
+
+
+                            //write out main item then child items
+                         
+                    <!--start-->
+                    <tr class='parent-with-child @ParentPub.ShortDesc.ToLower()'>
+                        <td class='pub-desc-td'>@ParentPub.LongDesc
+                        </td>
+                        <!--Write Main Item -->
+                        @{foreach (Scheduling.Models.ReportingObjects.NewsStandRowHeader item in PopulatedHeaderRows)
+                          {
+                                                       
+                              string CurrentContents = "N/A";
+
+                              int count = CurrentProjects.Where(x => x.PubCodeFK == ParentPub.ID && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).Count();
+
+                              // string classname = string.Format("timeline-range-id-{0} year-id-{1}", item.TimelineID, item.YearID);
+
+                              if (count == 1)
+                              {
+
+                                  int ProjID = CurrentProjects.Where(x => x.PubCodeFK == ParentPub.ID && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).First().ID;
+
+
+                                  DateTime? ndt = Scheduling.Database.Utility.GetNullableDateTimeForListedProject(ProjID);
+                                  if (ndt.HasValue)
+                                  {
+                                      CurrentContents = ndt.Value.ToShortDateString();
+                            <td class='content-@item.TimelineID'>@CurrentContents
+                            </td>
+                                  }
+
+                              }
+
+                              else
+                              {
+                            <td class='content-@item.TimelineID empty-content'>
+                                &nbsp;
+                            </td>
+
+                              }
+                          }
+                        
+                        }
+                        <!--stop-->
+                    </tr>         
+                
+                    <!--stop-->
+                          if (NoAnnualNoOffestChildItemCount > 0)
+                          {
+
+                              List<int> DistinctChildNoAnnualNoOffsetIDs = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Where(x => x.IsAnnual == 0).Where(x => x.HasCustomOffset == 0).Select(x => x.ID).ToList();
+                            
+                    <!--iteration start-->
+                
+                              foreach (int DistinctChild in DistinctChildNoAnnualNoOffsetIDs)
+                              {
+                                  string DistinctDesc = string.Format(" {1} - {0}", Scheduling.Database.Utility.GetPubCodeReportDescFromID(DistinctChild), Scheduling.Database.Utility.GetPubCodeShortDescFromID(DistinctChild));
+                    <tr class='no-annual-no-offset'>
+                        <td class='pub-desc-td show-parent-pub'>
+                            &nbsp;@DistinctDesc
+                        </td>
+                        @foreach (Scheduling.Models.ReportingObjects.NewsStandRowHeader item in PopulatedHeaderRows)
+                        {
+                            int count = CurrentProjects.Where(x => x.PubCodeFK == DistinctChild && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).Count();
+
+                            if (count == 1)
+                            {
+                                int ProjID = CurrentProjects.Where(x => x.PubCodeFK == DistinctChild && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).First().ID;
+
+                                DateTime? ndt = Scheduling.Database.Utility.GetNullableDateTimeForListedProject(ProjID);
+                                        
+                            <td class='content-@item.TimelineID'>@ndt.Value.ToShortDateString()
+                            </td>
+
+                            }
+
+                            else
+                            {
+                                      
+                            <td class='content-@item.TimelineID empty-content'>
+                                &nbsp;
+                            </td>
+
+                            }
+                        }
+                    </tr>
+
+                              }
+                    <!--stop-->
+
+
+                          }
+                
+                    <!-- *********************************************AnnualChildWithNoOffset START ********************************************************************* -->
+                          if (AnnualChildNoOffsetItemCount > 0)
+                          {
+                              List<int> DistinctChildAnnualNoOffsetIDs = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Where(x => x.IsAnnual == 1).Where(x => x.HasCustomOffset == 0).Select(x => x.ID).ToList();
+
+                              foreach (int CurrentChildPubAnnualOnly in DistinctChildAnnualNoOffsetIDs)
+                              {
+                                  string CurrentAnnualDesc = string.Format(" {1} - {0} (Annual)", Scheduling.Database.Utility.GetPubCodeReportDescFromID(CurrentChildPubAnnualOnly), Scheduling.Database.Utility.GetPubCodeShortDescFromID(CurrentChildPubAnnualOnly));
+                    <tr class='annual-child-no-offset'>
+                        <td class='pub-desc-td show-parent-pub'>
+                            &nbsp;@CurrentAnnualDesc
+                        </td>
+                        @foreach (Scheduling.Models.ReportingObjects.NewsStandRowHeader item in PopulatedHeaderRows)
+                        {
+                            int count = CurrentProjects.Where(x => x.PubCodeFK == CurrentChildPubAnnualOnly && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).Count();
+
+                            if (count == 1)
+                            {
+                                int ProjID = CurrentProjects.Where(x => x.PubCodeFK == CurrentChildPubAnnualOnly && x.YearFK == item.YearID && x.ProjectRangeFK == item.TimelineID).First().ID;
+
+                                DateTime? ndt = Scheduling.Database.Utility.GetNullableDateTimeForListedProject(ProjID);
+                                        
+                            <td class='content-@item.TimelineID'>@ndt.Value.ToShortDateString()
+                            </td>
+
+                            }
+
+                            else
+                            {
+                                      
+                            <td class='content-@item.TimelineID empty-content'>
+                                &nbsp;
+                            </td>
+
+                            }
+                        }
+                    </tr>
+
+                              }
+
+                          }
+                         
+                    <!--Stop-->
+                
+                        
+                                        
+                          if (AnnualChildWithOffsetItemCount > 0)
+                          {
+                              List<int> DistinctChildAnnualIDs = CurrentPubCodeList.Where(x => x.ParentPub == ParentPub.ID).Where(x => x.IsAnnual == 1).Where(x => x.HasCustomOffset == 1).Select(x => x.ID).ToList();
+
+                              //Years based on Header cannot be first year..
+                              List<int> DistinctYearsForPub = HeaderRows.Where(x => x.YearID.HasValue && x.YearID != 1).Select(x => x.YearID.Value).Distinct().ToList();
+
+                              if (DistinctChildAnnualIDs.Count > 0)
+                              {
+                                  foreach (int CurrentChildPub in DistinctChildAnnualIDs)
+                                  {
+
+                                      foreach (int DistinctYear in DistinctYearsForPub)
+                                      {
+                                          string CurrentDesc = string.Format(" {2} - {0} ({1} Annual)", Scheduling.Database.Utility.GetPubCodeReportDescFromID(CurrentChildPub), Scheduling.Database.Utility.GetYearByID(DistinctYear - 1), Scheduling.Database.Utility.GetPubCodeShortDescFromID(CurrentChildPub));
+
+                                          //write out header for individual year
+                    <tr class='annual-child-with-offset'>
+                        <td class='pub-desc-td show-parent-pub'>
+                            &nbsp;@CurrentDesc
+                        </td>
+                        @foreach (Scheduling.Models.ReportingObjects.NewsStandRowHeader item in PopulatedHeaderRows)
+                        {
+                            if (item.TimelineID == 1 && item.YearID == DistinctYear)
+                            {
+                                int CalcYear = DistinctYear - 1;
+                                int ProjIDCount = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ProjectRangeFK == 10).Where(x => x.YearFK == CalcYear).Where(x => x.PubCodeFK == CurrentChildPub).Count();
+                                if (ProjIDCount == 1)
+                                {
+                                    int ProjID = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ProjectRangeFK == 10).Where(x => x.YearFK == CalcYear).Where(x => x.PubCodeFK == CurrentChildPub).First().ID;
+                                    DateTime? ndt = Scheduling.Database.Utility.GetNullableDateTimeForListedProject(ProjID);
+                                    if (ndt.HasValue)
+                                    {
+                            <td class='content-@item.TimelineID'>@ndt.Value.ToShortDateString()
+                            </td>
+                                    }
+                                }
+                            }
+
+
+                            else
+                            {
+                            <td class='content-@item.TimelineID empty-content'>
+                                &nbsp;
+                            </td>
+                            }
+
+
+                        }
+                    </tr>
+                                      }
+
+                                  }
+
+                              }
+
+                          }
+
+
+                        }
+
+
+                    }
+                
+                }
+            </table>
+        </div>
+
+        }
+
+
+        else
+        {
+        <p>
+            We need at least one publication code that is a parent to run this report.</p>
+        }
+
+    }
+
+    <!--Client Side Code -->
+
+    <!--This logic is based on the fact that the report will run from jan of one year to feb of the next.  -->
+    
+    <script type='text/javascript' src='@Url.Content("~/Scripts/jquery-1.10.2.min.js")'></script>
+    <script type='text/javascript'>
+        $(document).ready(function () {
+
+            // Establishing arrays for columns 17 (Jan-Feb), and moving text to column 1 (Jan)
+            var content17Elems = $('tr.parent-with-child.dsc').find('.content-17').toArray();
+            var arrayLength = content17Elems.length;
+            var content1Elems = $('tr.parent-with-child.dsc').find('.content-1').toArray();
+
+            for (var i = 0; i < arrayLength; i++) {
+                /*NOTE - 'innerText' is NOT W3C compliant, Firefox will not recognize it when
+                          referencing text values that are set to 'display:none' or visibility:hidden.
+                          Insteand you must use the W3C compliant 'textContent', which is cross browser compatible.
+                */
+                var currentText = content17Elems[i].textContent;
+                content1Elems[i].textContent = currentText;
+            }
+
+
+            // Setting the Jan-Feb column style to disply:none
+            if ($('tr.dsc td.content-1').textContent != "") {
+                $('tr.dsc td.content-1').removeClass('empty-content');
+                $('.timeline-header-17').css("display", "none");
+                $('.content-17').css("display", "none");
+            }
+
+
+            // Establishing arrays for columns 18 (Jul-Aug), and moving text to column 7 (July)
+            var content18Elems = $('tr.parent-with-child.dsc').find('.content-18').toArray();
+            var arrayLength = content18Elems.length;
+            var content7Elems = $('tr.parent-with-child.dsc').find('.content-7').toArray();
+
+            for (var i = 0; i < arrayLength; i++) {
+                /*NOTE - 'innerText' is NOT W3C compliant, Firefox will not recognize it when
+                          referencing text values that are set to 'display:none' or visibility:hidden.
+                          Insteand you must use the W3C compliant 'textContent', which is cross browser compatible.
+               */
+                var currentText = content18Elems[i].textContent;
+                content7Elems[i].textContent = currentText;
+            }
+
+
+            // Setting the Jul-Aug column style to disply:none
+            if ($('tr.dsc td.content-7').textContent != "") {
+                $('tr.dsc td.content-7').removeClass('empty-content');
+                $('.timeline-header-18').css("display", "none");
+                $('.content-18').css("display", "none");
+            }
+
+        });
+    </script>
+
+
+
+    <!--Stop -->
+</body>
+</html>

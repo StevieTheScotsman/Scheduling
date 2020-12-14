@@ -1,0 +1,81 @@
+﻿@model List<Scheduling.Models.ProjectDisplay>
+@{
+    ViewBag.Title = "Created Projects";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<!--used to invoke controllers-->
+@{ 
+    Html.BeginForm("ProjectsCreatedPDF", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToPDF" }); 
+    Html.EndForm();
+
+    Html.BeginForm("ProjectsCreatedCSV", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToCSV" });
+    Html.EndForm();
+    
+}
+
+<h2>
+    There are @Model.Count Current Projects With A Project Status of Created.
+    
+    <img src="@Url.Content("~/images/export-to-pdf.jpg")" alt='export-to-pdf' style='width:25px;padding-left:10px' class='export-to-pdf'/>
+
+      <img src="@Url.Content("~/images/export-to-csv.jpg")" alt='export-to-csv' style='width:25px;padding-left:10px' class='export-to-csv'/>
+</h2>
+
+@{
+    
+    
+    if (Model.Count > 0)
+    {
+        
+    <table cellspacing='0' cellpadding='0' class='zebra-striped'>
+        <thead>
+            <tr style='background-color: #808080'>
+                <th align='left'>
+                    Project Name
+                </th>
+                <th align='left'>
+                    Creation Date
+                </th>
+                <th align='left'>
+                    Time of Creation
+                </th>
+                <th align='left'>
+                    Year
+                </th>
+                <th align='left'>
+                    Profile Type
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                  
+
+        foreach (Scheduling.Models.ProjectDisplay pd in Model)
+        {
+
+                <tr>
+                    <td style='width: 15%'>@pd.Name
+                    </td>
+                    <td style='width: 15%'>@pd.DateCreated.ToLongDateString()
+                    </td>
+                    <td style='width: 15%'>@pd.DateCreated.ToShortTimeString()
+                    </td>
+                    <td style='width: 15%'>@Scheduling.Database.Utility.GetAllYears().Where(x => x.ID == pd.YearFK).First().Value
+                    </td>
+                    <td style='width: 15%'>@Scheduling.Database.Utility.GetProfileTypeNameFromProjectID(pd.ID)
+                    </td>
+                </tr>
+
+        }
+                   
+            }
+        </tbody>
+    </table>
+
+        
+        
+    }
+    
+}

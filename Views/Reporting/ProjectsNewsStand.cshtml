@@ -1,0 +1,69 @@
+﻿@model List<Scheduling.Models.ProjectNewstand>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<h2>
+    There are @Model.Count Current Projects With News Stand Dates
+
+     <img src="@Url.Content("~/images/export-to-pdf.jpg")" alt='export-to-pdf' style='width:25px;padding-left:10px' class='export-to-pdf'/>
+
+      <img src="@Url.Content("~/images/export-to-csv.jpg")" alt='export-to-csv' style='width:25px;padding-left:10px' class='export-to-csv'/>
+</h2>
+
+
+<!--used to invoke controllers-->
+@{ 
+    Html.BeginForm("ProjectsCreatedPDF", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToPDF" }); 
+    Html.EndForm();
+
+    Html.BeginForm("ProjectsCreatedCSV", "Reporting", FormMethod.Post, new { enctype = "multipart/form-data", id = "ExportToCSV" });
+    Html.EndForm();
+    
+}
+
+
+@{
+    
+    <!--use zebra-striped class for row-styling'-->
+    
+    if (Model.Count > 0)
+    {
+        
+    <table cellspacing='0' cellpadding='0' class='zebra-striped'>
+        <thead>
+            <tr style='background-color: #808080'>
+                <th>
+                    Project
+                </th>
+                <th>
+                    N/S Date
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                  
+
+        foreach (Scheduling.Models.ProjectNewstand pn in Model)
+        {
+                        
+                <tr>
+                    <td style='width: 25%'>@pn.ProjectName
+                    </td>
+                    <td style='width: 25%'>@pn.NewstandDate
+                    </td>
+                </tr>
+
+        }
+                   
+                   
+            }
+        </tbody>
+    </table>
+
+        
+        
+    }
+    
+}

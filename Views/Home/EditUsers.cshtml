@@ -1,0 +1,104 @@
+﻿@model List<Scheduling.Models.User> 
+@{
+    ViewBag.Title = "EditUsers";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+   // List<Scheduling.Models.UserToGroups> UserGroupList = ViewBag.UserGroupList;
+}
+@Html.Partial("_TableHeaderPartial", ViewData["header"] = "Users")
+<table id="user-table">
+    <tr>
+        <th id="th-username">
+            User Name
+        </th>
+        <th id="th-role">
+            Email
+        </th>
+        <th id="th-email">
+            Group(s)
+        </th>
+        <th>
+            Role
+        </th>
+        <th>
+        </th>
+    </tr>
+    @{ foreach (Scheduling.Models.User u in Model)
+       {
+           
+          
+        <tr>
+            <td>@u.UserName
+            </td>
+            <td>@u.Email
+            </td>
+            @{ Html.BeginForm("EditSingleUser", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "EditSingleUser" }); }
+            <td>
+                <select name='groups' id='groups' multiple='multiple' size='3'>
+                  <option value=''>NO GROUP</option>
+                  @{
+                      foreach (Scheduling.Models.Group g in ViewBag.Groups)
+                      {
+                          bool IsInGroup = Scheduling.Database.Utility.IsUserInGroup(u.ID, g.ID);
+                          if(IsInGroup)
+                          {
+                               <option selected='selected' value='@g.ID'>@g.Description</option>
+                              
+                          }
+
+                          else
+                          {
+                               <option value='@g.ID'>@g.Description</option>
+                              
+                          }
+
+                      }
+                      
+                      
+                      
+                      } 
+                                
+                                
+                      
+                </select>
+            </td>
+            <td>
+                <select class='td-role' name='role' id='role'>
+                    @{
+                    
+                      foreach (var r in ViewBag.Roles)
+                      {
+                          if (u.RoleFK == r.ID)
+                          {
+                        <option  selected="selected" value='@r.ID'>@r.ShortDesc</option>
+                   
+                          }
+
+                          else
+                          {
+
+                        <option  value='@r.ID'>@r.ShortDesc</option>
+                          }
+
+
+                      }
+                    
+                    }
+                </select>
+            </td>
+            <td>
+                <input type='hidden' value='@u.ID' name='id' />
+                <input type="submit" value='Edit Group/Role' />
+            </td>
+            @{ Html.EndForm(); }
+            <td>
+                @{ Html.BeginForm("DeleteSingleUser", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "DeleteSingleUser" }); }
+                <input type='hidden' value='@u.ID' name='hfDeleteSingleUser' />
+                <input type="submit" value='Remove User' />
+                @{ Html.EndForm(); }
+            </td>
+        </tr>
+       
+       }
+    }
+</table>

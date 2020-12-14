@@ -1,0 +1,69 @@
+﻿@model List<Scheduling.Models.FieldAlias>
+@{
+    ViewBag.Title = "List Field Aliases";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    List<Scheduling.Models.PublicationCode> PubcodeList = Scheduling.Database.Utility.GetAllPublicationCodes();
+    List<Scheduling.Models.MilestoneField> MileFieldList=Scheduling.Database.Utility.GetAllMilestoneFields();
+}
+
+
+@{ if (Model.Count==0)
+   {
+       <p>There are no results</p>
+    }
+}
+
+<div class='container'>
+    <div class='sixteen columns scroll-to-on-load'>
+        @{
+            if (Model.Count > 0)
+            {
+                <p>On Certain Views And Reports the system can use these values as the displayed values</p>  
+                
+                 @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Field Aliases")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr> 
+                      <th>Publication Code</th>
+                      <th>Milestone Field</th>
+                        <th>
+                          DisplayAlias
+                        </th>
+                       
+                                               
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.FieldAlias fa in Model)
+                        {
+
+                            string FieldVal = MileFieldList.Where(x => x.ID == fa.FieldFK).First().Description;
+                            string PubcodeVal = PubcodeList.Where(x => x.ID == fa.PubCodeFK).First().ShortDesc;
+                        <tr>
+                            <td>@PubcodeVal</td>
+                            <td>@FieldVal</td>
+                            <td>@fa.AliasValue
+                            </td>
+                            
+                           
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+      
+    
+</div>

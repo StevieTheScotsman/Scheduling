@@ -1,0 +1,398 @@
+﻿@{
+    ViewBag.Title = "User Information";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<div class='container'>
+    <div class='sixteen columns help-header-container'>
+        <h3 class='help-header'>
+            User Documentation
+        </h3>
+    </div>
+    <div class='sixteen columns help-summary'>
+        <!--Introduction--************************************-->
+        <p class='top-padding-only'>
+            This documentation will provide the user with a reference on how to work with the
+            Production Schedule.<br />
+            Once you are conversant with the terminology you can navigate to the relevant sections.
+
+        </p>
+        <div class='help-overview'>
+            <p class='vertical-padding'>
+                The Production Schedule is similar in structure to Microsoft Project in that each
+                deliverable is termed a "<span class='italic blue'>milestone</span>".<br />
+                These deliverables have a due date and form part of a single <span class='italic blue'>
+                    "project"
+                </span>.<br />
+                <br />
+            </p>
+            <div>
+                <img src="@Url.Content("~/images/terms.png")" alt="terms" class='help-img' />
+            </div>
+            A <span class='italic blue'>"baseline"</span> is a term used to describe a project
+            template.<br />
+            <br />
+            In the system predetermined baselines will be created and one or more projects can
+            be created from these baselines.<br />
+            Each baseline will have a set of pre-assigned milestones.<br />
+            <br />
+            There are <span class='italic blue'>"baseline types"</span> and the most common
+            one would be "magazine".<br />
+            <br />
+            When baselines are created they will be assigned a baseline type so the system can
+            use logic based on this designation.<br />
+            <br />
+            <span class='italic blue'>"Major Milestones"</span> or <span class='italic blue'>
+                "Main
+                Items"
+            </span> are Major Deliverables.<br />
+            <span class='italic blue'>"Minor Milestones"</span> or <span class='italic blue'>
+                "Sub
+                Items"
+            </span> are Minor Deliverables that will have a Major Milestone as a Parent.<br />
+            <p class='vertical-padding'>
+                In The <a href="#general-baseline-management" class='helplink open-hidden-baseline'>
+                    General Baseline Managment Section
+                </a>you will see reference to these items.
+                The diagram below shows how they are represented in the slider
+            </p>
+            <div>
+                <img src="@Url.Content("~/images/help-terms-slider.png")" alt="terms" class='help-img' />
+            </div>
+            <br />
+            <div class='help-images-terms'>
+                <p>
+                    Shown below is a diagram that outlines the relationship between milestones
+                </p>
+                <p class='italic'>
+                    Each milestone has the following values and some may be optional
+                </p>
+                <ul class='list-disc'>
+                    <li>Due Date</li>
+                    <li>Dependancy</li>
+                    <li>Calculation</li>
+                </ul>
+                <p>
+                    We can see that the top level milestone is News Stand Date and this will be typical
+                    for a project with a baseline type of Magazine.<br />
+                    This milestone has no dependancy or calculation since it is the top level node.
+                </p>
+                <p>
+                    The other 2 milestones do have dependencies and calculations attached
+                </p>
+                <p class='italic'>
+                    In this case the 'Last Sub Mail Date" will always be 10 days earlier than the News
+                    Stand Date and the Supplied Materials Due Date will be 27 days earlier than the
+                    News Stand Date.
+                </p>
+                <div>
+                    <img src="@Url.Content("~/images/help-mil-rel-table.png")" alt="terms" class='help-img' />
+                </div>
+                <img src="@Url.Content("~/images/help-mil-rel.png")" alt="terms" class='help-img' />
+            </div>
+        </div>
+        <!--non linear example-->
+        <div id='major-milestone-no-calc' class='topborder'>
+            <p class='top-padding-only larger-font'>
+                Below is a general representation of the node structure for the main items(major
+                miletones) for a baseline
+            </p>
+            <p>
+                <img src="@Url.Content("~/images/major-milestone-no-calc.png")" alt="terms" class='help-img' />
+                A typical baseline will have Major Milestones that have dependencies as well as
+                Major Milestones that have no dependencies.<br />
+                MM is shorthand for Major Milestone.
+            </p>
+            <!--start -->
+            For this baseline to be valid the baseline would need to be set up as follows
+            <p class='italic'>
+                Step 1
+            </p>
+            <p>
+                MM 1 would have no dependancies and be the starting (root) node. For a Magazine
+                Type this would typically be the NewsStand Date.
+            </p>
+            <p class='italic'>
+                Step 2
+            </p>
+            <p>
+                MM 2 and MM 4 would be set up. Their dependency would be MM1 and a calculation would
+                be assigned.
+            </p>
+            <p class='italic'>
+                Step 3
+            </p>
+            <p>
+                MM 5 would be set up .The dependency would be MM 4. The calculation firing order
+                MUST be greater than the one assigned to MM 4 so that when the system runs the calculations it
+                generates the due dates in the correct order. In the application we can run
+                a <a href='#baseline-verification' class='open-hidden-baseline'>Baseline Verification Test </a> at any time to check this set up.
+            </p>
+            <!--stop -->
+        </div>
+        <!--Baseline links start-->
+        <div>
+            <img class='help-baseline-container-toggle-click' src="@Url.Content("~/images/toggle.gif")" title='Show Baseline Help' alt='baseline help' style='width:25px;position:relative;top:5px' /><span class='toggle-span'>Baseline Documentation</span>
+        </div>
+        <div class='help-baseline-container-toggle'>
+            <div class='vertical-padding float-container linkhelpcontainer'>
+                <a class='floatleft helplink rounded-corners helplink-background' href="#general-baseline-management">
+                    General Baseline Management Overview
+                </a> <a class='floatleft helplink rounded-corners helplink-background'
+                        href="#baseline-set-up">Creating A Baseline</a> <a class='floatleft helplink rounded-corners helplink-background'
+                                                                           href="#add-subtract-milestone-from-baseline">
+                    Add/Remove Major Milestones From A
+                    Baseline
+                </a> <a class='floatleft helplink rounded-corners helplink-background' href="#add-subtract-subitems-from-baseline">
+                    Add/Remove Minor Milestones From A Baseline
+                </a> <a class='floatleft helplink rounded-corners helplink-background'
+                        href="#baseline-verification">Baseline Verification</a>
+            </div>
+            <!--stop-->
+            <div id='general-baseline-management'>
+                <p class='bottomborder italic larger-font'>
+                    General Baseline Management
+                </p>
+                <img src="@Url.Content("~/images/help-baseline-options.png")" class='help-img' alt='baseline options' />
+                <p class='vertical-padding'>
+                    Depending on the role assigned to the user they will have the options outlined in
+                    the diagram above.<br />
+                    Baselines assigned to projects cannot be altered.If you are looking to create a
+                    similar baseline an option is to clone a baseline and make small adjustments. If
+                    they baseline is of type Magazine the option to verify the baseline can be taken.
+                </p>
+                <p class='vertical-padding'>
+                    When setting up a baseline the main items can be verified by clicking the verify
+                    baseline button.<br />
+                    This process is not bulletproof and care should be taken setting up the baseline,especially
+                    the sub items.<br />
+                </p>
+            </div>
+            <div id="baseline-set-up">
+                <p class='bottomborder italic larger-font'>
+                    Creating A Baseline Based On Magazine Type
+                </p>
+                <div class='help-step'>
+                    <p class='vertical-padding'>
+                        You can create a new baseline from scratch or clone(copy) an existing baseline.<br />
+                        If you had created a baseline that is very similar to the one you wish to create
+                        cloning would be a better option
+                    </p>
+                    <p class='vertical-padding'>
+                        To create one from scratch do the following...
+                    </p>
+                    <ul class='list-disc'>
+                        <li>Go To the Baselines Tab and Select "Create Baseline Based On A Baseline Type"</li>
+                        <li>Enter a Name in the Description Field,Select Magazine and Click Add Baseline</li>
+                    </ul>
+                    <p>
+                        The Baseline Listing will appear and the InUse field will state No since no projects
+                        are assigned
+                    </p>
+                </div>
+            </div>
+            <div id='add-subtract-milestone-from-baseline'>
+                <p class='bottomborder italic larger-font'>
+                    Adding/Removing Major Milestones To/From A Baseline
+                </p>
+                <div class='help-step'>
+                    <p class='vertical-padding'>
+                        Once a baseline is created you can add the Main Milestones
+                    </p>
+                    <p class='vertical-padding'>
+                        To add major milestones do the following...
+                    </p>
+                    <ul class='list-disc'>
+                        <li>Go To the Baselines Tab,Select "Manage Baselines" and Click On Edit Main Items</li>
+                        <li class='nodisc'>
+                            <img src="@Url.Content("~/images/add-baseline-sub-items-help.png")" class='help-img' alt='add sub items' />
+                        </li>
+                    </ul>
+                    <p class='verticalpadding'>
+                        The screen will appear giving us the option to add a regular milestone or add a
+                        milestone with dependencies
+                    </p>
+                    <p class='verticalpadding'>
+                        Best Practise is to click the validate button before clicking the edit baseline
+                        button as this will validate the baseline and indicate any potential errors as shown
+                        below.
+                    </p>
+                    <div>
+                        <img src="@Url.Content("~/images/help-baseline-warning.png")" alt="terms" class='help-img' />
+                    </div>
+                    <p class='verticalpadding'>
+                        In the example below we have set up the milestones and clicked the validate button.Each
+                        line item will show a check flag and we can proceed to click the "edit baseline"
+                        button.
+                    </p>
+                    <p class='italic'>
+                        As you add baselines ensure to increment the display order and the calc order.It
+                        is important that the line before has a value less than the one after.
+                    </p>
+                    <p>
+                        If you would like to remove an item simply click the black minus button
+                    </p>
+                    <p>
+                        When you are finished adding/removing baselines click on the "edit baseline button"
+                        to update the entries
+                    </p>
+                    <p class='larger-font italic'>
+                        A checkmark will appear briefly indicating that the update has been successful.
+                    </p>
+                    <div>
+                        <img src="@Url.Content("~/images/help-baseline-success.png")" alt="terms" class='help-img' />
+                    </div>
+                    <p>
+                    </p>
+                </div>
+            </div>
+            <div id="add-subtract-subitems-from-baseline">
+                <p class='bottomborder italic larger-font'>
+                    Baseline Minor Milestone(Subitem) Management
+                </p>
+                <img src="@Url.Content("~/images/help-manage-sub-items.png")" class='help-img' alt='baseline options' />
+                <p>
+                    When editing the subitems(minor milestones) for a baseline a name and a parent are
+                    required<br />
+                    When choosing a dependency you must also choose a calculation.
+                </p>
+                <p>
+                    On this page the existing subitems are shown and these can be edited on a line by
+                    line basis.
+                    <br />
+                    When adding a subitem the system will create a calculation firing order by adding
+                    5 to the current maximum firing order value.
+                </p>
+            </div>
+            <div id='baseline-verification'>
+                <p class='bottomborder italic larger-font'>
+                    Baseline Verification
+                </p>
+                <p>
+                    Once the items and subitems are setup and before creating projects it is worth running
+                    the Verify Baseline check present available on the <a href="#general-baseline-management">
+                        General Baseline Management Screen
+                    </a>.This will verify that the Major Milestones
+                    firing order is correct
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <img class='help-project-container-toggle-click' src="@Url.Content("~/images/toggle.gif")" title='Show Project Help' alt='project help' style='width:25px;position:relative;top:5px' /><span class='toggle-span'>Project Documentation</span>
+        </div>
+
+        <div class='help-project-container-toggle'>
+
+
+            <div>
+
+                <p class='top-padding-only'>
+                    Once the baseline for the project is set up you can follow the steps in order to create one or more projects for the baseline<br />
+                    Navigate to Create Multiple Projects From Single Baseline which is displayed under the projects tab<br />
+
+                    By pressing the ctrl key on the timeline dropdown you can create more than one project.<br />Typically you would select the year ,profile,all the timelines,select a pub code then proceed to step 2.
+                    <br />
+
+                </p>
+                <img src="@Url.Content("~/images/help-create-project-step-one.png")" alt="terms" class='help-img' />
+            </div>
+
+
+            <div>
+
+                <p>Step 2 will give the user the ability to populate the newstand dates if the project is of type magazine as shown below</p>
+                <img src="@Url.Content("~/images/help-create-project-step-two.png")" alt="terms" class='help-img' />
+
+                <p>Clicking the Create Projects button will create the projects in the system</p>
+            </div>
+
+
+            <!--Editing A Project Start -->
+
+            <div id="editprojects">
+                <h3 style='border-bottom:1px solid #ddd;'>Edit Dates on an Existing Project</h3>
+
+                <p style="font-weight:bold">Navigation</p>
+
+                <pre>
+                     Go to the projects tab and select the manage project link.
+                     Once you are on the manage project page you can narrow down the list of available projects by using the dropdowns at the top of the page
+                     
+                     </pre>
+
+                <p style="font-weight:bold">Section Information</p>
+
+                <pre>Each project listing contains 3 read only sections that are expandable.
+                           1.Major Milestones and Corresponding Dates
+                           2.Dependencies
+                           3.Baseline Information and Current Dates    </pre>
+
+                <p style="font-style:italic">Typically you would use this information to verify the other milestones that could be affected if you decide to update the date and keep the dependency</p>
+
+                <p style="font-weight:bold">Manage Single Project</p>
+
+                <pre>To make actual changes on a single project click the manage link for the project you wish to edit
+               
+                 A new tab will open and you will be presented with the following icons.
+                 </pre>
+
+                <div style="overflow:hidden">
+
+
+                    <img src="@Url.Content("~/images/5icons.png")" style="display:block" />
+
+                    <p style="font-style:italic">From left to right here are the options</p>
+
+                    <p>The calendar icon will allow you to edit individual dates.Click on the existing date and a datepicker will appear giving you the option to update the date with or without breaking the dependencies</p>
+
+                    <p>The note icon will allow you to edit individual notes .It is worth bearing in mind that the quad job number may change if some of the major milestone dates are to be changed.</p>
+
+                    <p>The clock with the green arrow gives you the ability to windback the dates effectively starting fresh.It takes the current newsstand date as a base and uses the current baseline to determine the new calculations </p>
+
+                    <p>The red name icon allows the user to rename the project </p>
+
+                    <p>The combined add/remove icon gives us the ability to add and remove milestones for this project only.It may be worth considering creating another baseline instead of taking this approach.</p>
+
+                    <p>The white clock allows the user to see the history associated with the current project</p>
+
+                    <p>The red close tab is self explanatory</p>
+                </div>
+
+
+
+            </div>
+
+
+        </div>
+
+        <div class="help-project-reporting-toggle">
+            <img class='help-baseline-reporting-toggle-click' src="@Url.Content("~/images/toggle.gif")" title='Show Reporting Help' alt='reporting help' style='width:25px;position:relative;top:5px' /><span class='toggle-span'>Reporting Documentation</span>
+        </div>
+
+        <div class="help-project-reporting-information">
+            <p style="font-weight:bold;padding-top:10px">Navigation</p>
+
+            <p>Click on the Reporting tab on the application and then click on excel style reports link.</p>
+
+
+            <p>
+                The generated reports are dependant on the projects generated by the dropdowns and filter so ensure that you populate the page with the relevant selection.
+                There are 2 current reports that are used.
+            </p>
+
+            <img src="@Url.Content("~/images/report-icons.png")" />
+
+            <pre>
+            
+             The Pdf With Newstand Dates (Report For Circ) shows all the newstand dates for all the selected publications and has custom display  logic for certain pubs like discover.
+             Please ensure you double check these dates before putting on the global drive
+
+             The Pdf With Due Dates For Listed Projects shows a pdf with 5 projects on a page with a single header.
+             This was updated in Jan 2015. 
+  
+             </pre>
+
+        </div>
+
+    </div>
+</div>

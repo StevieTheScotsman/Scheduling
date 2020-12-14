@@ -1,0 +1,275 @@
+﻿@{
+    ViewBag.Title = "Application Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+       
+}
+<!--Just pulls raw html from appsettings.txt Wanted some control of layout and did not want to pull all web config app settings data..-->
+<div class='container'>
+
+  
+    <div class='sixteen columns'>
+        <table class='condensed zebra-striped' id='results'>
+            <caption>
+                Main Relevant Application Settings</caption>
+            <thead>
+                <tr>
+                    <th>
+                        Setting
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Value
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+              <!--Email Action Value-->
+                <tr>
+                    <td>
+                        EmailActionValue
+                    </td>
+                    <td>
+                        Current Just Uses Email
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("EmailActionValue")
+                    </td>
+                </tr>
+
+                <!--Email Sender-->
+                <tr>
+                    <td>
+                        EmailSender
+                    </td>
+                    <td>
+                        Email From For Notifications
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("EmailSender")
+                    </td>
+                </tr>
+
+
+                <!--Magazine Project Type-->
+                <tr>
+                    <td>
+                        MagazineProjectType
+                    </td>
+                    <td>
+                        System Value For Magazine Project Type
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("MagazineProjectType")
+                    </td>
+                </tr>
+
+                <!--Email Server-->
+                <tr>
+                    <td>
+                        SmtpHost
+                    </td>
+                    <td>
+                        Email Server IP would be scdevel for testing
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("SmtpHost")
+                    </td>
+                </tr>
+
+                 <!--Default Pub Code-->
+                <tr>
+                    <td>
+                        DefaultPubCode
+                    </td>
+                    <td>
+                        Prepopulates Project PubCode Dropdown(Asy=3,fsm=2)
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("DefaultPubCode")
+                    </td>
+                </tr>
+
+                   <!--Default Year-->
+                <tr>
+                    <td>
+                        DefaultYear
+                    </td>
+                    <td>
+                        If Empty Default to Current Year(2013=2,2014=3)
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("DefaultYear")
+                    </td>
+                </tr>
+
+
+
+                      <!--NonDeletableEventIDS-->
+                <tr>
+                    <td>
+                        NonDeletableEventIDS
+                    </td>
+                    <td>
+                        Currently Ensures Create Change Request Cannot Be Deleted(Comma Separated)
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("NonDeletableEventIDS")
+                    </td>
+                </tr>
+
+                <!--Csv Filename-->
+                  <tr>
+                    <td>
+                        ProjectNewsStandCSVFilename
+                    </td>
+                    <td>
+                        Prefix for Project NewsStand CSV Filename(Appended with Current Date)
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("ProjectNewsStandCSVFilename")
+                    </td>
+                </tr>
+
+                <!--Csv Column One Header-->
+
+                <tr>
+                    <td>
+                        ProjectNewstandCsvColOneHeader 
+                    </td>
+                    <td>
+                        CSV First Column Header Name
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("ProjectNewstandCsvColOneHeader")
+                    </td>
+                </tr>
+
+
+                <!--Csv Column Two Header-->
+
+                <tr>
+                    <td>
+                        ProjectNewstandCsvColTwoHeader 
+                    </td>
+                    <td>
+                        CSV Second Column Header Name
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("ProjectNewstandCsvColTwoHeader")
+                    </td>
+                </tr>
+
+
+                 <!--Csv Export Dir-->
+
+                <tr>
+                    <td>
+                        CsvExportDirectory 
+                    </td>
+                    <td>
+                        CSV Export Directory
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("CsvExportDirectory")
+                    </td>
+                </tr>
+
+
+                  <!--Link And Calculate-->
+
+                <tr>
+                    <td>
+                        LinkAndCalculate
+                    </td>
+                    <td>
+                        On Project Generation Should We Auto Fill In Other Milestones
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("LinkAndCalculate")
+                    </td>
+                </tr>
+
+                <!--Email Template Directory-->
+
+                  <tr>
+                    <td>
+                       EmailTemplateDirectory
+                    </td>
+                    <td>
+                        Email Template Directory
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("EmailTemplateDirectory")
+                    </td>
+                </tr>
+
+                <!--Project Lock Template -->
+
+                  <tr>
+                    <td>
+                       ProjectLockStatusTemplateFile
+                    </td>
+                    <td>
+                        Project Lock Status Email Notification Html Filename
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("ProjectLockStatusTemplateFile")
+                    </td>
+                </tr>
+
+                <!--Project Status Html Template File-->
+
+                   <tr>
+                    <td>
+                       ProjectStatusTemplateFile
+                    </td>
+                    <td>
+                        Project Status Email Notification Html Template Filename
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("ProjectStatusTemplateFile")
+                    </td>
+                </tr>
+
+                <!--Doc Directory-->
+                     <tr>
+                    <td>
+                       DocumentationDirectory
+                    </td>
+                    <td>
+                        Documentation Help File Location
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("DocumentationDirectory")
+                    </td>
+                </tr>
+
+
+                 <!--Csv File Removal Age-->
+                     <tr>
+                    <td>
+                       CsvFilesRemovalAge
+                    </td>
+                    <td>
+                        On CSV File Generation deletes files over x days
+                    </td>
+                    <td>
+                        @Scheduling.StringFunctions.Utility.GetAppSettingValue("CsvFilesRemovalAge")
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <!--paging -->
+    <div id="pageNavPosition">
+    </div>
+</div>
+<script type="text/javascript"><!--
+    var pager = new Pager('results', 5);
+    pager.init();
+    pager.showPageNav('pager', 'pageNavPosition');
+    pager.showPage(1);
+</script>

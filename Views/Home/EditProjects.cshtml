@@ -1,0 +1,186 @@
+﻿@model List<Scheduling.Models.EditProjectWithMilestones>
+@{
+    ViewBag.Title = "Edit Projects";
+    int counter = 0;
+    Layout = "~/Views/Shared/_EditProjectLayout.cshtml";
+}
+<h2>
+    Edit Projects</h2>
+@Html.Partial("_TableHeaderPartial", ViewData["header"] = "Projects")
+<div style='border-bottom: 4px solid #ccc; padding-bottom: 15px'>
+    @{ Html.BeginForm("EditProjects", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditProjects", id = "EditProjectFormFilter" }); }
+    <!--Filter by timeline-->
+    <select name='timeline' class='edit-project-select-filter'>
+        <option value=''>All Timelines</option>
+        @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedProjectRangeDropdown(ViewBag.CurrentTimeline))
+    </select>
+    <!--Filter by pubcode-->
+    <select name='pubcode' class='edit-project-select-filter'>
+        <option value=''>All Pubcodes</option>
+        @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedPublicationDropdown(ViewBag.CurrentPubcode))
+    </select>
+    <!--Filter by year-->
+    <select name='year' class='edit-project-select-filter'>
+        <option value=''>All Years</option>
+        @Html.Raw(Scheduling.Html.ViewDropdown.BuildPreselectedYearDropdown(ViewBag.CurrentYear))
+    </select>
+    @*<input type='submit' value='Filter Results' style='padding:2px'/>*@
+    @{ Html.EndForm(); }
+</div>
+@if (Model.Count == 0)
+{
+    <p class='italic'>
+        No Results
+    </p>
+}
+
+else
+{
+    <p class='italic'>
+        Found @Model.Count Project(s)</p>
+
+}
+<div class='edit-projects-container'>
+    @foreach (Scheduling.Models.EditProjectWithMilestones epm in Model)
+    {
+
+
+        counter = counter + 1;
+        <p class='bold'>
+            Project @counter of @Model.Count</p>
+        
+        <div class='edit-projects-show-history-container'>
+            <img src="@Url.Content("~/images/history.png")"alt='show-history'/>
+            <div class='edit-project-show-history'>
+                @{
+        List<Scheduling.Models.ProjectHistory> HisList = Scheduling.Database.Utility.GetProjectHistoryFromProjectID(epm.ID);
+
+        int HisCounter = 0;
+
+        foreach (Scheduling.Models.ProjectHistory ph in HisList)
+        {
+            HisCounter = HisCounter + 1;
+                    <div class='edit-history-item-container'>
+                        <div class='edit-history-item'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    Date</p>
+                            }
+                            <p>@ph.EntryDate</p>
+                        </div>
+                        <div class='edit-history-item is-comment'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    Comments</p>
+                            }
+                            <p>@ph.Comments</p>
+                        </div>
+                        <div class='edit-history-item'>
+                            @if (HisCounter == 1)
+                            {
+                                <p class='bold'>
+                                    UserName</p>
+                            }
+                            <p>@ph.Username</p>
+                        </div>
+                    </div>
+        }
+                }
+            </div>
+        </div>
+        <div class='edit-projects-inner-container'>
+            @{ Html.BeginForm("ProcessEditSingleProject", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditSingleProject" }); }
+            <div class='column-container'>
+                <p>
+                    Year</p>
+                @epm.Year
+            </div>
+            <div class='column-container'>
+                <p>
+                    Version</p>
+                @epm.CurrentVersion
+            </div>
+            <div class='column-container'>
+                <p>
+                    Creation Date</p>
+                @epm.DateCreated
+            </div>
+            <div class='column-container'>
+                <p>
+                    Name</p>@Html.TextBox("Name", epm.Name)</div>
+            <div class='column-container'>
+                <p>
+                    Project Status</p>
+                <select name='ProjectStatus'>
+                    @foreach (Scheduling.Models.ProjectStatus ps in ViewBag.StatusList)
+                    {
+                        if (ps.ID == epm.CurrentProjectStatus)
+                        {
+                        <option selected="selected" value='@ps.ID'>@ps.Description</option>
+
+                        }
+
+                        else
+                        {
+                        <option value='@ps.ID'>@ps.Description</option>  
+                        }
+
+
+                    }
+                </select></div>
+            <input type='hidden' value='@epm.ID' name='ID'/>
+            @{ Html.EndForm(); }
+        </div>
+        <!--end single project main properties container-->
+        
+     
+        <div style='clear: both' />
+               //form submit triggered by image click in editprojects.js
+        <div class='edit-projects-milestone-container'>
+            <div class='edit-projects-expand-logo-container'>
+                <img alt='toggle' src="@Url.Content("toggle.gif")" class='milestone-toggle' />
+                @{ Html.BeginForm("EditProjectsCalculate", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "EditProjectsCalculate" }); }
+                <img alt='toggle' src="@Url.Content("~/images/calc.png")" class='milestone-calc' />
+                @{ string NsDate = epm.MileValueList.Where(x => x.MilestoneFieldFK == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue"))).First().DueDate;
+                    <input type='hidden' value='@NsDate' name='hfDueDate' class='hfDueDate' />
+                }
+                <input type='hidden' value='@epm.ID' name='id'/>
+                @{Html.EndForm();}
+                <img src="@Url.Content("~/images/update.png")" class='edit-project-update' alt='update' />
+            </div>
+            @foreach (Scheduling.Models.MilestoneValue mv in epm.MileValueList)
+            {
+
+                Scheduling.Models.MilestoneField mf = Scheduling.Database.Utility.GetAllParentMilestoneFields().Where(x => x.ID == mv.MilestoneFieldFK).First();
+
+                string CurrentDesc = mf.Description;
+
+                if (mf.ID == Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue")))
+                {
+                    
+                <div class='milestone-item'>
+                    <p>@CurrentDesc</p>
+                    <input type='text' class='datepicker is-newsstand-item' value='@mv.DueDate' />
+                </div>
+                }
+
+                else
+                {
+                <div class='milestone-item'>
+                    <p>@CurrentDesc</p>
+                    <input type='text' class='datepicker ' value='@mv.DueDate' />
+                </div>
+                    
+                }
+
+
+
+
+            }
+        </div>
+        
+           
+    }
+</div>

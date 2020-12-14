@@ -1,0 +1,20 @@
+﻿@{ Html.BeginForm("RenameProject", "Project", FormMethod.Post, new { enctype = "multipart/form-data", name = "rename-project-form", id = "rename-project-form" }); }
+
+<div style="overflow:hidden">
+    <p style="float:left;margin-right:20px">
+        Project Name
+    </p>
+
+    <div style="float:left;">
+        <input type="text" value="@Model.Name" name="ProjectName"/>
+        <input type="hidden" value="@Model.ID" name="ProjectID"/>
+    </div>
+
+    <div style="float:left">
+        <img style='margin-left: 10px; margin-right: 5px; float: left;width:23px; margin-top: 2px'
+             alt='rename project' src="@Url.Content("~/images/save.png")" class='rename-project' />
+        <img style='display: none; width: 30px' src="@Url.Content("~/images/check.png")" alt='check' class='img-ajax-success' />
+    </div>
+</div>
+
+@{Html.EndForm();}

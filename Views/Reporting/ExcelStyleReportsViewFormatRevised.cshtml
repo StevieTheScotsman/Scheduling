@@ -1,0 +1,147 @@
+﻿<script src="@Url.Content("~/Scripts/jquery-1.10.2.min.js")" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="~/Content/Reporting/Reporting.css" />
+
+@model List<Scheduling.Models.ProjectDisplay>
+@using Scheduling.Models;
+@{
+    ViewBag.Title = "Reports by Pubcode";
+    int NewsstandID = Convert.ToInt32(Scheduling.StringFunctions.Utility.GetAppSettingValue("NewsstandOnSaleDateMilestoneValue"));
+
+}
+<div class="renderBody">
+    <div class="renderBodyCenter">
+        @{
+
+            int RunningCounter = 0;
+            int NumberOfItems = 5;
+            bool CreatePageBreak = false;
+            foreach (ProjectDisplay pd in Model)
+            {
+                if (RunningCounter == 0)
+                {
+                    <div style="@(CreatePageBreak ? "page-break-after: always" : "")"></div>
+                    int MajorMilestoneCount = Scheduling.Html.ReportingUtilities.GetNumberOfMajorMilestonesForProject(pd.ID);
+                    int getColIdByCount = MajorMilestoneCount;
+
+                    int cellCount = 0;
+                    switch (MajorMilestoneCount)
+                    {
+                        case 10:
+                            cellCount = 134;
+                            break;
+                        case 11:
+                            cellCount = 128;
+                            break;  
+                        case 12:
+                            cellCount = 122;
+                            break;
+                        case 13:
+                            cellCount = 116;
+                            break;
+                        case 14:
+                            cellCount = 110;
+                            break;
+                        case 15:
+                            cellCount = 104;
+                            break;
+                        case 16:
+                            cellCount = 98;
+                            break;
+                        case 17:
+                            cellCount = 92;
+                            break;
+                        case 18:
+                            cellCount = 86;
+                            break;
+                        case 19:
+                            cellCount = 80;
+                            break;
+                        case 20:
+                            cellCount = 74;
+                            break;
+                        case 21:
+                            cellCount = 68;
+                            break;
+                        case 22:
+                            cellCount = 62;
+                            break;
+                        case 23:
+                            cellCount = 56;
+                            break;
+                        case 24:
+                            cellCount = 50;
+                            break;
+                        case 25:
+                            cellCount = 44;
+                            break;
+
+                    }
+
+                    <input type="hidden" value="@getColIdByCount" id="getColIdByCountValue" />
+
+                    <div class="leftMarginBlock">
+                        <table class="milestoneTable">
+                @{
+                    int NewColspanVal = MajorMilestoneCount + 1;
+                    if (MajorMilestoneCount > 0)
+                    {
+                        List<Scheduling.Models.MilestoneValue> MilestoneValueWithoutParents = Scheduling.Database.Utility.GetMilestoneValuesByProjectID(pd.ID).Where(p => p.ParentID == null).OrderByDescending(x => x.DisplaySortOrder).ToList();
+                            <tr>
+                                <td colspan="@NewColspanVal">@Html.Partial("_ReportingProjectHeader", pd) </td>
+                            </tr>
+                            <tr id="msRow">
+                    @{ 
+                        foreach (Scheduling.Models.MilestoneValue TopItem in MilestoneValueWithoutParents)
+                        {
+                            string TopValue = Scheduling.Database.Utility.GetAllMilestoneFields().Find(x => x.ID == TopItem.MilestoneFieldFK).Description;
+                            if (TopItem.MilestoneFieldFK == NewsstandID)
+                            {
+                                TopValue = Scheduling.Database.Utility.GetAliasByPubCodeAndMilestoneField(pd.PubCodeFK, TopItem.MilestoneFieldFK, TopValue);
+
+                            }
+
+                                <td class="milestoneRight" ><div style="width:@cellCount; word-wrap: break-word;">@TopValue</div></td>
+                        }
+                      }
+                            </tr>
+                    }
+
+                 }
+                        </table>
+                    </div>
+                }
+                
+                RunningCounter++;
+
+
+                @Html.Partial("_ReportingProjectNumberInfo", pd)
+
+                int? CurrentPub = pd.PubCodeFK;
+                int NextIndex = Model.IndexOf(pd) + 1;
+            
+                
+                if (NextIndex < Model.Count)
+                {   
+                    ProjectDisplay NextPD = Model[NextIndex];
+                    int NextPub = NextPD.PubCodeFK.Value;
+
+                    if (CurrentPub != NextPub || RunningCounter == NumberOfItems)
+                    {
+                        @Html.Partial("_ReportingProjectFooter", pd)
+                        CreatePageBreak = true;
+                        RunningCounter = 0;
+                    }
+
+                }
+                
+                if(NextIndex == Model.Count)
+                {
+                     @Html.Partial("_ReportingProjectFooter", pd)
+                    
+                }
+            }
+
+        }
+    </div>
+
+</div>

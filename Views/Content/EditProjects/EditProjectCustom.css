@@ -1,0 +1,71 @@
+﻿div#main 
+{
+    padding:top:0px;
+    margin-top:-50px;
+    border-top:3px double #ccc;
+}
+
+div#main h2
+{
+    font-style:italic;
+}
+
+div.manage-single-project-help
+{
+    
+    border:botton:2px double #ccc;
+   
+}
+
+div.manage-single-project-help-inner
+{
+    display:none;
+     overflow:hidden;
+}
+
+div.manage-single-project-help-inner div
+{
+        
+    float:left;
+    padding:10px;
+    
+}
+
+div.manage-single-project-help-inner div img
+{
+    padding-right:5px;
+}
+
+/*Override funky styles..TODO figure out css deal */
+ul
+{
+    list-style-type:none;
+}
+
+#header hgroup h1
+{
+    color:#0F556F;
+    text-shadow:none;
+}
+
+
+/*note */
+
+.manage-single-project-note
+{
+    padding:7px 0px;
+}
+
+.image-note-container
+{
+    border-top:1px solid #ccc;
+    padding-top:7px;
+}
+
+.yellow-border
+{
+    
+    border:2px solid yellow;
+    
+    
+}

@@ -1,0 +1,63 @@
+﻿@{
+    ViewBag.Title = "Create Multiple Projects From Baseline Step One";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+<!--header -->
+<!--styling based on skeleton 960 grid -->
+<div class="container">
+     <div class='row clearfix'>
+     <p style='font-weight:bold;color:#f00'>@ViewBag.ErrorMessage</p>
+     </div>
+   
+    <div class='sixteen columns'>
+
+       <p style='font-style:italic'>Profiles with at least one item are currently shown</p>
+
+        <h3>
+            Step One</h3>
+    </div>
+    <!--form start-->
+    @{ Html.BeginForm("ProcessMultipleProjectsStepOne", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "CreateMultipleProjectForm" }); }
+    <div class='row'>
+        <!--steps one thro four-->
+        <div class='eight columns create-project-column'>
+            <!--Year start -->
+            <p>
+                Year</p>
+            <select name='year' id='year' class='dropdown'>
+                @Html.Raw(ViewBag.YearDropdownOptions)
+            </select>
+            <!--Profile Start-->
+            <p>
+                Profile</p>
+            <select name='profile' id='profile' class='dropdown'>
+                @Html.Raw(ViewBag.MilestoneTreeSettingsProfileOptions)
+            </select>
+            <!--timeline start -->
+            <p>
+                Choose Timeline(s)</p>
+            <select name='timeline' id='timeline' class='dropdown create-multiple-step-one' multiple="multiple">
+                <option value=''>Choose Timeline(s)</option>
+                @Html.Raw(ViewBag.ProjectRangeOptions)
+            </select>
+            <!--remaining steps-->
+        </div>
+        <div class='eight columns create-project-column'>
+            <!--Pubcode-->
+            <p>
+                Pubcode 
+            </p>
+            <select name='pubcode' class='dropdown' id="pubcode">
+                @Html.Raw(ViewBag.PubCodeDropdownOptions)
+            </select>
+            <p>
+                Product (Optional)
+            </p>
+            <select name='product' class='dropdown'>
+                @Html.Raw(ViewBag.ProductDropdownOptions)
+            </select>
+            <input type='submit' value='Step 2' />
+        </div>
+    </div>
+    @{ Html.EndForm(); }
+</div>

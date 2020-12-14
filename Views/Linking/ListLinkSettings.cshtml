@@ -1,0 +1,82 @@
+﻿@model List<Scheduling.Models.ProjectLinkSettingDisplay>
+
+@{
+    ViewBag.Title = "List Link Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<div class='container'>
+    <div class='sixteen columns scroll-to-on-load'>
+        @{
+            if (Model.Count > 0)
+            {
+            
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Link Settings")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>
+                           Primary Profile Type
+                        </th>
+                        <th>Primary Milestone</th>
+                          <th>
+                           Secondary Profile Type
+                        </th>
+                        <th>Secondary Milestone</th>
+                        <th>Calculation Offset</th>
+                        <th>Publication Code</th>
+                        <th>Timeline(Month)</th>
+                        
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.ProjectLinkSettingDisplay s in Model)
+                        { 
+           
+                        <tr>
+                            <td>@s.Name</td>
+                            <td>@s.PrimaryProfileType
+                            </td>
+                             <td>@s.PrimaryMilestone
+                            </td>
+                             <td>@s.SecondaryProfileType</td>
+                             <td>@s.SecondaryMilestone
+                            </td>
+                            <td>@s.Calculation</td>
+                            <td>@s.PubCode</td>
+                            <td>@s.Timeline</td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+            
+            else
+            {
+                <p style="font-style:italic">There are no current settings</p>
+                
+            }
+
+
+        }
+
+       
+    </div>
+    <div id="pageNavPosition">
+    </div>
+      <script type="text/javascript"><!--
+          var pager = new Pager('results', 10);
+          pager.init();
+          pager.showPageNav('pager', 'pageNavPosition');
+          pager.showPage(1);
+    </script>
+</div>

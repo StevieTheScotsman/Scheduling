@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "Clone Single Milestone Tree Profile";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+
+<h2>
+    Cloning @ViewBag.ExistingProfile.Description</h2>
+
+@Html.ValidationSummary()
+
+<p>
+    Description</p>
+@{ Html.BeginForm("ProcessCloneSingleMilestoneTreeProfile", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessCloneSingleMilestoneTreeProfile" }); }
+
+@Html.TextBox("Description")
+
+<div class='clone-submit-container'>
+    <input type="submit" value='Create Cloned Baseline' />
+    <input type='hidden' value='@ViewBag.ExistingProfile.ID' name='id'/>
+    <input type='hidden' value='@ViewBag.ExistingProfile.ProjectType'  name='ProjectType' />
+</div>
+@{ Html.EndForm(); }
+

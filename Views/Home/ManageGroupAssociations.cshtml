@@ -1,0 +1,160 @@
+﻿@model List<Scheduling.Models.DeptToGroupsToPubCodeDisplay>
+@{
+    ViewBag.Title = "List Groups";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+
+    List<Scheduling.Models.Department> DepList = ViewBag.DepList as List<Scheduling.Models.Department>;
+    List<Scheduling.Models.PublicationCode> PubList = ViewBag.PubList as List<Scheduling.Models.PublicationCode>;
+    List<Scheduling.Models.Group> GroupList = ViewBag.GroupList as List<Scheduling.Models.Group>;
+
+    bool CanAddEntry = (GroupList.Count > 0) && (PubList.Count > 0) && (PubList.Count > 0);
+    
+}
+<!--Add entry-->
+<div class='container' style='border-bottom: 3px double #ccc; margin-bottom: 15px'>
+    <div class='sixteen columns'>
+
+    @{
+        
+        if (CanAddEntry)
+        {
+
+            Html.BeginForm("ManageGroupAssociationsAddEntry", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageGroupAssociationsAddEntry", id = "ManageGroupAssociationsAddEntry" });
+            
+            <p class='bold'>Group</p>
+            
+            <select name="group">
+            @{foreach (Scheduling.Models.Group g in GroupList)
+              {
+                
+                <option value='@g.ID'>@g.Description</option>
+                
+              }
+            
+            }
+
+            </select>
+        
+              //dep 
+            
+            <p class='bold'>Department</p>
+         
+            <select name="dept">
+            @{foreach (Scheduling.Models.Department d in DepList)
+              {
+                
+                <option value='@d.ID'>@d.Description</option>
+                
+              }
+            
+            }
+
+            </select>
+        
+        
+              //pub
+          
+          
+             <p class='bold'>Publication</p>
+         
+            <select name="pubcode">
+            @{foreach (Scheduling.Models.PublicationCode p in PubList)
+              {
+                
+                <option value='@p.ID'>@p.ShortDesc</option>
+                
+              }
+            
+            }
+
+            </select>
+            
+            
+           <input type='submit' value='Add Group Association' />
+        
+            Html.EndForm();
+          
+        }
+        
+    }
+    
+    </div>
+</div>
+<!--stop-->
+
+
+@{ if (Model.Count == 0)
+   {
+    <p>
+        There are no results</p>
+   }
+}
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Group Associations")
+                
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                            Group
+                        </th>
+                        <th>
+                            Department
+                        </th>
+                        <th>
+                            Pub Code
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class='group-pagination'>
+                    @{  foreach (Scheduling.Models.DeptToGroupsToPubCodeDisplay d in Model)
+                        { 
+           
+                        <tr>
+                            <td>@d.GroupName
+                            </td>
+                            <td>@d.DeptName
+                            </td>
+                            <td>@d.PubCodeName
+                            </td>
+                            <td>
+                                <!-- //as a failsafe have the undelete events in the app setting since logic is associated with these.   -->
+                                @{
+                                   
+                            Html.BeginForm("ManageGroupAssociationsRemoveEntry", "Home", FormMethod.Post, new { enctype = "multipart/form-data", name = "ManageGroupAssociationsRemoveSingleEntry", id = "ManageGroupAssociationsRemoveSingleEntry" }); 
+                                    <input type='hidden' value='@d.ID' name='id' />
+                                    <input type='submit' value='Remove Entry' />
+                            Html.EndForm();
+                                         
+                                }
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+        <div id="pageNavPosition">
+        </div>
+    </div>
+    <script type="text/javascript">
+        var pager = new Pager('results', 3);
+        pager.init();
+        pager.showPageNav('pager', 'pageNavPosition');
+        pager.showPage(1);
+    </script>
+</div>

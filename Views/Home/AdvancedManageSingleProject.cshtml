@@ -1,0 +1,226 @@
+﻿@{
+    ViewBag.Title = "Advanced Manage Single Project";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    
+    
+}
+@{
+    
+    string CurrentName = ViewBag.Project.Name;
+    string CurrentYear = Scheduling.Database.Utility.GetAllYears().Where(x => x.ID == ViewBag.Project.YearFK).First().Value.ToString();
+    int NodeCount = ViewBag.MilValList.Count;
+    
+    
+}
+<div class='container'>
+    <div class='sixteen columns'>
+        <h2 style='border-bottom: 3px solid #ccc; padding-bottom: 15px'>
+            Manage @CurrentYear @CurrentName Project</h2>
+            <img style='display:block' class='advanced-edit-eye-click' alt='view records' src="@Url.Content("~/images/eye.png")" width='50px'/>
+    </div>
+    <!--Viewable area-->
+   <div class='row clearfix'>
+ @*       <div style='overflow: hidden; padding: 10px;' id='advanced-eye-container'>
+        </div>
+        <div style='overflow: hidden; padding: 10px;' id='advanced-eye-sort-container' class='advanced-eye-sort-container'>
+        </div>
+    </div>*@
+    <!--Error area-->
+    <div class='row clearfix advanced-error'>
+        <p style='color: Red; font-weight: bold;'>
+        </p>
+    </div>
+    @{
+    
+        int counter = 0;
+        foreach (Scheduling.Models.MilestoneValue v in ViewBag.MilValList)
+        {
+            counter++;
+            string CounterStr = counter.ToString();
+        <div class='row clearfix'>
+            <div class='sixteen columns advanced-item-record' id='itemRecord-@CounterStr' style='border-bottom:2px double #ccc'>
+               
+                    <div class='two columns'>
+                        <p>
+                            Milestone</p>
+                        <select name='advanced-select-milestone-field' id='AdvancedSelectMilestoneField-@CounterStr' class='advanced-select-milestone-field'>
+                            <option value=''>Choose a milestone</option>
+                            @{
+                
+            //Milestone Fields Start
+            foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+            {
+                int CurrentMfSel = v.MilestoneFieldFK;
+
+                if (mf.ID == CurrentMfSel)
+                {
+                                <option selected='selected' value='@mf.ID'>@mf.Description</option>
+
+                }
+
+                else
+                {
+
+                                <option value='@mf.ID'>@mf.Description</option>
+
+                }
+
+            }
+                 
+                            }
+                        </select>
+                    </div>
+                    <!--start -->
+                    <div class='two columns'>
+                        <p>
+                            Dependancy</p>
+                        <select name='advanced-select-milestone-field' id='AdvancedSelectMilestoneDepField-@CounterStr' class='advanced-select-milestone-dep-field'>
+                            <option value=''>Choose a Dependancy</option>
+                            @{
+                
+            //Milestone Fields Start
+            foreach (Scheduling.Models.MilestoneField mf in ViewBag.MilestoneFieldList)
+            {
+                int? CurrentMfSel = v.DependantUpon;
+
+                if (CurrentMfSel.HasValue)
+                {
+
+                    if (mf.ID == CurrentMfSel)
+                    {
+                                <option selected='selected' value='@mf.ID'>@mf.Description</option>
+
+                    }
+
+                    else
+                    {
+
+                                <option value='@mf.ID'>@mf.Description</option>
+
+                    }
+
+                }
+
+            }
+                 
+                 
+                
+                            }
+                        </select>
+                    </div>
+                    <!--stop-->
+
+
+                                        <!--start -->
+                    <div class='two columns'>
+                        <p>
+                            Calculation</p>
+                        <select name='advanced-f-milestone-field' id='AdvancedSelectMilestoneCalcField-@CounterStr' class='advanced-select-milestone-calc-field'>
+                            <option value=''>Choose a Calculation</option>
+                            @{
+                
+            //Calc Fields Start
+            foreach (Scheduling.Models.Calculation c in ViewBag.CalcList)
+            {
+                int? CurrentMfSel = v.CalculationFK;
+
+                if (CurrentMfSel.HasValue)
+                {
+
+                    if (c.ID == CurrentMfSel)
+                    {
+                                <option selected='selected' value='@c.ID'>@c.ShortDesc</option>
+
+                    }
+
+                    else
+                    {
+
+                                <option value='@c.ID'>@c.ShortDesc</option>
+
+                    }
+
+                }
+
+            }
+                 
+                 
+                
+                            }
+                        </select>
+                    </div>
+                    <!--stop-->
+
+                         <div class='two columns'>
+                        <p>
+                            Calc Order</p>
+
+                            @{
+                                
+                                string CurrentFiringOrder = "1";
+                                if (v.CalcFiringOrder.HasValue)
+                                {
+
+                                    CurrentFiringOrder = v.CalcFiringOrder.ToString();
+                                }
+                                
+                              }
+                          <input type='text' maxlength='3' value='@CurrentFiringOrder' id='AdvancedFirOrderField-@CounterStr' class='advanced-fire-order'/>
+                    </div>
+
+                    <!--displaySortOrder-->
+
+                     <div class='two columns' style='padding-left:25px'>
+                        <p>
+                            Display Order</p>
+
+                            @{
+                                
+                                string CurrentDisplayOrder = "1";
+                                if (v.DisplaySortOrder.HasValue)
+                                {
+
+                                    CurrentFiringOrder = v.DisplaySortOrder.ToString();
+                                }
+                                
+                              }
+                          <input type='text' maxlength='3' value='@CurrentDisplayOrder' id='AdvancedDisplayOrderField-@CounterStr' class='advanced-display-order'/>
+                    </div>
+
+
+
+                </div>
+            </div>
+        
+
+        }
+        
+    
+    }
+    <input type='hidden' value='@ViewBag.NewstandValue' name='hf-NewstandValue' id='hf-NewstandValue'/>
+    <input type='hidden' value='@NodeCount' name='hf-NodeCount' id='hf-NodeCount' />
+
+    <div class='row clearfix advanced-bottom-row'>
+            <div class='six columns add-click'>
+                <img src='/images/add-milestone.png' class='img-advanced-add-click' style='width: 25px; display: block'
+                    alt='add-dep' />
+                <p>
+                    Add Milestone</p>
+            </div>
+            <div class='six columns advanced-add-dep-click'>
+                <img src='/images/add-milestone.png' class='img-advanced-add-dep-click' style='width: 25px;
+                    display: block' alt='add-dep' />
+                <p>
+                    Add Milestone With Dependancy</p>
+            </div>
+            <div class='two columns advanced-val-click'>
+                <img src='/images/validate.png' class='img-advanced-val-click' style='width: 25px; display: block'
+                    alt='add-dep' />
+                <p>
+                    Validate</p>
+            </div>
+            <div class='two columns advanced-sub-click'>
+                <input type='submit' value='create milestone settings' /></div>
+        </div>
+
+</div>

@@ -1,0 +1,85 @@
+﻿@model List<Scheduling.Models.MessagingSettingDisplay>
+@{
+    ViewBag.Title = "List Messaging Settings";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+}
+@{ if (Model.Count == 0)
+   {
+    <p>
+        There are no results</p>
+   }
+}
+<div class='container'>
+    <div class='sixteen columns'>
+        @{
+            if (Model.Count > 0)
+            {
+                  
+            @Html.Partial("_TableHeaderPartial", ViewData["header"] = "Messaging Settings")
+                
+            <table class='condensed zebra-striped' id="results">
+                <thead>
+                    <tr>
+                        <th>
+                            Event
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                        <th>
+                            User Recipient
+                        </th>
+                        <th>
+                            Role Recipient
+                        </th>
+                        <th>
+                            Group Recipient
+                        </th>
+                        <th>
+                            Dept Recipient
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{  foreach (Scheduling.Models.MessagingSettingDisplay msd in Model)
+                        { 
+           
+                        <tr>
+                            <td>@msd.EventName
+                            </td>
+                            <td>@msd.ActionName
+                            </td>
+                            <td>@msd.UserName
+                            </td>
+                            <td>@msd.RoleName
+                            </td>
+                            <td>@msd.GroupName
+                            </td>
+                            <td>@msd.DeptName
+                            </td>
+                        </tr>
+      
+         
+                        }
+     
+                    }
+                </tbody>
+            </table> 
+ 
+        
+
+            }
+
+
+        }
+    </div>
+
+    <div id="pageNavPositionMessagingSetting">
+    </div>
+    <script type="text/javascript"><!--
+        var msPager = new Pager('results', 5);
+        msPager.init();
+        msPager.showPageNav('msPager', 'pageNavPositionMessagingSetting');
+        msPager.showPage(1);
+    </script>
+</div>

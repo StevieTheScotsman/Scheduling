@@ -1,0 +1,40 @@
+﻿@model List<Scheduling.Models.ProjectLinkSetting>
+@{
+    ViewBag.Title = "Manage Single Project Linking";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    int CurrentProject = (int)ViewBag.CurrentProject;
+    string CurrentProjectName = Scheduling.Database.Utility.GetAllProjects().Where(x => x.ID == CurrentProject).First().Name;
+}
+
+@{ Html.BeginForm("ProcessManageSingleProjectLinking", "Linking", FormMethod.Post, new { enctype = "multipart/form-data", id = "ProcessMangageSingleProjectLinking" }); }
+
+<h2>
+    Manage Single Project Linking for @CurrentProjectName
+</h2>
+<div class='choose-link-setting'>
+    <h4>
+        Step 1 Choose Link Setting(s)</h4>
+    <select name='link-setting-select' class='link-setting-select'>
+        @{
+            <option value=''>--Choose--</option>
+            foreach (Scheduling.Models.ProjectLinkSetting pls in Model)
+            {
+           
+            <option value='@pls.ID'>@pls.Name</option>
+    
+            }
+   
+    
+        }
+    </select>
+</div>
+<div class='link-setting-select-project'>
+</div>
+<div class='link-setting-project-submission' style='display: none'>
+    <input type='hidden' value='@CurrentProject' name='current-project' />
+    <input type='hidden' value='' name='chosen-linkable-project' class='chosen-linkable-project' />
+    <input type='hidden' value='@CurrentProjectName' class='current-project-name' name='current-project-name'/>
+    <input type='hidden' value='' class='chosen-setting-link' name='chosen-setting-link' />
+    <input type='submit' value='Link Projects' />
+    @{ Html.EndForm();}
+</div>

@@ -1,0 +1,140 @@
+﻿@model List<Scheduling.Models.SpecialIssue>
+@{
+    ViewBag.Title = "Manage Special Issues";
+    Layout = "~/Views/Shared/_ResponsiveLayout.cshtml";
+    List<Scheduling.Models.PublicationCode> PubCodeList = ViewBag.PubCodeList as List<Scheduling.Models.PublicationCode>;
+    List<Scheduling.Models.Year> YearList = ViewBag.YearList as List<Scheduling.Models.Year>;
+}
+@{
+    
+    <div class='container'>
+        <div class='sixteen columns special-issue-container'>
+            @{ Html.BeginForm("Add", "SpecialIssues", FormMethod.Post, new { enctype = "multipart/form-data", name = "CreateSpecialIssue", id = "CreateSpecialIssue" }); }
+            <h4 style='padding: 15px 0px'>
+                Special Issues Management</h4>
+            <img style='display:block;width:25px;padding:15px 0px' alt="Add Special Issue" class='add-special-issue' src="@Url.Content("~/images/add-milestone.png")"/>
+            <!--Pub Code-->
+            <div class='three columns'>
+                <p style='font-weight: bold'>
+                    Parent Pub Code</p>
+                <select name="pubcode">
+                    @Html.Raw(Scheduling.Html.AdminUtilities.BuildPublicationDropdown());
+                </select>
+            </div>
+            <!--Pub Code-->
+            <div class='three columns'>
+                <p style='font-weight: bold'>
+                    Year</p>
+                <select name="year">
+                    @Html.Raw(Scheduling.Html.AdminUtilities.BuildYearDropdown());
+                </select>
+            </div>
+            <!--Short Desc-->
+            <div class='three columns'>
+                <p style='font-weight: bold'>
+                    Description</p>
+                <input type='text' style='position: relative; top: -5px; width: 250px' name='desc' />
+            </div>
+            <!--Newsstand Date-->
+            <div class='three columns'>
+                <p style='font-weight: bold'>
+                    Newsstand Date</p>
+                <input class='datepicker' type='text' style='position: relative; top: -5px' name='nsdate' />
+            </div>
+            <div class='three columns'>
+                <input type='submit' value='Add SIP' style='position: relative; top: 38px' />
+            </div>
+           
+        </div>
+        
+         @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class='errormessage sixteen columns' style='font-weight:bold;color:#f00'>
+                @ViewBag.ErrorMessage
+                </div>
+                
+            }
+            @{ Html.EndForm(); }
+    </div>
+    
+    if (Model.Count > 0)
+    {
+        
+    <div class='container'>
+        <div class="sixteen columns">
+            <table class='condensed zebra-striped' id='results'>
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th>
+                            Year
+                        </th>
+                        <th>
+                            PubCode
+                        </th>
+                        <th>
+                            Short Desc
+                        </th>
+                        <th>
+                            Newsstand Date
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Scheduling.Models.SpecialIssue si in Model)
+                    {
+                        //Year
+                        string CurrentYear = Scheduling.Database.Utility.GetAllYears().Where(x => x.ID == si.YearFk).First().Value.ToString();
+
+                        //PubCode 
+                        string CurrentPubCode = "n/a";
+                        if (si.PubCodeFK.HasValue) { CurrentPubCode = Scheduling.Database.Utility.GetAllPublicationCodes().Where(x => x.ID == si.PubCodeFK).First().ShortDesc; }
+
+                        //Short Desc
+                        string CurrentShortDesc = si.ShortDesc;
+
+                        string CurrentNewsStandDate = "n/a";
+                        if (si.NewsstandDate.HasValue) { CurrentNewsStandDate = si.NewsstandDate.Value.ToShortDateString(); }
+                          
+                        <tr>
+                            <td>
+                                <div class='special-issue-delete'>
+                                    <img src="@Url.Content("~/images/remove-project.png")" alt='remove-special-issue' class='special-issue-delete' title='remove special issue' style='width:25px'/>
+                                    @{ Html.BeginForm("Delete", "SpecialIssues", FormMethod.Post, new { enctype = "multipart/form-data", name = "DeleteSpecialIssue", @class = "DeleteSpecialIssue" }); }
+                                    <input type='hidden' value='@si.ID' name='id'/>
+                                    @{ Html.EndForm(); }
+                                </div>
+                            </td>
+                            <td>
+                                @CurrentYear
+                            </td>
+                            <td>@CurrentPubCode
+                            </td>
+                            <td>@CurrentShortDesc
+                            </td>
+                            <td>@CurrentNewsStandDate
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+    else
+    {
+    <div class='container'>
+        <div class='sixteen columns'>
+            <p>
+                There are no current Special Issues</p>
+        </div>
+    </div>
+        
+        
+    }
+    
+    
+}
